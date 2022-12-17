@@ -14,6 +14,7 @@ public class Move {
     public static <T> T getRandomElement(T[] arr){
         return arr[ThreadLocalRandom.current().nextInt(arr.length)];
     }
+
     /**
      *The name of the move.
      */

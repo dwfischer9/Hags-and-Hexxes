@@ -23,21 +23,10 @@ public class Creature extends AbstractCreature {
     }
 
 
-    @Override
-    public float attack() throws IOException {
-        int damage = 0;
-        final int numMoves = this.getMoves().length;
-        for(int i = 0; i < numMoves; i++){
-            System.out.println(i +". "+ this.getMoves()[i].getMoveName());
-        }
-        
-        System.out.println("Enter the number of the attack to use");
-        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
- 
-        // Reading data using readLine
-        String moveChoice = input.readLine();
- 
-        damage = (int) this.getMoves()[Integer.parseInt(moveChoice)].getPower(); // chose the attack of the chosen number, or the first move in case of invalid input
+
+    public static float attack(Move moveChoice) throws IOException {
+        float damage = 0;
+        damage = moveChoice.getPower(); // chose the attack of the chosen number, or the first move in case of invalid input
         return damage;
     }
 
@@ -61,6 +50,11 @@ public class Creature extends AbstractCreature {
  
         damage = (int) moveChoice.getPower(); // chose the attack of the chosen number, or the first move in case of invalid input
         return damage;
+    }
+    public static void damageEnemy(float damage) {
+        geon.setHealth(geon.getHealth() - damage);
+
+        System.out.println("\n" + geon.toString());
     }
 
 }

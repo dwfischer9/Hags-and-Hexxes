@@ -84,7 +84,7 @@ abstract class AbstractCreature{
 
     }
     
-    abstract float attack() throws IOException;
+    //abstract float attack(Move moveChoice) throws IOException;
     abstract void levelUp();
     abstract float foeAttack() throws IOException;
 }

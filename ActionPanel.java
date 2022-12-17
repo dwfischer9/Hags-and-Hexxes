@@ -4,15 +4,21 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ActionPanel extends JPanel implements EventListener{
+    public static ActionPanel action = new ActionPanel();
 
-    private Color backgroundColor = new Color(24,243,89);
+    private Color backgroundColor = new Color(101, 87, 168);
     public ActionPanel(){
-        this.setLayout(null);
+        this.setLayout(new GridLayout(2,2,5,5));
         this.setBackground(backgroundColor);
     }
 
-    public void drawActionPanel(){
-        ActionPanel action = new ActionPanel();
-        statusBar.setBounds(new Rectangle(0,0,tileSize*5,tileSize*2));
+    public static void drawActionPanel(){
+        action.setBounds(new Rectangle(0,480,Window.tileSize*10,Window.tileSize*2));
+        action.setVisible(true);
+        Window.gamePanel.add(action);
+        ActionButton.drawButtons();
+
+
     }
+
 }

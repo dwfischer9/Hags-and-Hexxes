@@ -4,19 +4,19 @@ import javax.swing.*;
 
 public class Game{
     
-    private static Creature creatureAlly = Creature.geoff;
-    private static Creature creatureFoe = Creature.geon;
+    public static Creature creatureAlly = Creature.geoff;
+    public static Creature creatureFoe = Creature.geon;
 
     private static void takeTurn(Creature currentCreature, Creature currentFoe) throws IOException{
         System.out.format("%s, HP: %.0f / %.0f\n", currentCreature.getName(),currentCreature.getHealth(),currentCreature.getMaxHealth());
         System.out.format("%s, HP: %.0f / %.0f\n", currentFoe.getName(),currentFoe.getHealth(),currentFoe.getMaxHealth());
-        float damage = currentCreature.attack();
+       float damage = 0;
         currentFoe.setHealth(currentFoe.getHealth() - damage);
         System.out.format("%s took %.0f damage! HP: %.0f", currentFoe.getName(), damage,currentFoe.getHealth());
-        if(currentFoe.getHealth() > 0)
-            foeTurn(currentFoe,currentCreature);
-        else 
-          victory();
+        // if(currentFoe.getHealth() > 0)
+        //     //foeTurn(currentFoe,currentCreature);
+        // else 
+        //   victory();
             
     }
     private static void foeTurn(Creature currentFoe, Creature currentCreature) throws IOException{
