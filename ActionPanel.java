@@ -16,7 +16,7 @@ public class ActionPanel extends JPanel implements EventListener{
         action.setBounds(new Rectangle(0,480,Window.tileSize*10,Window.tileSize*2));
         action.setVisible(true);
         Window.gamePanel.add(action);
-        ActionButton.drawButtons();
+        ActionButton.drawAttackButtons();
 
 
     }

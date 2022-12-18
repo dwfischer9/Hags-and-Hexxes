@@ -19,7 +19,7 @@ public class ActionButton extends JButton implements EventListener {
         super(text);
     }
 
-    public static void drawButtons() {
+    public static void drawAttackButtons() {
         attack1.addActionListener(new ActionListener() {
 
             @Override
@@ -56,5 +56,6 @@ public class ActionButton extends JButton implements EventListener {
         ActionPanel.action.add(attack1);
         ActionPanel.action.add(attack2);
     }
+    
 
 }
