@@ -2,19 +2,17 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.security.Key;
-
 import javax.swing.*;
 
 public class Window extends JPanel implements ActionListener, Runnable {
     protected final static Color backgroundColor = new Color(26, 26, 26);
     private static final int originalTileSize = 16;// 16x16 tiles
     private static final int scale = 3; // 768 x 576
-    protected final static int tileSize = originalTileSize * scale;
-    public static final int maxScreenCol = 16;
-    public static final int maxScreenRow = 12;
-    private static final int screenWidth = tileSize * maxScreenCol;
-    private static final int screenHeight = tileSize * maxScreenRow;
+    protected static final int tileSize = originalTileSize * scale;
+    public final static int maxScreenCol = 16;
+    public final static int maxScreenRow = 12;
+     public final static  int screenWidth = tileSize * maxScreenCol;
+     public final static  int screenHeight = tileSize * maxScreenRow;
     private static final int FPS = 60;
     public static JPanel statusBar = new JPanel();
     public static JLabel playerHealth = new JLabel();
@@ -25,17 +23,23 @@ public class Window extends JPanel implements ActionListener, Runnable {
     public static ActionButton victoryButton = new ActionButton("Continue");
     public static Window gamePanel = new Window();
     public static JFrame frame = new JFrame(); // Initialization of the window
-
+    public Thread gameThread;
+    public static KeyHandler keyH = new KeyHandler();
     public static Window victoryPanel = new Window();
-
+    CollisionDetection cDetection = new CollisionDetection(this);
     public static Window overWorldPanel = new Window();
+    static OverWorldPlayer player = new OverWorldPlayer(overWorldPanel, keyH);
+    
     private final Dimension winSize = new Dimension(screenWidth, screenHeight);
     int playerX = 100;
     int playerY = 100;
     int playerSpeed = 4;
-    private static TileManager tileM = new TileManager(overWorldPanel);
-    public Thread gameThread;
-    public KeyHandler keyH = new KeyHandler();
+    public static TileManager tileM = new TileManager(overWorldPanel);
+    //WORLD SETTINGS
+    public final int maxWorldCol = 50;
+    public final int maxWorldRow = 50;
+    public final int worldWidth = tileSize * maxWorldCol;
+    public final int worldHeight = tileSize * maxWorldRow;
 
     public Window() {
         this.setPreferredSize(winSize);
@@ -56,14 +60,18 @@ public class Window extends JPanel implements ActionListener, Runnable {
 
     public void initialize() {
         startGameThread();
+        player.setDefaultValues();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // set close behavior to stop the program when the window // is closed
         frame.setResizable(false); // I don't want to allow resizing of the window yet
         frame.setTitle("Hags and Hexxes "); // setting the title of the window, this is pretty temporary
-        drawStatusBar();
-        drawFoeBar();
-        gamePanel.setBackground(Color.WHITE);
-        ActionPanel.drawActionPanel();
-        frame.add(gamePanel);
+        overWorldPanel();
+
+
+        // drawStatusBar();
+        // drawFoeBar();
+        // gamePanel.setBackground(Color.WHITE);
+        // ActionPanel.drawActionPanel();
+        // frame.add(gamePanel);
 
         frame.pack();
         frame.setLocationRelativeTo(null);
@@ -134,19 +142,7 @@ public class Window extends JPanel implements ActionListener, Runnable {
     }
 
     public void update() {
-        if (keyH.upPressed == true) {
-            System.out.println("pog");
-            playerY -= playerSpeed;
-        } else if (keyH.downPressed == true) {
-
-            playerY += playerSpeed;
-        } else if (keyH.leftPressed == true) {
-
-            playerX -= playerSpeed;
-        } else if (keyH.rightPressed == true) {
-            playerX += playerSpeed;
-        }
-
+      player.update();
     }
 
     @Override
@@ -154,8 +150,7 @@ public class Window extends JPanel implements ActionListener, Runnable {
         double drawInterval = 1000000000 / FPS; // 0.01666 seconds
         double nextDrawTime = System.nanoTime() + drawInterval;
         while (gameThread != null) {
-            gamePanel.update();
-            gamePanel.repaint();
+
             overWorldPanel.update();
             overWorldPanel.repaint();
             try {
@@ -179,8 +174,9 @@ public class Window extends JPanel implements ActionListener, Runnable {
 
         Graphics2D g2 = (Graphics2D) g;
         tileM.draw(g2);
-        g2.setColor(Color.BLACK);
-        g2.fillRect(playerX, playerY, tileSize, tileSize);
+        player.draw(g2);
+        
+       
         
         
     }

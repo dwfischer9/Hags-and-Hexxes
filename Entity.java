@@ -10,11 +10,11 @@ public class Entity extends AbstractEntity {
     private float maxHealth;
     private String name;
     private float health;
-    public static int x;
-    public static int y;
+    public static int worldX,worldY;
     public static int speed;
-    public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2;
-    public String direction;
+    
+    public int spriteCounter = 0;
+    public int spriteNum = 1;
 
     /**
      * @param name      The name of the creature.

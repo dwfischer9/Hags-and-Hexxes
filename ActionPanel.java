@@ -4,7 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ActionPanel extends JPanel implements EventListener{
-    public static ActionPanel action = new ActionPanel();
+     ActionButton butt;
+    Window window;
+    public ActionPanel(Window window){
+        this.window = window;
+    }
+
+    public ActionPanel action = new ActionPanel(window);
 
     private Color backgroundColor = new Color(101, 87, 168);
     public ActionPanel(){
@@ -12,11 +18,11 @@ public class ActionPanel extends JPanel implements EventListener{
         this.setBackground(backgroundColor);
     }
 
-    public static void drawActionPanel(){
-        action.setBounds(new Rectangle(0,480,Window.tileSize*10,Window.tileSize*2));
+    public void drawActionPanel(Window gamePanel){
+        action.setBounds(new Rectangle(0,480,window.tileSize*10,window.tileSize*2));
         action.setVisible(true);
-        Window.gamePanel.add(action);
-        ActionButton.drawAttackButtons();
+        gamePanel.add(action);
+        butt.drawAttackButtons();
 
 
     }

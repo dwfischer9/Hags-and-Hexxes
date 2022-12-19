@@ -6,7 +6,7 @@ import java.util.EventListener;
 import javax.swing.*;
 
 public class ActionButton extends JButton implements EventListener {
-
+    ActionPanel actionPanel;
     private String text;
     private static ActionButton attack1 = new ActionButton(Player.playerCharacter.getMoves()[0].getMoveName());
     private static ActionButton attack2 = new ActionButton(Player.playerCharacter.getMoves()[1].getMoveName());
@@ -23,7 +23,7 @@ public class ActionButton extends JButton implements EventListener {
      * Displays the moves known by the player character and puts them on the screen. 
      * These buttons trigger an attack and deal with the damage and rereshing the stats of the foe.
      */
-    public static void drawAttackButtons() {
+    public void drawAttackButtons() {
         attack1.addActionListener(new ActionListener() {
 
             @Override
@@ -57,8 +57,8 @@ public class ActionButton extends JButton implements EventListener {
 
             }
         });
-        ActionPanel.action.add(attack1);
-        ActionPanel.action.add(attack2);
+        actionPanel.add(attack1);
+        actionPanel.add(attack2);
     }
     
 

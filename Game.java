@@ -34,6 +34,7 @@ public class Game {
 
     public static void main(String[] args) throws IOException {
         Window window = new Window();
+        Window.player.setDefaultValues();
         window.initialize();
         window.addCreatureInfo(Player.playerCharacter, Window.playerHealth);
         window.addCreatureInfo(Entity.testEnemy, Window.foeHealth);
