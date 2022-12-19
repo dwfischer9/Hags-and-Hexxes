@@ -55,6 +55,9 @@ abstract class AbstractEntity {
         return this.health;
     }
 
+    /**
+     * @return Float the max health of the creature 
+     */
     public float getMaxHealth() {
         return this.maxHealth;
     }

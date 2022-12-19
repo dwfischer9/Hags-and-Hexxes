@@ -22,6 +22,9 @@ public class Game {
 
     }
 
+    /**
+     * When the enemy is defeated, hide the battle panel and start the victory screen.
+     */
     protected static void victory() {
         System.out.format("The enemy %s has been defeated!\n", Entity.testEnemy.getName());
         Window.gamePanel.setVisible(false);
@@ -31,7 +34,6 @@ public class Game {
 
     public static void main(String[] args) throws IOException {
         Window window = new Window();
-        
         window.initialize();
         window.addCreatureInfo(Player.playerCharacter, Window.playerHealth);
         window.addCreatureInfo(Entity.testEnemy, Window.foeHealth);

@@ -28,6 +28,7 @@ public class Entity extends AbstractEntity {
         this.health = health;
     }
 
+    @Override
     public String toString() {
         return String.format("%s, HP: %.0f / %.0f\n", this.getName(), this.getHealth(), this.getMaxHealth()); // This is the creature's status.
     }

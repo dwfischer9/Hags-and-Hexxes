@@ -2,12 +2,11 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.security.Key;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
-public class Window extends JPanel implements ActionListener, Runnable{
+public class Window extends JPanel implements ActionListener, Runnable {
     protected final static Color backgroundColor = new Color(26, 26, 26);
     private static final int originalTileSize = 16;// 16x16 tiles
     private static final int scale = 3; // 768 x 576
@@ -28,22 +27,23 @@ public class Window extends JPanel implements ActionListener, Runnable{
     public static JFrame frame = new JFrame(); // Initialization of the window
 
     public static Window victoryPanel = new Window();
-    
+
     public static Window overWorldPanel = new Window();
     private final Dimension winSize = new Dimension(screenWidth, screenHeight);
-    static int playerX = 100;
-    static int playerY  = 100;
-    static int playerSpeed = 4;
+    int playerX = 100;
+    int playerY = 100;
+    int playerSpeed = 4;
     private static TileManager tileM = new TileManager(overWorldPanel);
     public Thread gameThread;
-    public KeyHandler keyH = new KeyHandler();
+    KeyHandler keyH = new KeyHandler();
+
     public Window() {
         this.setPreferredSize(winSize);
         this.setBackground(backgroundColor);
         this.setDoubleBuffered(true);
         this.setLayout(null);
-        this.addKeyListener(keyH);
         this.setFocusable(true);
+        this.addKeyListener(keyH);
     }
 
     public static void updateFoeHealth() {
@@ -56,6 +56,7 @@ public class Window extends JPanel implements ActionListener, Runnable{
 
     public void initialize() {
         startGameThread();
+        overWorldPanel.addKeyListener(keyH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // set close behavior to stop the program when the window
                                                               // // // is closed
         frame.setResizable(false); // I don't want to allow resizing of the window yet
@@ -65,7 +66,7 @@ public class Window extends JPanel implements ActionListener, Runnable{
         gamePanel.setBackground(Color.WHITE);
         ActionPanel.drawActionPanel();
         frame.add(gamePanel);
-        
+
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -87,15 +88,15 @@ public class Window extends JPanel implements ActionListener, Runnable{
         gamePanel.add(foeBar);
     }
 
-    public static void victoryPanel(){
-        
+    public static void victoryPanel() {
+
         gamePanel.setVisible(false);
 
         victoryLabel.setForeground(Color.WHITE);
         victoryLabel.setFont(new Font("Comic Sans MS", Font.PLAIN, 32));
-        victoryLabel.setBounds(screenWidth/3,screenHeight/4,200,40);
-        victoryButton.setBounds(screenWidth/2,screenHeight/2,200,20);
-        victoryButton.addActionListener(new ActionListener(){
+        victoryLabel.setBounds(screenWidth / 3, screenHeight / 4, 200, 40);
+        victoryButton.setBounds(screenWidth / 2, screenHeight / 2, 200, 20);
+        victoryButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -110,85 +111,83 @@ public class Window extends JPanel implements ActionListener, Runnable{
         victoryPanel.add(victoryLabel);
         frame.add(victoryPanel);
         victoryPanel.setVisible(true);
-        
+
     }
-    public static void overWorldPanel(){
+
+    public static void overWorldPanel() {
         overWorldPanel.setName("overWorldPanel");
         frame.add(overWorldPanel);
         overWorldPanel.setVisible(true);
         overWorldPanel.repaint();
-        
+
     }
+
     public void addCreatureInfo(Entity creature, JLabel creatureLabel) {
         creatureLabel.setText(creature.toString());
     }
 
-    public void startGameThread(){
+    public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
     }
 
-    public void update(){
-        if(keyH.upPressed == true){
+    public void update() {
+        if (keyH.upPressed == true) {
             System.out.println("pog");
             playerY -= playerSpeed;
-        }
-        else if(keyH.downPressed == true){
-         
-            playerY +=playerSpeed;
-        }
-        else if(keyH.leftPressed == true){
-         
-            playerX-=playerSpeed;
-        }
-        else if(keyH.rightPressed == true){
- 
+        } else if (keyH.downPressed == true) {
+
+            playerY += playerSpeed;
+        } else if (keyH.leftPressed == true) {
+
+            playerX -= playerSpeed;
+        } else if (keyH.rightPressed == true) {
             playerX += playerSpeed;
         }
-        
+
     }
 
     @Override
-    public void run(){
-        double drawInterval = 1000000000/FPS; //0.01666 seconds
+    public void run() {
+        double drawInterval = 1000000000 / FPS; // 0.01666 seconds
         double nextDrawTime = System.nanoTime() + drawInterval;
-        while(gameThread != null){
-            gamePanel.update();
-            gamePanel.repaint();
+        while (gameThread != null) {
+            overWorldPanel.update();
+            overWorldPanel.repaint();
             try {
                 double remainingTime = nextDrawTime - System.nanoTime();
-                remainingTime = remainingTime/1000000;
-                if(remainingTime < 0){
+                remainingTime = remainingTime / 1000000;
+                if (remainingTime < 0) {
                     remainingTime = 0; // we don't need a sleep if the time is used up
                 }
                 Thread.sleep((long) remainingTime);
                 nextDrawTime += drawInterval;
-                //pause the game loop so that we only draw 60 times per second
+                // pause the game loop so that we only draw 60 times per second
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
     }
-    public void paintComponent(Graphics g){
-       super.paintComponent(g);
-       
-       Graphics2D g2 = (Graphics2D)g;
-       g2.setColor(Color.BLACK);
-       g2.fillRect(playerX,playerY,tileSize,tileSize);
-    
-        
-       tileM.draw(g2);
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        Graphics2D g2 = (Graphics2D) g;
+        tileM.draw(g2);
+        if (this.getName() == "overWorldPanel") {
+            g2.setColor(Color.BLACK);
+            g2.fillRect(playerX, playerY, tileSize, tileSize);
+        }
+
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
-        
+
     }
 
-
-       
-    //    g2.dispose();
+    // g2.dispose();
     // }
 }

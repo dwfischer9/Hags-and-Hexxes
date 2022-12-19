@@ -19,6 +19,10 @@ public class ActionButton extends JButton implements EventListener {
         super(text);
     }
 
+    /**
+     * Displays the moves known by the player character and puts them on the screen. 
+     * These buttons trigger an attack and deal with the damage and rereshing the stats of the foe.
+     */
     public static void drawAttackButtons() {
         attack1.addActionListener(new ActionListener() {
 

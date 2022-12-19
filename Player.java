@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.awt.Graphics;
 import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -7,8 +6,8 @@ import java.awt.image.BufferedImage;
 public class Player extends Entity {
 
     Window overWorldPanel;
-
-    static KeyHandler keyH = new KeyHandler();
+    int playerX = 100,playerY=100,playerSpeed=100;
+    String direction;
     public static Player playerCharacter = new Player("Hero", Type.normal, new Move[] { Move.slap, Move.tackle }, 5, 90,
             90);
 
@@ -26,35 +25,35 @@ public class Player extends Entity {
        playerCharacter.setHealth(playerCharacter.getHealth() - damage);
     }
     public void setDefaultValue(){
-        x = 100;
-        y = 100;
-        speed = 4;
+        playerX = 100;
+        playerY = 100;
+        playerSpeed = 4;
         direction = "down";
     }
-    public static void update(){
-        if(keyH.upPressed == true){
-            direction = "up";
-            Window.playerY-= speed;
-        }
-        else if(keyH.downPressed = true){
-            direction = "down";
-            Window.playerY +=speed;
-        }
-        else if(keyH.leftPressed == true){
-            direction = "left";
-            Window.playerX-=speed;
-        }
-        else if(keyH.rightPressed == true){
-            direction = "right";
-            Window.playerX += speed;
-        }
-    }
+    // public static void update(){
+    //     if(keyH.upPressed == true){
+    //         System.out.println("up!");
+    //         direction = "up";
+    //         playerY-= speed;
+    //     }
+    //     else if(keyH.downPressed = true){
+    //         direction = "down";
+    //         playerY +=speed;
+    //     }
+    //     else if(keyH.leftPressed == true){
+    //         direction = "left";
+    //         playerX-=speed;
+    //     }
+    //     else if(keyH.rightPressed == true){
+    //         direction = "right";
+    //         playerX += speed;
+    //     }
+    // }
     public void draw(Graphics2D g2){
         BufferedImage image = null;
-        
+        getPlayerImage();
         switch(direction){
         case "up":
-
             image = up1;
             break;
         case "down":
@@ -67,9 +66,12 @@ public class Player extends Entity {
             image = up1;
             break;
         }
-        g2.drawImage(image, Window.playerX,Window.playerY,Window.tileSize,Window.tileSize,null);
+        g2.drawImage(image, playerX,playerY,Window.tileSize,Window.tileSize,null);
     }
 
+    /**
+     * Update global variables
+     */
     public void getPlayerImage(){
         try {
             up1 = ImageIO.read(getClass().getResourceAsStream("assets/Knight...png"));
@@ -86,6 +88,6 @@ public class Player extends Entity {
     }
 
     public static void repaint() {
-        Window.gamePanel.repaint();
+        Window.overWorldPanel.repaint();
     }
 }
