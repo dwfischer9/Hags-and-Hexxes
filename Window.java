@@ -35,7 +35,7 @@ public class Window extends JPanel implements ActionListener, Runnable {
     int playerSpeed = 4;
     private static TileManager tileM = new TileManager(overWorldPanel);
     public Thread gameThread;
-    KeyHandler keyH = new KeyHandler();
+    public KeyHandler keyH = new KeyHandler();
 
     public Window() {
         this.setPreferredSize(winSize);
@@ -56,9 +56,7 @@ public class Window extends JPanel implements ActionListener, Runnable {
 
     public void initialize() {
         startGameThread();
-        overWorldPanel.addKeyListener(keyH);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // set close behavior to stop the program when the window
-                                                              // // // is closed
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // set close behavior to stop the program when the window // is closed
         frame.setResizable(false); // I don't want to allow resizing of the window yet
         frame.setTitle("Hags and Hexxes "); // setting the title of the window, this is pretty temporary
         drawStatusBar();
@@ -103,6 +101,8 @@ public class Window extends JPanel implements ActionListener, Runnable {
                 victoryPanel.setVisible(false);
                 frame.remove(victoryPanel);
                 overWorldPanel();
+
+                overWorldPanel.requestFocus();
             }
 
         });
@@ -119,6 +119,7 @@ public class Window extends JPanel implements ActionListener, Runnable {
         frame.add(overWorldPanel);
         overWorldPanel.setVisible(true);
         overWorldPanel.repaint();
+        
 
     }
 
@@ -129,6 +130,7 @@ public class Window extends JPanel implements ActionListener, Runnable {
     public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
+        System.out.println("Started game thread");
     }
 
     public void update() {
@@ -152,6 +154,8 @@ public class Window extends JPanel implements ActionListener, Runnable {
         double drawInterval = 1000000000 / FPS; // 0.01666 seconds
         double nextDrawTime = System.nanoTime() + drawInterval;
         while (gameThread != null) {
+            gamePanel.update();
+            gamePanel.repaint();
             overWorldPanel.update();
             overWorldPanel.repaint();
             try {
@@ -175,11 +179,10 @@ public class Window extends JPanel implements ActionListener, Runnable {
 
         Graphics2D g2 = (Graphics2D) g;
         tileM.draw(g2);
-        if (this.getName() == "overWorldPanel") {
-            g2.setColor(Color.BLACK);
-            g2.fillRect(playerX, playerY, tileSize, tileSize);
-        }
-
+        g2.setColor(Color.BLACK);
+        g2.fillRect(playerX, playerY, tileSize, tileSize);
+        
+        
     }
 
     @Override

@@ -5,9 +5,8 @@ import java.awt.image.BufferedImage;
 
 public class Player extends Entity {
 
-    Window overWorldPanel;
-    int playerX = 100,playerY=100,playerSpeed=100;
-    String direction;
+    int playerX = 100,playerY=100,playerSpeed=4;
+    KeyHandler keyH = new KeyHandler();
     public static Player playerCharacter = new Player("Hero", Type.normal, new Move[] { Move.slap, Move.tackle }, 5, 90,
             90);
 
@@ -30,25 +29,25 @@ public class Player extends Entity {
         playerSpeed = 4;
         direction = "down";
     }
-    // public static void update(){
-    //     if(keyH.upPressed == true){
-    //         System.out.println("up!");
-    //         direction = "up";
-    //         playerY-= speed;
-    //     }
-    //     else if(keyH.downPressed = true){
-    //         direction = "down";
-    //         playerY +=speed;
-    //     }
-    //     else if(keyH.leftPressed == true){
-    //         direction = "left";
-    //         playerX-=speed;
-    //     }
-    //     else if(keyH.rightPressed == true){
-    //         direction = "right";
-    //         playerX += speed;
-    //     }
-    // }
+    public  void update(){
+        if(keyH.upPressed == true){
+            System.out.println("up!");
+            this.direction = "up";
+            playerY-= speed;
+        }
+        else if(keyH.downPressed = true){
+            direction = "down";
+            playerY +=speed;
+        }
+        else if(keyH.leftPressed == true){
+            direction = "left";
+            playerX-=speed;
+        }
+        else if(keyH.rightPressed == true){
+            direction = "right";
+            playerX += speed;
+        }
+    }
     public void draw(Graphics2D g2){
         BufferedImage image = null;
         getPlayerImage();
@@ -89,5 +88,12 @@ public class Player extends Entity {
 
     public static void repaint() {
         Window.overWorldPanel.repaint();
+    }
+    public void paintComponent(Graphics2D g) {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+        this.draw(g2);
+        
+        
     }
 }
