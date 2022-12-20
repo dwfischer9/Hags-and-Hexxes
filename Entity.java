@@ -22,6 +22,7 @@ public class Entity {
     public int spriteCounter = 0;
     public int spriteNumber = 1;
     public Rectangle hitBox = new Rectangle(0,0,48,48);
+    public int hitBoxDefeaultX,hitBoxDefeaultY;
     public boolean collisionOn = false;
     @Override
     public String toString() {

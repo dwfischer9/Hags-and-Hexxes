@@ -2,14 +2,14 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 /**
- * ObjectChest
+ * ObjectLockedDoor
  */
-public class ObjectChest extends AbstractObject{
+public class ObjectLockedDoor extends AbstractObject{
 
-    public ObjectChest(){
-    this.name = "Chest";
+    public ObjectLockedDoor(){
+    this.name = "LockedDoor";
         try {
-            this.image = ImageIO.read(getClass().getResourceAsStream("/assets/chest.png"));
+            this.image = ImageIO.read(getClass().getResourceAsStream("assets/lockeddoor.png"));
             
         }
          catch (IOException e) {

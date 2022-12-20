@@ -7,7 +7,7 @@ import java.io.IOException;
 import javax.swing.*;
 
 
-public class Window extends JPanel implements ActionListener, Runnable {
+public class Window extends JPanel implements Runnable {
     protected final static Color backgroundColor = new Color(26, 26, 26);
     private static final int originalTileSize = 16;// 16x16 tiles
     private static final int scale = 3; // 768 x 576
@@ -28,9 +28,8 @@ public class Window extends JPanel implements ActionListener, Runnable {
     public Thread gameThread;
     public static KeyHandler keyH = new KeyHandler();
     public static Window victoryPanel = new Window();
-    public AssetSetter assetSetter = new AssetSetter(this);
     public static Window overWorldPanel = new Window();
-    
+    public AssetSetter assetSetter = new AssetSetter(overWorldPanel);
     CollisionDetection cDetection = new CollisionDetection(this);
     public static Player player = new Player(overWorldPanel, keyH, "Hero", Type.normal, new Move[] { Move.slap, Move.tackle }, 5, 90,
     90);
@@ -45,7 +44,10 @@ public class Window extends JPanel implements ActionListener, Runnable {
     public final int maxWorldRow = 50;
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
-    public AbstractObject obj[] = new AbstractObject[1];
+    public AbstractObject obj[] = new AbstractObject[10];
+    /**
+     * Constructs a new instance of Window and sets some defeault properties
+     */
     public Window() {
         this.setPreferredSize(winSize);
         this.setBackground(backgroundColor);
@@ -55,16 +57,10 @@ public class Window extends JPanel implements ActionListener, Runnable {
         this.addKeyListener(keyH);
     }
     
-    public static void updateFoeHealth() {
-        Window.foeHealth.setText(Window.entity.toString());
-    }
+
     public void setupGame() throws IOException{
         assetSetter.setObject();
     }
-    public static void updatePlayerHealth() {
-        Window.playerHealth.setText(Window.player.toString());
-    }
-
     public void initialize() throws IOException {
          //set up assets BEFORE thread starts
 
@@ -78,26 +74,32 @@ public class Window extends JPanel implements ActionListener, Runnable {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
-
-
-   
-
+    /**
+     *  initializes the overworld panel. Should be called at the end of a battle
+     */
     public static void overWorldPanel() {
         overWorldPanel.setName("overWorldPanel");
         frame.add(overWorldPanel);
         overWorldPanel.setVisible(true);
-        overWorldPanel.repaint();
-        
-
     }
+
+    /**
+     * Initiates the game thread. Called in Game's main method
+     */
     public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
         System.out.println("Started game thread");
     }
+    /**
+     * update graphics 
+     */
     public void update() {
       player.update();
     }
+    /** 
+     * This is the method that controls the game loop.
+     */
     @Override
     public void run() {
         double drawInterval = 1000000000 / FPS; // 0.01666 seconds
@@ -122,31 +124,33 @@ public class Window extends JPanel implements ActionListener, Runnable {
         }
     } 
 
+    /* (non-Javadoc)
+     * Paint method is called when repaint is called
+     */
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g;
         //Tilesheet
         tileM.draw(g2);
-        
+        //Objects
+        for (int i = 0; i < obj.length; i++) //for each object we have loaded in obj, 
+        //we need to draw it to the screen
+        {
+           if(obj[i] != null) {
+               obj[i].draw(g2, this);
+            }
+       }
+      
         //Player
         player.draw(g2);
-        //Objects
-        for (int i = 0; i < obj.length; i++) 
-         {
-            if(obj[i] != null) 
-                obj[i].draw(g2, this);
-        }
+        
        
         
         
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        // TODO Auto-generated method stub
 
-    }
 
     // g2.dispose();
     // }

@@ -16,7 +16,7 @@ public class Player extends Entity {
     private float maxHealth;
     protected float health;
     private Move[] moves;
-
+    public int hasKey = 0;
     public Player(Window window, KeyHandler keyH,String name, Type type, Move[] moves, int level, float health, float maxHealth) {
         super(window);
         this.keyH = keyH;
@@ -31,6 +31,8 @@ public class Player extends Entity {
         setDefaultValues();
         getPlayerImage();
         hitBox = new Rectangle(8,16,24,24);
+        hitBoxDefeaultX = hitBox.x;
+        hitBoxDefeaultY = hitBox.y;
     }
 
 
@@ -74,6 +76,10 @@ public class Player extends Entity {
         //Checkig tile colllision
         collisionOn = false;
         window.cDetection.checkTile(this);
+
+        //checking object collision
+        int objIndex = window.cDetection.checkObject(this, true);
+        pickUpObject(objIndex);
        // if collision is flase, player can move
         if(collisionOn == false){
             switch(direction){
@@ -136,5 +142,28 @@ public class Player extends Entity {
         // }
         g2.drawImage(image, screenX,screenY,Window.tileSize,Window.tileSize,null);
     
+    }
+    public void pickUpObject(int i){
+        if(i != 999){ // Must exclude the obejcts that we don't want picked
+            String objectName = window.obj[i].name;
+            switch(objectName){
+                case"Chest":
+                    break;
+                case "Key":
+                    window.obj[i] = null;
+                    this.hasKey++;
+                    break;
+                case "LockedDoor":
+                    if(this.hasKey >0){
+                        window.obj[i] = null;
+                        this.hasKey--;
+                    }
+                    break;
+                
+            }
+        }
+        // if(i != 999){
+        //     window.obj[i] = null;
+        // }
     }
 }
