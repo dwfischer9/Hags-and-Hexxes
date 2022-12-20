@@ -1,19 +1,16 @@
-import java.awt.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.EventListener;
 import javax.swing.*;
 
 public class ActionButton extends JButton implements EventListener {
     ActionPanel actionPanel;
-    private String text;
-    private static ActionButton attack1 = new ActionButton(Player.playerCharacter.getMoves()[0].getMoveName());
-    private static ActionButton attack2 = new ActionButton(Player.playerCharacter.getMoves()[1].getMoveName());
-    private static ActionButton attack3 = new ActionButton("Attack 3");
-    private static ActionButton attack4 = new ActionButton("Attack 4");
+    private static ActionButton attack1 = new ActionButton("Attack 3");
+     private static ActionButton attack2 = new ActionButton("Attack 3");
+    // private static ActionButton attack3 = new ActionButton("Attack 3");
+    // private static ActionButton attack4 = new ActionButton("Attack 4");
 
-    private static ActionButton[] actions = { attack1, attack2 };
 
     public ActionButton(String text) {
         super(text);
@@ -28,15 +25,15 @@ public class ActionButton extends JButton implements EventListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    float damage = Entity.attack(Player.playerCharacter.getMoves()[0]);
-                    Player.damageEnemy(damage);
-                    Window.updateFoeHealth();
-                    Game.foeTurn(Entity.testEnemy, Player.playerCharacter);
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
+                // try {
+                //     float damage = OverWorldEntity.attack(Window.player.getMoves()[0]);
+                //     Player.damageEnemy(damage);
+                //     Window.updateFoeHealth();
+                //     Game.foeTurn(Entity.testEnemy, Player.playerCharacter);
+                // } catch (IOException e1) {
+                //     // TODO Auto-generated catch block
+                //     e1.printStackTrace();
+                // }
 
             }
         });
@@ -44,16 +41,12 @@ public class ActionButton extends JButton implements EventListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    float damage = Entity.attack(Player.playerCharacter.getMoves()[1]);
-                    Entity.damageEnemy(damage);
-                    Window.updateFoeHealth();
-                    
-                    Game.foeTurn(Entity.testEnemy, Player.playerCharacter);
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
+                // float damage = OverWorldEntity.attack(Window.player.getMoves()[1]);
+                // OverWorldEntity.damageEnemy(damage);
+                // Window.updateFoeHealth();
+                //TODO: implement attack and dealing damage
+                //Game.foeTurn(Window.entity, Window.player);
+                System.out.println('c');
 
             }
         });

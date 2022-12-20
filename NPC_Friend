@@ -1,0 +1,11 @@
+public class NPC_Friend extends Entity{
+
+    public NPC_Friend(Window window){
+        super(window);
+        direction = "down";
+        speed = 2;
+    }
+    public void getNPCImage(){
+        up1 
+    }
+}

@@ -19,7 +19,7 @@ public class ActionPanel extends JPanel implements EventListener{
     }
 
     public void drawActionPanel(Window gamePanel){
-        action.setBounds(new Rectangle(0,480,window.tileSize*10,window.tileSize*2));
+        action.setBounds(new Rectangle(0,480,Window.tileSize*10,Window.tileSize*2));
         action.setVisible(true);
         gamePanel.add(action);
         butt.drawAttackButtons();

@@ -2,7 +2,10 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+
 import javax.swing.*;
+
 
 public class Window extends JPanel implements ActionListener, Runnable {
     protected final static Color backgroundColor = new Color(26, 26, 26);
@@ -20,16 +23,18 @@ public class Window extends JPanel implements ActionListener, Runnable {
     public static JLabel foeHealth = new JLabel();
     public static JLabel victoryLabel = new JLabel("Victory!");
     public static JPanel actionPanel = new JPanel();
-    public static ActionButton victoryButton = new ActionButton("Continue");
     public static Window gamePanel = new Window();
     public static JFrame frame = new JFrame(); // Initialization of the window
     public Thread gameThread;
     public static KeyHandler keyH = new KeyHandler();
     public static Window victoryPanel = new Window();
-    CollisionDetection cDetection = new CollisionDetection(this);
+    public AssetSetter assetSetter = new AssetSetter(this);
     public static Window overWorldPanel = new Window();
-    static OverWorldPlayer player = new OverWorldPlayer(overWorldPanel, keyH);
     
+    CollisionDetection cDetection = new CollisionDetection(this);
+    public static Player player = new Player(overWorldPanel, keyH, "Hero", Type.normal, new Move[] { Move.slap, Move.tackle }, 5, 90,
+    90);
+    public static Entity entity = new Entity(overWorldPanel);
     private final Dimension winSize = new Dimension(screenWidth, screenHeight);
     int playerX = 100;
     int playerY = 100;
@@ -40,7 +45,7 @@ public class Window extends JPanel implements ActionListener, Runnable {
     public final int maxWorldRow = 50;
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
-
+    public AbstractObject obj[] = new AbstractObject[1];
     public Window() {
         this.setPreferredSize(winSize);
         this.setBackground(backgroundColor);
@@ -49,78 +54,33 @@ public class Window extends JPanel implements ActionListener, Runnable {
         this.setFocusable(true);
         this.addKeyListener(keyH);
     }
-
+    
     public static void updateFoeHealth() {
-        Window.foeHealth.setText(Entity.testEnemy.toString());
+        Window.foeHealth.setText(Window.entity.toString());
     }
-
+    public void setupGame() throws IOException{
+        assetSetter.setObject();
+    }
     public static void updatePlayerHealth() {
-        Window.playerHealth.setText(Player.playerCharacter.toString());
+        Window.playerHealth.setText(Window.player.toString());
     }
 
-    public void initialize() {
+    public void initialize() throws IOException {
+         //set up assets BEFORE thread starts
+
         startGameThread();
         player.setDefaultValues();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // set close behavior to stop the program when the window // is closed
         frame.setResizable(false); // I don't want to allow resizing of the window yet
         frame.setTitle("Hags and Hexxes "); // setting the title of the window, this is pretty temporary
         overWorldPanel();
-
-
-        // drawStatusBar();
-        // drawFoeBar();
-        // gamePanel.setBackground(Color.WHITE);
-        // ActionPanel.drawActionPanel();
-        // frame.add(gamePanel);
-
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 
-    public void drawStatusBar() {
-        statusBar.add(playerHealth);
-        statusBar.setBackground(backgroundColor);
-        statusBar.setBounds(new Rectangle(0, 0, tileSize * 5, tileSize * 2));
-        playerHealth.setForeground(Color.white);
-        gamePanel.add(statusBar);
-    }
 
-    public void drawFoeBar() {
-        foeHealth.setForeground(Color.white);
-        foeBar.add(foeHealth);
-        foeBar.setBackground(backgroundColor);
-        foeBar.setBounds(new Rectangle(tileSize * 11, tileSize * 0, tileSize * 5, tileSize * 2));
-        gamePanel.add(foeBar);
-    }
-
-    public static void victoryPanel() {
-
-        gamePanel.setVisible(false);
-
-        victoryLabel.setForeground(Color.WHITE);
-        victoryLabel.setFont(new Font("Comic Sans MS", Font.PLAIN, 32));
-        victoryLabel.setBounds(screenWidth / 3, screenHeight / 4, 200, 40);
-        victoryButton.setBounds(screenWidth / 2, screenHeight / 2, 200, 20);
-        victoryButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                victoryPanel.setVisible(false);
-                frame.remove(victoryPanel);
-                overWorldPanel();
-
-                overWorldPanel.requestFocus();
-            }
-
-        });
-        victoryPanel.add(victoryButton);
-
-        victoryPanel.add(victoryLabel);
-        frame.add(victoryPanel);
-        victoryPanel.setVisible(true);
-
-    }
+   
 
     public static void overWorldPanel() {
         overWorldPanel.setName("overWorldPanel");
@@ -130,21 +90,14 @@ public class Window extends JPanel implements ActionListener, Runnable {
         
 
     }
-
-    public void addCreatureInfo(Entity creature, JLabel creatureLabel) {
-        creatureLabel.setText(creature.toString());
-    }
-
     public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
         System.out.println("Started game thread");
     }
-
     public void update() {
       player.update();
     }
-
     @Override
     public void run() {
         double drawInterval = 1000000000 / FPS; // 0.01666 seconds
@@ -167,15 +120,23 @@ public class Window extends JPanel implements ActionListener, Runnable {
                 e.printStackTrace();
             }
         }
-    }
+    } 
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g;
+        //Tilesheet
         tileM.draw(g2);
-        player.draw(g2);
         
+        //Player
+        player.draw(g2);
+        //Objects
+        for (int i = 0; i < obj.length; i++) 
+         {
+            if(obj[i] != null) 
+                obj[i].draw(g2, this);
+        }
        
         
         

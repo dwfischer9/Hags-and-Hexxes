@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,26 +22,26 @@ public class TileManager {
         try{
             //Grass Texture
             tiles[0] = new Tile();
-            tiles[0].image = ImageIO.read(getClass().getResourceAsStream("assets/Grass..png"));
+            tiles[0].image = ImageIO.read(getClass().getResourceAsStream("assets/grass.png"));
         
             //Water Texture
             tiles[1] = new Tile();
-            tiles[1].image = ImageIO.read(getClass().getResourceAsStream("assets/Water1...png"));
+            tiles[1].image = ImageIO.read(getClass().getResourceAsStream("assets/water.png"));
             tiles[1].collision = true;
             //Path Texture\\
             tiles[2] = new Tile();
             tiles[2].image = ImageIO.read(getClass().getResourceAsStream("assets/path.png"));
             //----Wall Texture----\\
             tiles[3] = new Tile();
-            tiles[3].image = ImageIO.read(getClass().getResourceAsStream("assets/wall...png"));
+            tiles[3].image = ImageIO.read(getClass().getResourceAsStream("assets/wall.png"));
             tiles[3].collision = true;
             //----Tree textures----\\
             tiles[4] = new Tile();
-            tiles[4].image = ImageIO.read(getClass().getResourceAsStream("assets/tree..png"));
+            tiles[4].image = ImageIO.read(getClass().getResourceAsStream("assets/tree.png"));
             tiles[4].collision = true;
 
             tiles[5] = new Tile();
-            tiles[5].image = ImageIO.read(getClass().getResourceAsStream("assets/Water1...png"));
+            tiles[5].image = ImageIO.read(getClass().getResourceAsStream("assets/water.png"));
             tiles[5].collision = true;
         }catch(IOException e){
             e.printStackTrace();

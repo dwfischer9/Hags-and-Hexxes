@@ -1,10 +1,12 @@
+
+
 public class CollisionDetection {
     Window window;
     public CollisionDetection(Window window){
         this.window = window;
     }
 
-    public void checkTile(OverWorldEntity entity){
+    public void checkTile(Entity entity){
         int entityLeftWorldX = entity.worldX + entity.hitBox.x;
         int entityRightWorldX = entity.worldX + entity.hitBox.x + entity.hitBox.width;
         int entityTopWorldY = entity.worldY + entity.hitBox.y;
