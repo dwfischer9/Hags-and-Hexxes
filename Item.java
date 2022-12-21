@@ -4,26 +4,42 @@
 import java.awt.Rectangle;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-    public class AbstractObject {
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+    public class Item {
 
     protected final Rectangle HITBOX = new Rectangle(0,0,24,24);
     protected final Integer HITBOXDEFAULTX = 0;
     protected final Integer HITBOXDEFAULTY = 0;
-    private BufferedImage image;
+    protected BufferedImage image;
 
     protected String name;
     protected boolean collision = false;
     protected Integer worldX,worldY;
     protected final UtilityTools uTool = new UtilityTools();
+    public Item(Window window, String name, boolean collision) {
+        this.name = name;
+        this.collision = collision;
+        this.image = getImage();
+	}
 
-    public BufferedImage getImage(){
-        return this.image;
-    }
-    public void setImage(BufferedImage image) {
-        this.image = image;
+	public BufferedImage getImage() {
+        try {
+            image = ImageIO.read(getClass().getResourceAsStream("assets/" + name +
+        ".png"));
+        image = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+        } catch (IOException e) {
+            System.err.println("Error getting image for item: " + this.getName());
+            e.printStackTrace();
+        }
+        return image;
+        
     }
 
-    
+    public String getName(){
+        return this.name;
+    }
     public void draw(Graphics2D g2, Window window){
         int screenX = worldX - Window.player.worldX + Window.player.screenX;
         int screenY = worldY - Window.player.worldY + Window.player.screenY;

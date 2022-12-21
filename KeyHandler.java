@@ -16,50 +16,42 @@ public class KeyHandler implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
-        if (code == KeyEvent.VK_W) {
+        if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) 
             upPressed = true;
-            System.out.println("W Pressed");
-        }
-        if (code == KeyEvent.VK_S) {
-            downPressed = true;
-            System.out.println("S Pressed");
-        }
-        if (code == KeyEvent.VK_A) {
+        if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) 
+            downPressed = true;       
+        if (code == KeyEvent.VK_A || code == KeyEvent.VK_LEFT) 
             leftPressed = true;
-            System.out.println("A Pressed");
-        }
-        if (code == KeyEvent.VK_D) {
-            rightPressed = true;
-            System.out.println("D Pressed");
-        }
-        if(code == KeyEvent.VK_ESCAPE){
-            System.out.println("Escape pressed");
-            if(Window.gameState == Window.pauseState)
+        if (code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT)  
+            rightPressed = true;   
+        if(code == KeyEvent.VK_ESCAPE)
+            if(Window.gameState == Window.pauseState){
                 Window.gameState = Window.playState;
-            else
+                System.out.println("Game is resumed.");
+            }
+            else if(Window.gameState == Window.playState){
                 Window.gameState = Window.pauseState;
-                
-                
-                
-                ;
-        }
+                System.out.println("Game is paused.");
+            }
+            else
+                System.out.println("Cannot pause from this screen");
+        if(code == KeyEvent.VK_W || code == KeyEvent.VK_S || code == KeyEvent.VK_A || code == KeyEvent.VK_S || code == KeyEvent.VK_D || code == KeyEvent.VK_R || code == KeyEvent.VK_UP || code == KeyEvent.VK_DOWN || code == KeyEvent.VK_LEFT || code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_ESCAPE)  
+        //For debugging, print the registered key. 
+            System.out.println(KeyEvent.getKeyText(code) + " Pressed");
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         int code = e.getKeyCode();
-        if (code == KeyEvent.VK_W) {
+        if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) 
             upPressed = false;
-        }
-        if (code == KeyEvent.VK_S) {
+        if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) 
             downPressed = false;
-        }
-        if (code == KeyEvent.VK_A) {
+        if (code == KeyEvent.VK_A || code == KeyEvent.VK_LEFT) 
             leftPressed = false;
-        }
-        if (code == KeyEvent.VK_D) {
+        if (code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT) 
             rightPressed = false;
-        }
+        
 
     }
 

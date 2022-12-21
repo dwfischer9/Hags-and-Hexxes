@@ -1,10 +1,15 @@
-
+import java.awt.Graphics2D;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
+
+import java.awt.image.BufferedImage;
 
 
 
 abstract class AbstractEntity {
+    public BufferedImage up1;
+    public int worldX,worldY;
     private String name;
     private int level;
     private float maxHealth;
@@ -27,9 +32,15 @@ abstract class AbstractEntity {
         this.maxHealth = maxHealth;
         this.moves = moves;
     }
+    public String toString() {
+        return String.format("%s, HP: %.0f / %.0f\n", this.getName(), this.getHealth(), this.getMaxHealth());
+     } // This is
+    /**
+ * Retreive the name of the creature.
+ * 
+ * @return the name of the creature.
+ */
 
-    public AbstractEntity(Window window) {
-    }
 
     public Move[] getMoves() {
         return this.moves;
@@ -83,7 +94,7 @@ abstract class AbstractEntity {
         return this.level;
     }
 
-    /**
+    /** Sets the name of this creature
      * @param name must have length of [2,20]
      *             Set the name of the creature.
      */
@@ -93,8 +104,7 @@ abstract class AbstractEntity {
         else
             System.err.println("The entered level name is not of valid length.");
     }
-
-    /**e
+    /**Sets the health of this creature
      * @param health must be a nonzero integer less than or equal to
      *               the maximum health of the creature.
      */
@@ -110,6 +120,35 @@ abstract class AbstractEntity {
 
     // abstract float attack(Move moveChoice) throws IOException;
     abstract void levelUp();
-
+    abstract BufferedImage getImage();
     abstract float foeAttack() throws IOException;
+
+    /**
+     * @param imagePath the name of the image
+     * @return scaledImage the scaled image.
+     */
+    public BufferedImage setup(String imagePath){
+        UtilityTools uTool = new UtilityTools();
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + imagePath + ".png"));
+            image = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+       return image;
+    }
+    public void draw(Graphics2D g2) {
+
+        int screenX = worldX - Window.player.worldX + Window.player.screenX;
+        int screenY = worldY - Window.player.worldY + Window.player.screenY;
+        if( worldX + Window.tileSize > Window.player.worldX - Window.player.screenX && 
+        worldX - Window.tileSize < Window.player.worldX + Window.player.screenX && 
+        worldY + Window.tileSize > Window.player.worldY - Window.player.screenY && 
+        worldY - Window.tileSize < Window.player.worldY + Window.player.screenY){ // only render tiles in the camera view
+
+        g2.drawImage(this.getImage(),screenX,screenY,Window.tileSize,Window.tileSize,null);    
+        }      
+    }
 }

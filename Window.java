@@ -32,6 +32,7 @@ public class Window extends JPanel implements Runnable {
     public AssetSetter assetSetter = new AssetSetter(overWorldPanel);
     CollisionDetection cDetection = new CollisionDetection(this);
     
+    public AbstractEntity npc[] = new AbstractEntity[10];
     public static Entity entity = new Entity(overWorldPanel);
     private final Dimension winSize = new Dimension(screenWidth, screenHeight);
     int playerX = 100;
@@ -49,7 +50,7 @@ public class Window extends JPanel implements Runnable {
     public final static int pauseState = 2;
     public final static int battleState = 3;
     int menuState;
-    public AbstractObject obj[] = new AbstractObject[20];
+    public Item obj[] = new Item[20];
     /**
      * Constructs a new instance of Window and sets some defeault properties
      */
@@ -65,6 +66,7 @@ public class Window extends JPanel implements Runnable {
 
     public void setupGame() throws IOException{
         assetSetter.setObject();
+        assetSetter.setNPC();
         gameState = playState;
     }
     public void initialize() throws IOException {
@@ -119,11 +121,6 @@ public class Window extends JPanel implements Runnable {
     public void update() {
         if(gameState == playState)
             player.update();
-        if(gameState == pauseState)
-            System.out.println("Pause");
-        if(gameState == battleState)
-            System.out.println("Battle");
-       
         }
     /** 
      * This is the method that controls the game loop.
@@ -174,9 +171,15 @@ public class Window extends JPanel implements Runnable {
             }
        }
       
+        //NPCS
+        for(int i = 0; i < npc.length; i++){
+                if(npc[i] != null){
+                    npc[i].draw(g2);
+                }
+        }
+        
         //Player
         player.draw(g2);
-        
         long drawEnd = System.nanoTime();
         long passed = drawEnd - drawStart;
         g2.setColor(backgroundColor);

@@ -48,16 +48,17 @@ public class Player extends Entity {
      * Update global variables
      */
     public void getPlayerImage(){
-        try {
             up1 = setup("player");
+    }
+    public BufferedImage setup(String imageName) {
+        UtilityTools uTool = new UtilityTools();
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(getClass().getResourceAsStream("assets/" +imageName +".png"));
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-    public BufferedImage setup(String imageName) throws IOException{
-        UtilityTools uTool = new UtilityTools();
-        BufferedImage image = ImageIO.read(getClass().getResourceAsStream("assets/" +imageName +".png"));
         uTool.scaleImage(image,Window.tileSize,Window.tileSize);
         return image;
     }
@@ -156,16 +157,16 @@ public class Player extends Entity {
     }
     public void pickUpObject(int i){
         if(i != 999){ // Must exclude the obejcts that we don't want picked
-            String objectName = window.obj[i].name;
+            String objectName = window.obj[i].getName();
             switch(objectName){
-                case"Chest":
+                case"chest":
                     Window.startBattle(Window.player, Window.entity);
                     break;
-                case "Key":
+                case "key":
                     window.obj[i] = null;
                     this.hasKey++;
                     break;
-                case "LockedDoor":
+                case "lockeddoor":
                     if(this.hasKey >0){
                         window.obj[i] = null;
                         this.hasKey--;

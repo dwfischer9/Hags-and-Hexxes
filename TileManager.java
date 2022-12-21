@@ -23,16 +23,17 @@ public class TileManager {
 
     public void getTileImage(){
         try{
+            //Grass tiles
             setup(0, "grass", false);
             setup(1, "grass1", false);
-
+            //Walking path tiles
             setup(2, "path", false);
-
+            //Wall tiles
             setup(3, "wall", true);
-
+            //Tree tiles
             setup(4, "tree", true);
             setup(5, "tree", true);
-
+            //Water tiles
             setup(6, "water", true);
             setup(7, "edgeofwater-left", true);
             setup(8, "water-corner-bottom-left",true);
@@ -57,10 +58,12 @@ public class TileManager {
      */
     public void setup(int index, String imagePath,boolean collision) throws IOException{
         UtilityTools uTool = new UtilityTools();
-        tiles[index] = new Tile();
+        
         BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/assets/" + imagePath + ".png"));
-        tiles[index].image = uTool.scaleImage(img, Window.tileSize, Window.tileSize);
-        tiles[index].collision = collision;
+        BufferedImage scaledImg = uTool.scaleImage(img, Window.tileSize, Window.tileSize);
+  
+
+        tiles[index] = new Tile(scaledImg,collision);
     }
 
 /**
