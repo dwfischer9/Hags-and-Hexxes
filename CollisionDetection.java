@@ -63,13 +63,13 @@ public class CollisionDetection {
                 entity.hitBox.x += entity.worldX;
                 entity.hitBox.y += entity.worldY;
                 
-                window.obj[i].hitBox.x += window.obj[i].worldX;
-                window.obj[i].hitBox.y += window.obj[i].worldY;
+                window.obj[i].HITBOX.x += window.obj[i].worldX;
+                window.obj[i].HITBOX.y += window.obj[i].worldY;
 
                 switch(entity.direction){
                     case "up":
                         entity.hitBox.y -= entity.speed;
-                        if(entity.hitBox.intersects(window.obj[i].hitBox)){
+                        if(entity.hitBox.intersects(window.obj[i].HITBOX)){
                             if(window.obj[i].collision)
                                 entity.collisionOn = true;
                             if(player)
@@ -78,7 +78,7 @@ public class CollisionDetection {
                         break;
                     case "down":
                         entity.hitBox.y += entity.speed;
-                        if(entity.hitBox.intersects(window.obj[i].hitBox)){
+                        if(entity.hitBox.intersects(window.obj[i].HITBOX)){
                             if(window.obj[i].collision)
                                 entity.collisionOn = true;
                             if(player)
@@ -87,7 +87,7 @@ public class CollisionDetection {
                         break;
                     case "left":
                         entity.hitBox.x -= entity.speed;
-                        if(entity.hitBox.intersects(window.obj[i].hitBox)){
+                        if(entity.hitBox.intersects(window.obj[i].HITBOX)){
                             if(window.obj[i].collision)
                                 entity.collisionOn = true;
                             if(player)
@@ -96,7 +96,7 @@ public class CollisionDetection {
                         break;
                     case "right":
                         entity.hitBox.x += entity.speed;
-                        if(entity.hitBox.intersects(window.obj[i].hitBox)){
+                        if(entity.hitBox.intersects(window.obj[i].HITBOX)){
                             if(window.obj[i].collision)
                                 entity.collisionOn = true;
                             if(player)
@@ -106,8 +106,8 @@ public class CollisionDetection {
                 }
                 entity.hitBox.x = entity.hitBoxDefeaultX;
                 entity.hitBox.y = entity.hitBoxDefeaultY;
-                window.obj[i].hitBox.x = window.obj[i].hitBoxDefeaultX;
-                window.obj[i].hitBox.y = window.obj[i].hitBoxDefeaultY;
+                window.obj[i].HITBOX.x = window.obj[i].HITBOXDEFAULTX;
+                window.obj[i].HITBOX.y = window.obj[i].HITBOXDEFAULTY;
             }
 
         

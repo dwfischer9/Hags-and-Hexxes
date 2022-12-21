@@ -12,19 +12,15 @@ public class Player extends Entity {
     public final int screenX;
     public final int screenY;
     private String name;
-    private int level;
     private float maxHealth;
     protected float health;
-    private Move[] moves;
     public int hasKey = 0;
     public Player(Window window, KeyHandler keyH,String name, Type type, Move[] moves, int level, float health, float maxHealth) {
         super(window);
         this.keyH = keyH;
         this.name = name;
         this.health = health;
-        this.level = level;
         this.maxHealth = maxHealth;
-        this.moves = moves;
 
         screenX = Window.screenWidth/2 - Window.tileSize/2;
         screenY = Window.screenHeight/2 - Window.tileSize/2;
@@ -33,6 +29,12 @@ public class Player extends Entity {
         hitBox = new Rectangle(8,16,24,24);
         hitBoxDefeaultX = hitBox.x;
         hitBoxDefeaultY = hitBox.y;
+    }
+    public String toString() {
+        return String.format("%s, HP: %.0f / %.0f\n", this.getName(), this.getHealth(), this.getMaxHealth()); // This is
+                                                                                                              // the
+                                                                                                              // creature's
+                                                                                                              // status.
     }
 
 
@@ -47,17 +49,26 @@ public class Player extends Entity {
      */
     public void getPlayerImage(){
         try {
-            up1 = ImageIO.read(getClass().getResourceAsStream("assets/player.png"));
-            up2 = ImageIO.read(getClass().getResourceAsStream("assets/player.png"));
-            down1 = ImageIO.read(getClass().getResourceAsStream("assets/player.png"));
-            down2 = ImageIO.read(getClass().getResourceAsStream("assets/player.png"));
-            left1 = ImageIO.read(getClass().getResourceAsStream("assets/player.png"));
-            left2 = ImageIO.read(getClass().getResourceAsStream("assets/player.png"));
-            right1 = ImageIO.read(getClass().getResourceAsStream("assets/player.png"));
-            right2 = ImageIO.read(getClass().getResourceAsStream("assets/player.png"));
+            up1 = setup("player");
         } catch (IOException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+    public BufferedImage setup(String imageName) throws IOException{
+        UtilityTools uTool = new UtilityTools();
+        BufferedImage image = ImageIO.read(getClass().getResourceAsStream("assets/" +imageName +".png"));
+        uTool.scaleImage(image,Window.tileSize,Window.tileSize);
+        return image;
+    }
+    public String getName() {
+        return this.name;
+    }
+    public float getHealth(){
+        return this.health;
+    }
+    public float getMaxHealth(){
+        return this.maxHealth;
     }
     public void update(){
         if(keyH.upPressed == true)
@@ -148,6 +159,7 @@ public class Player extends Entity {
             String objectName = window.obj[i].name;
             switch(objectName){
                 case"Chest":
+                    Window.startBattle(Window.player, Window.entity);
                     break;
                 case "Key":
                     window.obj[i] = null;

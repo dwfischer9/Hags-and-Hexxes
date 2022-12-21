@@ -6,17 +6,24 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
     public class AbstractObject {
 
-    public Rectangle hitBox = new Rectangle(0,0,24,24);
-    public int hitBoxDefeaultX = 0;
-    public int hitBoxDefeaultY = 0;
-    public BufferedImage image;
-    public String name;
-    public boolean collision = false;
-    public int worldX,worldY;
+    protected final Rectangle HITBOX = new Rectangle(0,0,24,24);
+    protected final Integer HITBOXDEFAULTX = 0;
+    protected final Integer HITBOXDEFAULTY = 0;
+    private BufferedImage image;
 
-    public BufferedImage getImage() {
+    protected String name;
+    protected boolean collision = false;
+    protected Integer worldX,worldY;
+    protected final UtilityTools uTool = new UtilityTools();
+
+    public BufferedImage getImage(){
         return this.image;
     }
+    public void setImage(BufferedImage image) {
+        this.image = image;
+    }
+
+    
     public void draw(Graphics2D g2, Window window){
         int screenX = worldX - Window.player.worldX + Window.player.screenX;
         int screenY = worldY - Window.player.worldY + Window.player.screenY;

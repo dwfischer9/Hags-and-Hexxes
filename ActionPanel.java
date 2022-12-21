@@ -4,27 +4,36 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ActionPanel extends JPanel implements EventListener{
-     ActionButton butt;
-    Window window;
+
+    public static Window window = new Window();
+    public static ActionPanel actionPanel = new ActionPanel(window);
+    public static JPanel attackPanel = new JPanel();
+    public static JPanel foePanel = new JPanel();
+    public static JLabel foeHealth = new JLabel();
     public ActionPanel(Window window){
-        this.window = window;
-    }
-
-    public ActionPanel action = new ActionPanel(window);
-
-    private Color backgroundColor = new Color(101, 87, 168);
-    public ActionPanel(){
-        this.setLayout(new GridLayout(2,2,5,5));
         this.setBackground(backgroundColor);
+        this.setVisible(true);
+        this.setLayout(null);
+        this.setBounds(0,0,Window.screenWidth,Window.screenHeight);
     }
-
-    public void drawActionPanel(Window gamePanel){
-        action.setBounds(new Rectangle(0,480,Window.tileSize*10,Window.tileSize*2));
-        action.setVisible(true);
-        gamePanel.add(action);
-        butt.drawAttackButtons();
+    private Color backgroundColor = new Color(0, 0, 0);
 
 
+    public static void setup(ActionPanel actionPanel){
+        attackPanel.setBackground(Color.WHITE);
+        attackPanel.setBounds(new Rectangle(0,Window.tileSize * 10,Window.tileSize * 6,Window.tileSize * 2));
+        attackPanel.setVisible(true);
+
+        foeHealth.setText(Window.entity.toString());
+        foeHealth.setForeground(Color.RED);
+        foePanel.setLayout(null);
+        foePanel.setBounds(0,Window.tileSize*15,Window.tileSize *6, Window.tileSize * 2);
+        foePanel.setVisible(true);
+        foePanel.setBackground(Color.WHITE);
+        actionPanel.add(foePanel);
+        actionPanel.add(attackPanel);
+        Window.frame.add(actionPanel);
+        System.out.println("Battle start");
+        ActionButton.drawAttackButtons(actionPanel);
     }
-
 }

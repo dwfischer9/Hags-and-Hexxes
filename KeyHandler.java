@@ -6,7 +6,7 @@ public class KeyHandler implements KeyListener {
     public boolean downPressed = false;
     public boolean leftPressed = false;
     public boolean rightPressed = false;
-
+   
     @Override
     public void keyTyped(KeyEvent e) {
         // TODO Auto-generated method stub
@@ -15,7 +15,6 @@ public class KeyHandler implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        // TODO Auto-generated method stub
         int code = e.getKeyCode();
         if (code == KeyEvent.VK_W) {
             upPressed = true;
@@ -32,6 +31,17 @@ public class KeyHandler implements KeyListener {
         if (code == KeyEvent.VK_D) {
             rightPressed = true;
             System.out.println("D Pressed");
+        }
+        if(code == KeyEvent.VK_ESCAPE){
+            System.out.println("Escape pressed");
+            if(Window.gameState == Window.pauseState)
+                Window.gameState = Window.playState;
+            else
+                Window.gameState = Window.pauseState;
+                
+                
+                
+                ;
         }
     }
 

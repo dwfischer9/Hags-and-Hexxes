@@ -1,7 +1,5 @@
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 
 import javax.swing.*;
@@ -14,25 +12,26 @@ public class Window extends JPanel implements Runnable {
     protected static final int tileSize = originalTileSize * scale;
     public final static int maxScreenCol = 16;
     public final static int maxScreenRow = 12;
-     public final static  int screenWidth = tileSize * maxScreenCol;
-     public final static  int screenHeight = tileSize * maxScreenRow;
+    public final static  int screenWidth = tileSize * maxScreenCol;
+    public final static  int screenHeight = tileSize * maxScreenRow;
     private static final int FPS = 60;
+    public static KeyHandler keyH = new KeyHandler();
+    public static Window victoryPanel = new Window();
+    public static Window overWorldPanel = new Window();
     public static JPanel statusBar = new JPanel();
-    public static JLabel playerHealth = new JLabel();
+    public static Player player = new Player(overWorldPanel, keyH, "Hero", Type.normal, new Move[] { Move.slap, Move.tackle }, 5, 90,
+    90);
+    public static JLabel playerHealth = new JLabel(player.toString());
     public static JPanel foeBar = new JPanel();
     public static JLabel foeHealth = new JLabel();
     public static JLabel victoryLabel = new JLabel("Victory!");
     public static JPanel actionPanel = new JPanel();
     public static Window gamePanel = new Window();
     public static JFrame frame = new JFrame(); // Initialization of the window
-    public Thread gameThread;
-    public static KeyHandler keyH = new KeyHandler();
-    public static Window victoryPanel = new Window();
-    public static Window overWorldPanel = new Window();
+    public static Thread gameThread;
     public AssetSetter assetSetter = new AssetSetter(overWorldPanel);
     CollisionDetection cDetection = new CollisionDetection(this);
-    public static Player player = new Player(overWorldPanel, keyH, "Hero", Type.normal, new Move[] { Move.slap, Move.tackle }, 5, 90,
-    90);
+    
     public static Entity entity = new Entity(overWorldPanel);
     private final Dimension winSize = new Dimension(screenWidth, screenHeight);
     int playerX = 100;
@@ -44,7 +43,13 @@ public class Window extends JPanel implements Runnable {
     public final int maxWorldRow = 50;
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
-    public AbstractObject obj[] = new AbstractObject[10];
+
+    public static int gameState;
+    public final static int playState = 1;
+    public final static int pauseState = 2;
+    public final static int battleState = 3;
+    int menuState;
+    public AbstractObject obj[] = new AbstractObject[20];
     /**
      * Constructs a new instance of Window and sets some defeault properties
      */
@@ -60,6 +65,7 @@ public class Window extends JPanel implements Runnable {
 
     public void setupGame() throws IOException{
         assetSetter.setObject();
+        gameState = playState;
     }
     public void initialize() throws IOException {
          //set up assets BEFORE thread starts
@@ -91,12 +97,34 @@ public class Window extends JPanel implements Runnable {
         gameThread.start();
         System.out.println("Started game thread");
     }
+    public void statusBarInit(Window window){
+        this.add(statusBar);
+        statusBar.setBounds(0,0,tileSize*5,tileSize*2);
+        statusBar.setVisible(true);
+        statusBar.add(playerHealth);
+        
+        overWorldPanel.add(statusBar);
+
+    }
+
+    public static void startBattle(Player player, Entity entity) {
+        ActionPanel.setup(ActionPanel.actionPanel);
+        overWorldPanel.setVisible(false);
+        gameState = battleState;
+        
+    }
     /**
      * update graphics 
      */
     public void update() {
-      player.update();
-    }
+        if(gameState == playState)
+            player.update();
+        if(gameState == pauseState)
+            System.out.println("Pause");
+        if(gameState == battleState)
+            System.out.println("Battle");
+       
+        }
     /** 
      * This is the method that controls the game loop.
      */
@@ -104,10 +132,14 @@ public class Window extends JPanel implements Runnable {
     public void run() {
         double drawInterval = 1000000000 / FPS; // 0.01666 seconds
         double nextDrawTime = System.nanoTime() + drawInterval;
+        statusBarInit(overWorldPanel);
+        
         while (gameThread != null) {
 
             overWorldPanel.update();
             overWorldPanel.repaint();
+            
+
             try {
                 double remainingTime = nextDrawTime - System.nanoTime();
                 remainingTime = remainingTime / 1000000;
@@ -129,7 +161,7 @@ public class Window extends JPanel implements Runnable {
      */
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-
+        long drawStart = System.nanoTime();
         Graphics2D g2 = (Graphics2D) g;
         //Tilesheet
         tileM.draw(g2);
@@ -145,7 +177,10 @@ public class Window extends JPanel implements Runnable {
         //Player
         player.draw(g2);
         
-       
+        long drawEnd = System.nanoTime();
+        long passed = drawEnd - drawStart;
+        g2.setColor(backgroundColor);
+        g2.drawString("Draw Time:" + passed,10,400);
         
         
     }

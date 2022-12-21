@@ -6,7 +6,7 @@ import java.io.IOException;
  * 
  * OverWorldEntity
  */
-public class Entity {
+public class Entity extends AbstractEntity{
     private String name;
     private int level;
     private float maxHealth;
@@ -24,17 +24,16 @@ public class Entity {
     public Rectangle hitBox = new Rectangle(0,0,48,48);
     public int hitBoxDefeaultX,hitBoxDefeaultY;
     public boolean collisionOn = false;
-    @Override
-    public String toString() {
-        return String.format("%s, HP: %.0f / %.0f\n", this.getName(), this.getHealth(), this.getMaxHealth()); // This is
-                                                                                                              // the
-                                                                                                              // creature's
-                                                                                                              // status.
-    }
+
     public Entity(Window window){
+        super("Hero", Type.normal, new Move[] { Move.slap, Move.tackle }, 5, (float )90,(float)90);
         this.window = window;
 
     }
+    public String toString() {
+        return String.format("%s, HP: %.0f / %.0f\n", this.getName(), this.getHealth(), this.getMaxHealth());
+     } // This is
+        
 public Move[] getMoves() {
     return this.moves;
 }
@@ -115,5 +114,6 @@ public void setHealth(float newHealth) {
 // abstract float attack(Move moveChoice) throws IOException;
 public void levelUp(){}
 
-public void foeAttack() throws IOException{}
+public float foeAttack() throws IOException{
+    return health;}
 }

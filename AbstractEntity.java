@@ -28,6 +28,9 @@ abstract class AbstractEntity {
         this.moves = moves;
     }
 
+    public AbstractEntity(Window window) {
+    }
+
     public Move[] getMoves() {
         return this.moves;
     }

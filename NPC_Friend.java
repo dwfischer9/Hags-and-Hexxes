@@ -6,6 +6,6 @@ public class NPC_Friend extends Entity{
         speed = 2;
     }
     public void getNPCImage(){
-        up1 
+        
     }
 }

@@ -1,10 +1,13 @@
 
 import java.io.BufferedReader;
+
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.awt.Graphics2D;
 import javax.imageio.ImageIO;
+
 
 public class TileManager {
     Window tileWindow;
@@ -12,7 +15,7 @@ public class TileManager {
     int mapTileNum[][];
     public TileManager(Window tileWindow){
         this.tileWindow = tileWindow;
-        tiles = new Tile[10];
+        tiles = new Tile[20];
         mapTileNum = new int[tileWindow.maxWorldCol][tileWindow.maxWorldRow];
         getTileImage();
         loadMapData("assets/world01.txt");
@@ -20,33 +23,53 @@ public class TileManager {
 
     public void getTileImage(){
         try{
-            //Grass Texture
-            tiles[0] = new Tile();
-            tiles[0].image = ImageIO.read(getClass().getResourceAsStream("assets/grass.png"));
-        
-            //Water Texture
-            tiles[1] = new Tile();
-            tiles[1].image = ImageIO.read(getClass().getResourceAsStream("assets/water.png"));
-            tiles[1].collision = true;
-            //Path Texture\\
-            tiles[2] = new Tile();
-            tiles[2].image = ImageIO.read(getClass().getResourceAsStream("assets/path.png"));
-            //----Wall Texture----\\
-            tiles[3] = new Tile();
-            tiles[3].image = ImageIO.read(getClass().getResourceAsStream("assets/wall.png"));
-            tiles[3].collision = true;
-            //----Tree textures----\\
-            tiles[4] = new Tile();
-            tiles[4].image = ImageIO.read(getClass().getResourceAsStream("assets/tree.png"));
-            tiles[4].collision = true;
+            setup(0, "grass", false);
+            setup(1, "grass1", false);
 
-            tiles[5] = new Tile();
-            tiles[5].image = ImageIO.read(getClass().getResourceAsStream("assets/water.png"));
-            tiles[5].collision = true;
+            setup(2, "path", false);
+
+            setup(3, "wall", true);
+
+            setup(4, "tree", true);
+            setup(5, "tree", true);
+
+            setup(6, "water", true);
+            setup(7, "edgeofwater-left", true);
+            setup(8, "water-corner-bottom-left",true);
+            setup(9, "edgeofwater-right", true);
+            setup(10, "water-corner-top-right", true);
+            setup(11, "water-corner-top-left", true);
+            setup(12, "water-corner-bottom-right",true);
+            setup(13, "edgeofwater-top", true);
+            setup(14, "edgeofwater-bottom", true);
+
         }catch(IOException e){
             e.printStackTrace();
         }
     }
+
+    /**
+     * A helper method to pre-scale the images before the game loop begins, intended to improve performance by only loading images once.
+     * @param index the number the tile will be represented by in map files.
+     * @param imagePath the name of the tile, excluding the extension as all tiles in this program will be in PNG format.
+     * @param collision True: The tile should be impassable by the player. False(default): The player can pass through the tile.
+     * @throws IOException
+     */
+    public void setup(int index, String imagePath,boolean collision) throws IOException{
+        UtilityTools uTool = new UtilityTools();
+        tiles[index] = new Tile();
+        BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/assets/" + imagePath + ".png"));
+        tiles[index].image = uTool.scaleImage(img, Window.tileSize, Window.tileSize);
+        tiles[index].collision = collision;
+    }
+
+/**
+         * A method that is used to load map files. This currently only supports loading maps
+         * that are 50x50 grids. This will need to be updated soon to support smaller or larger instance maps.
+         * TODO: Add support for loading maps of any size as long as they are formatted properly)
+     * 
+     * @param filePath - The relative path to the map file.
+     */
     public void loadMapData(String filePath){
         try {
             InputStream is = getClass().getResourceAsStream(filePath);
