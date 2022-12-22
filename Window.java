@@ -38,8 +38,6 @@ public class Window extends JPanel implements Runnable {
     public static Entity testEntity = new Entity("Entity", Type.normal, new Move[] { Move.slap, Move.tackle }, 5, 90,
     90);
     private final Dimension winSize = new Dimension(screenWidth, screenHeight);
-    int playerX = 100;
-    int playerY = 100;
     int playerSpeed = 4;
     public static TileManager tileM = new TileManager(overWorldPanel);
     //WORLD SETTINGS
@@ -155,7 +153,7 @@ public class Window extends JPanel implements Runnable {
                 // pause the game loop so that we only draw 60 times per second
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                System.err.println("Something went wer");
+                System.err.println("Something went wrong when drawing the timer");
             }
         }
     } 

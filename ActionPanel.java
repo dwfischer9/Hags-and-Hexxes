@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ActionPanel extends JPanel implements EventListener{
-
+    public JFrame frame = Window.frame;
     public static Window window = new Window();
     public static ActionButton attack1 = new ActionButton("Attack 1");
     public static ActionButton attack2 = new ActionButton("Attack 2");
@@ -34,7 +34,6 @@ public class ActionPanel extends JPanel implements EventListener{
         attackPanel.setLayout(new GridLayout(3,2));
         attackPanel.setBounds(new Rectangle(0,Window.tileSize * 10,Window.tileSize * 6,Window.tileSize * 2));
         attackPanel.setVisible(true);
-
         foeHealth.setText(Window.testEntity.toString());
         foeHealth.setForeground(Color.RED);
         foePanel.setLayout(null);
@@ -45,7 +44,7 @@ public class ActionPanel extends JPanel implements EventListener{
         actionPanel.add(attackPanel);
         
         drawAttackButtons(actionPanel);
-        Window.frame.add(actionPanel);
+        frame.add(actionPanel);
         System.out.println("Battle start");
     }
     public void drawAttackButtons(ActionPanel actionPanel){

@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 
 public class Player extends Entity {
     KeyHandler keyH;
-    
+    CollisionDetection cDetection = window.cDetection;
     public final int screenX = Window.screenWidth/2 - Window.tileSize/2;
     public final int screenY = Window.screenHeight/2 - Window.tileSize/2;
     private float maxHealth;
@@ -59,10 +59,10 @@ public class Player extends Entity {
         }
         //Checkig tile colllision
         collisionOn = false;
-        window.cDetection.checkTile(this);
+        cDetection.checkTile(this);
 
         //checking object collision
-        int objIndex = window.cDetection.checkObject(this, true);
+        int objIndex = cDetection.checkObject(this, true);
         pickUpObject(objIndex);
        // if collision is flase, player can move
         if(collisionOn == false){
