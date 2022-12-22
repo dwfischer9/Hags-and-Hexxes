@@ -7,6 +7,7 @@ public class Game {
         
         Window window = new Window();
         window.setupGame();
+
         Window.player.setDefaultValues();
         window.initialize();
     }
