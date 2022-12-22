@@ -15,12 +15,14 @@ public class Window extends JPanel implements Runnable {
     public final static  int screenWidth = tileSize * maxScreenCol;
     public final static  int screenHeight = tileSize * maxScreenRow;
     private static final int FPS = 60;
+    
     public static KeyHandler keyH = new KeyHandler();
     public static Window victoryPanel = new Window();
     public static Window overWorldPanel = new Window();
     public static JPanel statusBar = new JPanel();
     public static Player player = new Player(overWorldPanel, keyH, "player", Type.normal, new Move[] { Move.slap, Move.tackle }, 5, 90,
     90);
+    public static BattleManager bm = new BattleManager();
     public static JLabel playerHealth = new JLabel(player.toString());
     public static JPanel foeBar = new JPanel();
     public static JLabel foeHealth = new JLabel();
@@ -28,6 +30,7 @@ public class Window extends JPanel implements Runnable {
     public static Window gamePanel = new Window();
     public static JFrame frame = new JFrame(); // Initialization of the window
     public static Thread gameThread;
+    public static ActionPanel ap = new ActionPanel(gamePanel);
     public AssetSetter assetSetter = new AssetSetter(overWorldPanel);
     CollisionDetection cDetection = new CollisionDetection(this);
     
@@ -108,10 +111,11 @@ public class Window extends JPanel implements Runnable {
 
     }
 
-    public static void startBattle(Player player, Entity entity) {
-        ActionPanel.setup(ActionPanel.actionPanel);
+    public  void startBattle(Player player, Entity entity) {
+        ap.setup(ap);
         overWorldPanel.setVisible(false);
         gameState = battleState;
+        bm.playerTurn();
         
     }
     /**
@@ -190,10 +194,12 @@ public class Window extends JPanel implements Runnable {
     }
 
 
-    public static void endBattle() {
+    public static  void endBattle() {
+        bm.waitingForAttack = false;
+        bm.isPlayerTurn = false;
         gameState = playState;
         overWorldPanel.setVisible(true);
-        frame.remove(ActionPanel.actionPanel);
+        frame.remove(ap);
 
     }
 

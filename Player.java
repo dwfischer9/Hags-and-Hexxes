@@ -93,7 +93,7 @@ public class Player extends Entity {
             String objectName = window.items[i].getName();
             switch(objectName){
                 case"chest":
-                    Window.startBattle(Window.player, Window.testEntity);
+                    window.startBattle(Window.player, Window.testEntity);
                     window.items[i] = null;
                     break;
                 case "key":
