@@ -19,7 +19,12 @@ abstract class AbstractEntity {
     public BufferedImage image;
     int spriteCounter = 0;
     int spriteNum = 1;
-
+    public int hitBoxDefeaultX = 0;
+    public final int hitBoxDefeaultY = 0;
+    public Window window;
+    public int speed;
+    public final int screenX = Window.screenWidth/2 - Window.tileSize/2;
+    public final int screenY = Window.screenHeight/2 - Window.tileSize/2;
     
     /**
      * @param name      The name of the creature.

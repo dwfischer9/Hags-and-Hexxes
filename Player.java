@@ -8,7 +8,6 @@ import java.awt.Rectangle;
 public class Player extends Entity {
     KeyHandler keyH;
     public int hasKey = 0;
-
     public Player(Window window, KeyHandler keyH, String name, Type type, Move[] moves, int level, float health,
             float maxHealth) {
         super(name, type, moves, level, health, maxHealth);
@@ -22,6 +21,8 @@ public class Player extends Entity {
     }
 
     public void setDefaultValues() {
+        this.hitBoxDefeaultY = 16;
+        this.hitBoxDefeaultX = 8;
         this.hitBox = new Rectangle(8, 16, 32, 32);
         this.worldX = Window.tileSize * 23;
         this.worldY = Window.tileSize * 21;
