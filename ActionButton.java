@@ -1,8 +1,7 @@
 
-import java.awt.Color;
+
 import java.util.EventListener;
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 
 public class ActionButton extends JButton implements EventListener {
 

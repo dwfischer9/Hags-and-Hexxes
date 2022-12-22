@@ -22,15 +22,9 @@ public class AssetSetter {
      * @throws IOException
      */
     public void setObject() {
-        window.items[0] = new Item(window, "chest", true);
-        window.items[0].worldX = Window.tileSize * 20;
-        window.items[0].worldY = Window.tileSize * 20;
-        window.items[1] = new Item(window, "lockeddoor", true);
-        window.items[1].worldX = Window.tileSize * 23;
-        window.items[1].worldY = Window.tileSize * 25;
-        window.items[2] = new Item(window, "key", true);
-        window.items[2].worldX = Window.tileSize * 21;
-        window.items[2].worldY = Window.tileSize * 20;
+        window.items[0] = new Item(window, "chest", true, Window.tileSize * 20, Window.tileSize * 20);
+        window.items[1] = new Item(window, "lockeddoor", true, Window.tileSize * 23, Window.tileSize * 25);
+        window.items[2] = new Item(window, "key", true, Window.tileSize * 21, Window.tileSize * 20);
 
     }
 
@@ -45,7 +39,6 @@ public class AssetSetter {
     }
 
     public void setPlayer() {
-
         player.setup();
     }
 }

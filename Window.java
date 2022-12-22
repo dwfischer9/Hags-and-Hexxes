@@ -32,7 +32,7 @@ public class Window extends JPanel implements Runnable {
     public static Thread gameThread;
     public static ActionPanel ap = new ActionPanel(gamePanel);
     public AssetSetter assetSetter = new AssetSetter(overWorldPanel);
-    public CollisionDetection cDetection = new CollisionDetection(this);
+    public static CollisionDetection cDetection = new CollisionDetection(overWorldPanel);
     
     public AbstractEntity npc[] = new AbstractEntity[10];
     public static Entity testEntity = new Entity("Entity", Type.normal, new Move[] { Move.slap, Move.tackle }, 5, 90,

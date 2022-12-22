@@ -54,11 +54,9 @@ public class ActionPanel extends JPanel implements EventListener{
                 public void actionPerformed(ActionEvent e) {
                     System.out.println("Attack 1");
                     bm.waitingForAttack = false;
-                    
                 }
             });
             attack2.addActionListener(new ActionListener() {
-    
                 @Override
                 public void actionPerformed(ActionEvent e) {
                    System.out.println("Attack 2");
@@ -66,19 +64,16 @@ public class ActionPanel extends JPanel implements EventListener{
                 }
             });
             attack3.addActionListener(new ActionListener() {
-    
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     System.out.println("Attack 3");
-    
                     bm.waitingForAttack = false;
                 }
             });
             attack4.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    System.out.println("Attack 4");
-    
+                    System.out.println("Attack 4");    
                     bm.waitingForAttack = false;
                 }
             });
@@ -91,8 +86,6 @@ public class ActionPanel extends JPanel implements EventListener{
             });
     
             escapeButton.setBackground(Color.magenta);
-            actionPanel.add(escapeButton);
-            
             attackPanel.add(attack1);
             attackPanel.add(attack2);
             attackPanel.add(attack3);
