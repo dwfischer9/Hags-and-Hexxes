@@ -19,6 +19,8 @@ abstract class AbstractEntity {
     public BufferedImage image;
     int spriteCounter = 0;
     int spriteNum = 1;
+
+    
     /**
      * @param name      The name of the creature.
      * @param type      The type of creature.
