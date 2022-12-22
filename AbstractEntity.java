@@ -1,15 +1,15 @@
 import java.awt.Graphics2D;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
-
 import java.awt.image.BufferedImage;
 
-
-
+/**
+ * This class is used to serve as a parent class to the {@link Entity} class. 
+ */
 abstract class AbstractEntity {
     public BufferedImage up1,up2,down1,down2,left1,left2,right1,right2;
     public int worldX,worldY;
+    public boolean collisionOn;
     protected String name;
     private int level;
     private float maxHealth;
@@ -41,7 +41,7 @@ abstract class AbstractEntity {
     }
     public String toString() {
         return String.format("%s, HP: %.0f / %.0f\n", this.getName(), this.getHealth(), this.getMaxHealth());
-     } // This is
+     } 
     /**
  * Retreive the name of the creature.
  * 

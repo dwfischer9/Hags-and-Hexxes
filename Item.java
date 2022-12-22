@@ -1,12 +1,13 @@
-/**
- * AbstractObject
- */
 import java.awt.Rectangle;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
+
+/**
+ * This class handles the drawing of the various items in this program. 
+ * To create a new item, call the constructor in the {@link AssetSetter} class.
+ */
     public class Item {
 
     protected final Rectangle HITBOX = new Rectangle(0,0,24,24);
@@ -18,8 +19,10 @@ import javax.imageio.ImageIO;
     protected boolean collision = false;
     protected Integer worldX,worldY;
     protected final UtilityTools uTool = new UtilityTools();
-    public Item(Window window, String name, boolean collision) {
+    public Item(Window window, String name, boolean collision, int worldX,int worldY) {
         this.name = name;
+        this.worldX = worldX;
+        this.worldY = worldY;
         this.collision = collision;
         this.image = getImage();
 	}
