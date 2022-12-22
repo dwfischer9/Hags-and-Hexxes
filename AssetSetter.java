@@ -37,4 +37,9 @@ public class AssetSetter {
         window.npc[0].worldX = Window.tileSize * 23;
         window.npc[0].worldY = Window.tileSize * 20;
     }
+
+    public void setPlayer(){
+
+        Window.player.setup();
+    }
 }

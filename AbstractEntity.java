@@ -17,6 +17,8 @@ abstract class AbstractEntity {
     protected float health;
     private Move[] moves;
     public BufferedImage image;
+    int spriteCounter = 0;
+    int spriteNum = 1;
     /**
      * @param name      The name of the creature.
      * @param type      The type of creature.
@@ -127,17 +129,40 @@ abstract class AbstractEntity {
     public BufferedImage getImage(){
         switch(this.getDirection()){ //handles the direction that the sprite is facing.
            case "up": 
-               this.image = this.up1;
-               break;
+            if(this.spriteNum == 1)
+                this.image = this.up1;
+            if(this.spriteNum == 2)
+                this.image = this.up2;
+            break;
            case "down":
+            if(this.spriteNum == 1)
                this.image = this.down1;
+            if(this.spriteNum == 2)
+                this.image = this.down2;
                break;
            case "left":
+            if(this.spriteNum == 1)
                this.image = this.left1;
-               break;
+            if(this.spriteNum == 2)
+               this.image = this.left2;   
+            break;
            case "right":
-               this.image = right1;
-               break;
+            if(this.spriteNum == 1)
+               this.image = this.right1;
+            if(this.spriteNum == 2)
+                this.image = this.right2;
+            break;
+           }
+          this.spriteCounter ++; // switches between sprite 1 and 2 for the direction.
+           if(this.spriteCounter > 90){ //serves as an idle animation. The player image
+               //will change every 12 frames.
+               if(this.spriteNum == 1){
+                this.spriteNum = 2 ;
+               }
+               else if(this.spriteNum == 2){
+                this.spriteNum = 1;
+               }
+               this.spriteCounter = 0;
            }
        return this.image;
 
@@ -162,7 +187,6 @@ abstract class AbstractEntity {
 
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/down1.png"));
             this.down1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
-
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/down2.png"));
             this.down2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
 
@@ -178,6 +202,7 @@ abstract class AbstractEntity {
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/right2.png"));
             this.right2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
             
+            System.out.println("Finished loading assets for " + this.getName());
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

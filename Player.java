@@ -39,7 +39,6 @@ public class Player extends Entity {
         worldY = Window.tileSize * 21;
         speed = 4;
         this.direction = "down";
-        this.setup();
     }
     public float getMaxHealth(){
         return this.maxHealth;
@@ -83,17 +82,7 @@ public class Player extends Entity {
             }
         }
 
-        spriteCounter ++; // switches between sprite 1 and 2 for the direction.
-        if(spriteCounter > 12){ //serves as an idle animation. The player image
-            //will change every 12 frames.
-            if(spriteNumber == 1){
-                spriteNumber = 2 ;
-            }
-            else if(spriteNumber == 2){
-                spriteNumber = 1;
-            }
-            spriteNumber = 0;
-        }
+
     }
     public void draw(Graphics2D g2){
         g2.drawImage(this.getImage(), screenX,screenY,Window.tileSize,Window.tileSize,null);

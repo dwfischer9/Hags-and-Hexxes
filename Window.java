@@ -67,6 +67,7 @@ public class Window extends JPanel implements Runnable {
     public void setupGame() throws IOException{
         assetSetter.setObject();
         assetSetter.setNPC();
+        assetSetter.setPlayer();
         gameState = playState;
     }
     public void initialize() throws IOException {
@@ -149,8 +150,8 @@ public class Window extends JPanel implements Runnable {
                 nextDrawTime += drawInterval;
                 // pause the game loop so that we only draw 60 times per second
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
+                System.err.println("Something went wer");
             }
         }
     } 
@@ -173,7 +174,7 @@ public class Window extends JPanel implements Runnable {
             }
        }
       
-        //NPCS
+        //NPC
         for(int i = 0; i < npc.length; i++){
                 if(npc[i] != null){
                     npc[i].draw(g2);
