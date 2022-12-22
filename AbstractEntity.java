@@ -8,14 +8,15 @@ import java.awt.image.BufferedImage;
 
 
 abstract class AbstractEntity {
-    public BufferedImage up1;
+    public BufferedImage up1,up2,down1,down2,left1,left2,right1,right2;
     public int worldX,worldY;
-    private String name;
+    protected String name;
     private int level;
     private float maxHealth;
+    String direction;
     protected float health;
     private Move[] moves;
-
+    public BufferedImage image;
     /**
      * @param name      The name of the creature.
      * @param type      The type of creature.
@@ -29,8 +30,10 @@ abstract class AbstractEntity {
         this.name = name;
         this.health = health;
         this.level = level;
+        this.direction = "down";
         this.maxHealth = maxHealth;
         this.moves = moves;
+        this.image = getImage();
     }
     public String toString() {
         return String.format("%s, HP: %.0f / %.0f\n", this.getName(), this.getHealth(), this.getMaxHealth());
@@ -120,34 +123,73 @@ abstract class AbstractEntity {
 
     // abstract float attack(Move moveChoice) throws IOException;
     abstract void levelUp();
-    abstract BufferedImage getImage();
+
+    public BufferedImage getImage(){
+        switch(this.getDirection()){ //handles the direction that the sprite is facing.
+           case "up": 
+               this.image = this.up1;
+               break;
+           case "down":
+               this.image = this.down1;
+               break;
+           case "left":
+               this.image = this.left1;
+               break;
+           case "right":
+               this.image = right1;
+               break;
+           }
+       return this.image;
+
+    }
+    public String getDirection(){
+        return this.direction;
+    }
     abstract float foeAttack() throws IOException;
 
     /**
      * @param imagePath the name of the image
      * @return scaledImage the scaled image.
      */
-    public BufferedImage setup(String imagePath){
+    public void setup(){
         UtilityTools uTool = new UtilityTools();
-        BufferedImage image = null;
         try {
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + imagePath + ".png"));
-            image = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/up1.png"));
+            this.up1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/up2.png"));
+            this.up2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/down1.png"));
+            this.down1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/down2.png"));
+            this.down2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/left1.png"));
+            this.left1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/left2.png"));
+            this.left2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/right1.png"));
+            this.right1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/right2.png"));
+            this.right2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+            
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-       return image;
     }
     public void draw(Graphics2D g2) {
-
         int screenX = worldX - Window.player.worldX + Window.player.screenX;
         int screenY = worldY - Window.player.worldY + Window.player.screenY;
         if( worldX + Window.tileSize > Window.player.worldX - Window.player.screenX && 
         worldX - Window.tileSize < Window.player.worldX + Window.player.screenX && 
         worldY + Window.tileSize > Window.player.worldY - Window.player.screenY && 
         worldY - Window.tileSize < Window.player.worldY + Window.player.screenY){ // only render tiles in the camera view
-
         g2.drawImage(this.getImage(),screenX,screenY,Window.tileSize,Window.tileSize,null);    
         }      
     }

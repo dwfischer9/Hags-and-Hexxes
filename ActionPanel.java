@@ -24,7 +24,7 @@ public class ActionPanel extends JPanel implements EventListener{
         attackPanel.setBounds(new Rectangle(0,Window.tileSize * 10,Window.tileSize * 6,Window.tileSize * 2));
         attackPanel.setVisible(true);
 
-        foeHealth.setText(Window.entity.toString());
+        foeHealth.setText(Window.testEntity.toString());
         foeHealth.setForeground(Color.RED);
         foePanel.setLayout(null);
         foePanel.setBounds(0,Window.tileSize*15,Window.tileSize *6, Window.tileSize * 2);
@@ -32,8 +32,9 @@ public class ActionPanel extends JPanel implements EventListener{
         foePanel.setBackground(Color.WHITE);
         actionPanel.add(foePanel);
         actionPanel.add(attackPanel);
+        
+        ActionButton.drawAttackButtons(actionPanel);
         Window.frame.add(actionPanel);
         System.out.println("Battle start");
-        ActionButton.drawAttackButtons(actionPanel);
     }
 }

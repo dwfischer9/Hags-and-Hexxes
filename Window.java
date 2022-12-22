@@ -19,13 +19,12 @@ public class Window extends JPanel implements Runnable {
     public static Window victoryPanel = new Window();
     public static Window overWorldPanel = new Window();
     public static JPanel statusBar = new JPanel();
-    public static Player player = new Player(overWorldPanel, keyH, "Hero", Type.normal, new Move[] { Move.slap, Move.tackle }, 5, 90,
+    public static Player player = new Player(overWorldPanel, keyH, "player", Type.normal, new Move[] { Move.slap, Move.tackle }, 5, 90,
     90);
     public static JLabel playerHealth = new JLabel(player.toString());
     public static JPanel foeBar = new JPanel();
     public static JLabel foeHealth = new JLabel();
     public static JLabel victoryLabel = new JLabel("Victory!");
-    public static JPanel actionPanel = new JPanel();
     public static Window gamePanel = new Window();
     public static JFrame frame = new JFrame(); // Initialization of the window
     public static Thread gameThread;
@@ -33,7 +32,8 @@ public class Window extends JPanel implements Runnable {
     CollisionDetection cDetection = new CollisionDetection(this);
     
     public AbstractEntity npc[] = new AbstractEntity[10];
-    public static Entity entity = new Entity(overWorldPanel);
+    public static Entity testEntity = new Entity("Entity", Type.normal, new Move[] { Move.slap, Move.tackle }, 5, 90,
+    90);
     private final Dimension winSize = new Dimension(screenWidth, screenHeight);
     int playerX = 100;
     int playerY = 100;
@@ -50,7 +50,7 @@ public class Window extends JPanel implements Runnable {
     public final static int pauseState = 2;
     public final static int battleState = 3;
     int menuState;
-    public Item obj[] = new Item[20];
+    public Item items[] = new Item[20];
     /**
      * Constructs a new instance of Window and sets some defeault properties
      */
@@ -132,9 +132,11 @@ public class Window extends JPanel implements Runnable {
         statusBarInit(overWorldPanel);
         
         while (gameThread != null) {
-
+            if (gameState == playState) {
+                
             overWorldPanel.update();
             overWorldPanel.repaint();
+            }
             
 
             try {
@@ -163,11 +165,11 @@ public class Window extends JPanel implements Runnable {
         //Tilesheet
         tileM.draw(g2);
         //Objects
-        for (int i = 0; i < obj.length; i++) //for each object we have loaded in obj, 
+        for (int i = 0; i < items.length; i++) //for each item we have loaded in , 
         //we need to draw it to the screen
         {
-           if(obj[i] != null) {
-               obj[i].draw(g2, this);
+           if(items[i] != null) {
+               items[i].draw(g2, this);
             }
        }
       
@@ -186,6 +188,14 @@ public class Window extends JPanel implements Runnable {
         g2.drawString("Draw Time:" + passed,10,400);
         
         
+    }
+
+
+    public static void endBattle() {
+        gameState = playState;
+        overWorldPanel.setVisible(true);
+        frame.remove(ActionPanel.actionPanel);
+
     }
 
 

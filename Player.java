@@ -3,70 +3,43 @@
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.io.IOException;
 import java.awt.image.BufferedImage;
 
-import javax.imageio.ImageIO;
+
 public class Player extends Entity {
     KeyHandler keyH;
-    public final int screenX;
-    public final int screenY;
-    private String name;
+    
+    public final int screenX = Window.screenWidth/2 - Window.tileSize/2;
+    public final int screenY = Window.screenHeight/2 - Window.tileSize/2;
     private float maxHealth;
     protected float health;
     public int hasKey = 0;
+    public BufferedImage up1,up2,down1,down2,left1,left2,right1,right2;
     public Player(Window window, KeyHandler keyH,String name, Type type, Move[] moves, int level, float health, float maxHealth) {
-        super(window);
+        super(name, type,moves, level,health,maxHealth);
         this.keyH = keyH;
         this.name = name;
+        this.window = window;
         this.health = health;
         this.maxHealth = maxHealth;
-
-        screenX = Window.screenWidth/2 - Window.tileSize/2;
-        screenY = Window.screenHeight/2 - Window.tileSize/2;
         setDefaultValues();
-        getPlayerImage();
-        hitBox = new Rectangle(8,16,24,24);
-        hitBoxDefeaultX = hitBox.x;
-        hitBoxDefeaultY = hitBox.y;
+       
     }
     public String toString() {
-        return String.format("%s, HP: %.0f / %.0f\n", this.getName(), this.getHealth(), this.getMaxHealth()); // This is
-                                                                                                              // the
-                                                                                                              // creature's
-                                                                                                              // status.
-    }
-
-
-    public void setDefaultValues(){
-        worldX = Window.tileSize * 23;
-        worldY = Window.tileSize * 21;
-        speed = 4;
-        direction = "down";
-    }
-        /**
-     * Update global variables
-     */
-    public void getPlayerImage(){
-            up1 = setup("player");
-    }
-    public BufferedImage setup(String imageName) {
-        UtilityTools uTool = new UtilityTools();
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(getClass().getResourceAsStream("assets/" +imageName +".png"));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        uTool.scaleImage(image,Window.tileSize,Window.tileSize);
-        return image;
+        return String.format("%s, HP: %.0f / %.0f\n", this.getName(), this.getHealth(), this.getMaxHealth());
     }
     public String getName() {
         return this.name;
     }
-    public float getHealth(){
-        return this.health;
+    public void setDefaultValues(){
+        hitBox = new Rectangle(8,16,24,24);
+        hitBoxDefeaultX = hitBox.x;
+        hitBoxDefeaultY = hitBox.y;
+        worldX = Window.tileSize * 23;
+        worldY = Window.tileSize * 21;
+        speed = 4;
+        this.direction = "down";
+        this.setup();
     }
     public float getMaxHealth(){
         return this.maxHealth;
@@ -123,60 +96,29 @@ public class Player extends Entity {
         }
     }
     public void draw(Graphics2D g2){
-        BufferedImage image = null;
-        getPlayerImage();
-        image = up1;
-        // switch(direction){ //handles the direction that the sprite is facing.
-        // case "up": 
-        //     if(spriteNumber == 1)
-        //         image = up1;
-        //     if(spriteNumber == 2)
-        //         image = up2;
-        //     break;
-        // case "down":
-        //     if(spriteNumber == 1)
-        //         image = down1;
-        //     if(spriteNumber == 2)
-        //         image = down2;
-        //     break;
-        // case "left":
-        //     if(spriteNumber == 1)
-        //         image = left1;
-        //     if(spriteNumber == 2)
-        //         image = left2;
-        //     break;
-        // case "right":
-        //     if(spriteNumber == 1)
-        //         image = right1;
-        //     if(spriteNumber == 2)
-        //         image = right2;
-        //     break;
-        // }
-        g2.drawImage(image, screenX,screenY,Window.tileSize,Window.tileSize,null);
+        g2.drawImage(this.getImage(), screenX,screenY,Window.tileSize,Window.tileSize,null);
     
     }
     public void pickUpObject(int i){
         if(i != 999){ // Must exclude the obejcts that we don't want picked
-            String objectName = window.obj[i].getName();
+            String objectName = window.items[i].getName();
             switch(objectName){
                 case"chest":
-                    Window.startBattle(Window.player, Window.entity);
+                    Window.startBattle(Window.player, Window.testEntity);
+                    window.items[i] = null;
                     break;
                 case "key":
-                    window.obj[i] = null;
+                    window.items[i] = null;
                     this.hasKey++;
                     break;
                 case "lockeddoor":
                     if(this.hasKey >0){
-                        window.obj[i] = null;
+                        window.items[i] = null;
                         this.hasKey--;
                     }
                     break;
                 
             }
         }
-        // if(i != 999){
-        //     window.obj[i] = null;
-        // }
     }
 }

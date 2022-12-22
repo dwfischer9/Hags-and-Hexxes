@@ -58,11 +58,8 @@ public class TileManager {
      */
     public void setup(int index, String imagePath,boolean collision) throws IOException{
         UtilityTools uTool = new UtilityTools();
-        
         BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/assets/" + imagePath + ".png"));
         BufferedImage scaledImg = uTool.scaleImage(img, Window.tileSize, Window.tileSize);
-  
-
         tiles[index] = new Tile(scaledImg,collision);
     }
 
@@ -77,7 +74,9 @@ public class TileManager {
         try {
             InputStream is = getClass().getResourceAsStream(filePath);
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        
             int col = 0;
+            
             int row = 0;
             while(col < tileWindow.maxWorldCol && row < tileWindow.maxWorldRow){
                 String line = br.readLine();
@@ -94,7 +93,7 @@ public class TileManager {
             br.close();
         
         } catch (Exception e) {
-            
+            e.printStackTrace();
         }
     }
     public void draw(Graphics2D g2){

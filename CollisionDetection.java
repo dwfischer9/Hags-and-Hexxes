@@ -57,20 +57,20 @@ public class CollisionDetection {
     public int checkObject(Entity entity, boolean player){
         int index = 999;
         
-        for(int i=0; i< window.obj.length; i++){
-            if(window.obj[i] != null){
+        for(int i=0; i< window.items.length; i++){
+            if(window.items[i] != null){
                 //get solid area position for both entity and object
                 entity.hitBox.x += entity.worldX;
                 entity.hitBox.y += entity.worldY;
                 
-                window.obj[i].HITBOX.x += window.obj[i].worldX;
-                window.obj[i].HITBOX.y += window.obj[i].worldY;
+                window.items[i].HITBOX.x += window.items[i].worldX;
+                window.items[i].HITBOX.y += window.items[i].worldY;
 
                 switch(entity.direction){
                     case "up":
                         entity.hitBox.y -= entity.speed;
-                        if(entity.hitBox.intersects(window.obj[i].HITBOX)){
-                            if(window.obj[i].collision)
+                        if(entity.hitBox.intersects(window.items[i].HITBOX)){
+                            if(window.items[i].collision)
                                 entity.collisionOn = true;
                             if(player)
                                 index = i;
@@ -78,8 +78,8 @@ public class CollisionDetection {
                         break;
                     case "down":
                         entity.hitBox.y += entity.speed;
-                        if(entity.hitBox.intersects(window.obj[i].HITBOX)){
-                            if(window.obj[i].collision)
+                        if(entity.hitBox.intersects(window.items[i].HITBOX)){
+                            if(window.items[i].collision)
                                 entity.collisionOn = true;
                             if(player)
                                 index = i;
@@ -87,8 +87,8 @@ public class CollisionDetection {
                         break;
                     case "left":
                         entity.hitBox.x -= entity.speed;
-                        if(entity.hitBox.intersects(window.obj[i].HITBOX)){
-                            if(window.obj[i].collision)
+                        if(entity.hitBox.intersects(window.items[i].HITBOX)){
+                            if(window.items[i].collision)
                                 entity.collisionOn = true;
                             if(player)
                                 index = i;
@@ -96,8 +96,8 @@ public class CollisionDetection {
                         break;
                     case "right":
                         entity.hitBox.x += entity.speed;
-                        if(entity.hitBox.intersects(window.obj[i].HITBOX)){
-                            if(window.obj[i].collision)
+                        if(entity.hitBox.intersects(window.items[i].HITBOX)){
+                            if(window.items[i].collision)
                                 entity.collisionOn = true;
                             if(player)
                                 index = i;
@@ -106,8 +106,8 @@ public class CollisionDetection {
                 }
                 entity.hitBox.x = entity.hitBoxDefeaultX;
                 entity.hitBox.y = entity.hitBoxDefeaultY;
-                window.obj[i].HITBOX.x = window.obj[i].HITBOXDEFAULTX;
-                window.obj[i].HITBOX.y = window.obj[i].HITBOXDEFAULTY;
+                window.items[i].HITBOX.x = window.items[i].HITBOXDEFAULTX;
+                window.items[i].HITBOX.y = window.items[i].HITBOXDEFAULTY;
             }
 
         
