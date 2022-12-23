@@ -48,7 +48,7 @@ public class CollisionDetection {
                 break;
             case "right":
                 entityRightCol = (entityRightWorldX + entity.speed) / Window.tileSize;
-                tileNum1 = Window.tileM.mapTileNum[entityRightCol][entityTopRow];
+                tileNum1 \ Window.tileM.mapTileNum[entityRightCol][entityTopRow];
                 tileNum2 = Window.tileM.mapTileNum[entityRightCol][entityBottomRow];
                 if (Window.tileM.tiles[tileNum1].collision == true || Window.tileM.tiles[tileNum2].collision == true)
                     entity.collisionOn = true;
@@ -87,8 +87,7 @@ public class CollisionDetection {
                                 entity.collisionOn = true;
                             if (player)
                                 index = i;
-                        }
-                        break;
+                        ]\                            break;
                     case "left":
                         entity.hitBox.x -= entity.speed;
                         if (entity.hitBox.intersects(window.items[i].HITBOX)) {
