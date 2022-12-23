@@ -8,6 +8,7 @@ import java.awt.Rectangle;
 public class Player extends Entity {
     KeyHandler keyH;
     public int hasKey = 0;
+
     public Player(Window window, KeyHandler keyH, String name, Type type, Move[] moves, int level, float health,
             float maxHealth) {
         super(name, type, moves, level, health, maxHealth);
@@ -24,9 +25,9 @@ public class Player extends Entity {
         this.hitBoxDefeaultY = 16;
         this.hitBoxDefeaultX = 8;
         this.hitBox = new Rectangle(8, 16, 32, 32);
-        this.worldX = Window.tileSize * 23;
-        this.worldY = Window.tileSize * 21;
-        this.speed = 4;
+        this.setWorldX(Window.tileSize * 23); 
+        this.setWorldY(Window.tileSize * 21);
+        this.setSpeed(4);
         this.direction = "down";
     }
 
@@ -54,16 +55,17 @@ public class Player extends Entity {
         if (collisionOn == false) {
             switch (direction) {
                 case "up":
-                    worldY -= speed;
+                    this.setWorldY(this.getWorldY() - this.getSpeed());
+
                     break;
                 case "down":
-                    worldY += speed;
+                this.setWorldY(this.getWorldY() + this.getSpeed());
                     break;
                 case "left":
-                    worldX -= speed;
+                this.setWorldX(this.getWorldX() - this.getSpeed());
                     break;
                 case "right":
-                    worldX += speed;
+                this.setWorldX(this.getWorldX() + this.getSpeed());
                     break;
             }
         }
@@ -71,7 +73,7 @@ public class Player extends Entity {
     }
 
     public void draw(Graphics2D g2) {
-        g2.drawImage(this.getImage(), screenX, screenY, Window.tileSize, Window.tileSize, null);
+        g2.drawImage(this.getImage(), SCREEN_X, SCREEN_Y, Window.tileSize, Window.tileSize, null);
 
     }
 

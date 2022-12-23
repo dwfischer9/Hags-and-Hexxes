@@ -12,13 +12,13 @@ public class Entity extends AbstractEntity {
 
     public Entity(String name, Type normal, Move[] moves, int level, float health, float maxHealth) {
 
-        super(name, Type.normal, new Move[] { Move.slap, Move.tackle }, 5, (float) 90, (float) 90);
+        super(name, Type.normal, moves, 5, (float) 90, (float) 90);
     }
     // abstract float attack(Move moveChoice) throws IOException;
     public void levelUp() {
     }
     public float foeAttack() throws IOException {
-        return health;
+        return this.getHealth();
     }
 
 }
