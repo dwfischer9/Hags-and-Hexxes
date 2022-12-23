@@ -34,8 +34,8 @@ public class AssetSetter {
     public void setNPC() {
         window.npc[0] = new Entity("boxguy", Type.normal, new Move[] { Move.slap, Move.tackle }, 10, 40, 40);
         window.npc[0].setup();
-        window.npc[0].worldX = Window.tileSize * 23;
-        window.npc[0].worldY = Window.tileSize * 20;
+        window.npc[0].setWorldX(Window.tileSize * 23);
+        window.npc[0].setWorldY(Window.tileSize * 20);
     }
 
     public void setPlayer() {
