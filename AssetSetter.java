@@ -1,5 +1,5 @@
 import java.io.IOException;
-
+import java.awt.Rectangle;
 /**
  * 
  * This class handles creating various assets and placing them
@@ -37,11 +37,16 @@ public class AssetSetter {
         window.npc[0].setup();
         window.npc[0].setWorldX(Window.tileSize * 23);
         window.npc[0].setWorldY(Window.tileSize * 20);
-        window.npc[1] = Window.slime;
-        window.npc[1].setup();
-        window.npc[1].setSpeed(1);
-        window.npc[1].setWorldX(Window.tileSize * 29);
-        window.npc[1].setWorldY(Window.tileSize * 20);
+
+        window.monster[0] = Window.slime;
+        window.monster[0].isMonster = true;
+        window.monster[0].hitBoxDefeaultX = 6;
+        window.monster[0].hitBoxDefeaultY = 18;
+        window.monster[0].hitBox = new Rectangle(6,18,38,30);
+        window.monster[0].setup();
+        window.monster[0].setSpeed(1);
+        window.monster[0].setWorldX(Window.tileSize * 24);
+        window.monster[0].setWorldY(Window.tileSize * 20);
     }
 
     public void setPlayer() {

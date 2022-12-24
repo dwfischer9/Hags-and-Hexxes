@@ -135,7 +135,6 @@ public class CollisionDetection {
 
                         entity.hitBox.y -= entity.getSpeed();
                         if (entity.hitBox.intersects(target[i].hitBox)) {
-                            System.out.println("Collision detected");
                             entity.collisionOn = true;
                             index = i;
                         }
@@ -152,7 +151,6 @@ public class CollisionDetection {
                     case "left":
                         entity.hitBox.x -= entity.getSpeed();
                         if (entity.hitBox.intersects(target[i].hitBox)) {
-                            System.out.println("Collision detected");
                             entity.collisionOn = true;
                             index = i;
                         }
@@ -160,7 +158,6 @@ public class CollisionDetection {
                     case "right":
                         entity.hitBox.x += entity.getSpeed();
                         if (entity.hitBox.intersects(target[i].hitBox)) {
-                            System.out.println("Collision detected");
                             entity.collisionOn = true;
                             index = i;
                         }
@@ -168,6 +165,60 @@ public class CollisionDetection {
                 }
                 entity.hitBox.x = entity.hitBoxDefeaultX;
                 entity.hitBox.y = entity.hitBoxDefeaultY;
+                target[i].hitBox.x = target[i].hitBoxDefeaultX;
+                target[i].hitBox.y = target[i].hitBoxDefeaultX;
+            }
+        }
+
+        return index;
+    }
+
+    public int checkAttackEntity(Entity entity, Entity[] target) {
+        int index = 999;
+
+        for (int i = 0; i < target.length; i++) {
+            if (target[i] != null) {
+                // get solid area position for both entity and object
+                entity.attackArea.x += entity.getWorldX();
+                entity.attackArea.y += entity.getWorldY();
+
+                target[i].hitBox.x += target[i].getWorldX();
+                target[i].hitBox.y += target[i].getWorldY();
+                switch (entity.direction) {
+                    case "up":
+
+                        entity.attackArea.y -= entity.getSpeed();
+                        if (entity.attackArea.intersects(target[i].hitBox)) {
+                            entity.collisionOn = true;
+                            index = i;
+                        }
+                        break;
+                    case "down":
+
+                        entity.attackArea.y += entity.getSpeed();
+                        if (entity.attackArea.intersects(target[i].hitBox)) {
+                            index = i;
+                            entity.collisionOn = true;
+
+                        }
+                        break;
+                    case "left":
+                        entity.attackArea.x -= entity.getSpeed();
+                        if (entity.attackArea.intersects(target[i].hitBox)) {
+                            entity.collisionOn = true;
+                            index = i;
+                        }
+                        break;
+                    case "right":
+                        entity.attackArea.x += entity.getSpeed();
+                        if (entity.attackArea.intersects(target[i].hitBox)) {
+                            entity.collisionOn = true;
+                            index = i;
+                        }
+                        break;
+                }
+                entity.attackArea.x = entity.attackAreaDefaultx;
+                entity.attackArea.y = entity.attackAreaDefaulty;
                 target[i].hitBox.x = target[i].hitBoxDefeaultX;
                 target[i].hitBox.y = target[i].hitBoxDefeaultX;
             }
@@ -213,7 +264,6 @@ public class CollisionDetection {
                 break;
         }
         entity.hitBox.x = entity.hitBoxDefeaultX;
-        entity.hitBox.y = entity.hitBoxDefeaultY;
         Window.player.hitBox.x = Window.player.hitBoxDefeaultX;
         Window.player.hitBox.y = Window.player.hitBoxDefeaultY;
     }

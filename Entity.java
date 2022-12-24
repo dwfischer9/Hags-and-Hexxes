@@ -8,6 +8,9 @@ import java.util.Random;
 
 public class Entity extends AbstractEntity {
     public int actionLock = 0;
+    public boolean isMonster;
+
+    public Window window = new Window();
     public int hitBoxDefeaultX = 8, hitBoxDefeaultY = 16;
     String dialogues[] = new String[20];
 
@@ -21,8 +24,9 @@ public class Entity extends AbstractEntity {
 
         collisionOn = false;
         Window.cDetection.checkTile(this);
+        Window.cDetection.checkEntity(this, window.npc);
+        Window.cDetection.checkEntity(this, window.monster);
         Window.cDetection.checkObject(this, false);
-        Window.cDetection.checkPlayer(this);
         if (collisionOn == false) {
             switch (direction) {
                 case "up":
@@ -43,6 +47,15 @@ public class Entity extends AbstractEntity {
                     break;
             }
         }
+        /// invincible timer
+        if (this.invincible == true) {
+            this.invincibleCounter++;
+            if (this.invincibleCounter > 60) {
+                this.invincible = false;
+                this.invincibleCounter = 0;
+
+            }
+        }
     }
 
     public void setAction() {
@@ -61,6 +74,15 @@ public class Entity extends AbstractEntity {
             actionLock = 0;
         }
 
+    }
+
+    public void contactMonster(int index) {
+        if (index != 999 && invincible == false) {
+            this.setHealth(this.getHealth() - 10);
+            System.out.println("Damage taken");
+            this.invincible = true;
+
+        }
     }
 
     public void speak() {

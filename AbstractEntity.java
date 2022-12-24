@@ -1,6 +1,7 @@
 import java.awt.Rectangle;
 import java.awt.Graphics2D;
 import java.io.IOException;
+import java.awt.Color;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
@@ -8,21 +9,26 @@ import java.awt.image.BufferedImage;
  * This class is used to serve as a parent class to the {@link Entity} class.
  */
 abstract class AbstractEntity {
-    public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, attackUp1, attackUp2, attackDown1,
-            attackDown2, attackLeft1, attackLeft2, attackRight1, attackRight2;
+    public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, attackup1, attackup2, attackdown1,
+            attackdown2, attackleft1, attackleft2, attackright1, attackright2;
     private int worldX, worldY;
     public boolean collisionOn;
-    private String name;
+    private String name; 
+    
+    public Rectangle attackArea = new Rectangle(8,16,Window.tileSize,Window.tileSize);
+    public int attackAreaDefaultx = 8;
+    public int attackAreaDefaulty = 16;
     private int level;
     private float maxHealth;
     String direction;
     private float health;
-    public boolean attacking = false;
+    public boolean attacking;
 
-
-    private BufferedImage image;
+    protected BufferedImage image;
     int spriteCounter = 0;
     int spriteNum = 1;
+    public boolean invincible = false;
+    public int invincibleCounter = 0;
     public Window window;
     private int speed = 2;
     public Rectangle hitBox = new Rectangle(8, 16, 32, 32);
@@ -134,83 +140,82 @@ abstract class AbstractEntity {
     abstract void levelUp();
 
     public BufferedImage getImage() {
-        switch (this.getDirection()) { // handles the direction that the sprite is facing.
+        switch (getDirection()) { // handles the direction that the sprite is facing.
             case "up":
                 if (attacking == false) {
-                    if (this.spriteNum == 1)
-                        this.image = this.up1;
-                    if (this.spriteNum == 2)
-                        this.image = this.up2;
-                } else {
-                    if (this.spriteNum == 1)
-                        this.image = this.attackUp1;
-                    if (this.spriteNum == 2)
-                        this.image = this.attackUp2;
+                    if (spriteNum == 1)
+                        image = up1;
+                    if (spriteNum == 2)
+                        image = up2;
+                } if(attacking == true){
+                    if (spriteNum == 1)
+                        image = attackup1;
+                    if (spriteNum == 2)
+                        image = attackup2;
                 }
 
                 break;
             case "down":
                 if (attacking == false) {
-                    if (this.spriteNum == 1)
-                        this.image = this.down1;
-                    if (this.spriteNum == 2)
-                        this.image = this.down2;
-                } else {
-                    if (this.spriteNum == 1)
-                        this.image = this.attackDown1;
-                    if (this.spriteNum == 2)
-                        this.image = this.attackDown2;
+                    if (spriteNum == 1)
+                        image = down1;
+                    if (spriteNum == 2)
+                        image = down2;
+                } if(attacking == true) {
+                    if (spriteNum == 1)
+                        image = attackdown1;
+                    if (spriteNum == 2)
+                        image = attackdown2;
                 }
 
                 break;
             case "left":
                 if (attacking == false) {
-                    if (this.spriteNum == 1)
-                        this.image = this.left1;
-                    if (this.spriteNum == 2)
-                        this.image = this.left2;
-                } else {
-                    if (this.spriteNum == 1)
-                        this.image = this.attackLeft1;
-                    if (this.spriteNum == 2)
-                        this.image = this.attackLeft2;
+                    if (spriteNum == 1)
+                    
+                    if (spriteNum == 2)
+                        image = left2;
+                } if(attacking == true) {
+                    if (spriteNum == 1)
+                        image = attackleft1;
+                    if (spriteNum == 2)
+                        image = attackleft2;
                 }
 
                 break;
             case "right":
                 if (attacking == false) {
-                    if (this.spriteNum == 1)
-                        this.image = this.right1;
-                    if (this.spriteNum == 2)
-                        this.image = this.right2;
-                } else {
-                    if (this.spriteNum == 1)
-                        this.image = this.attackRight1;
-                    if (this.spriteNum == 2)
-                        this.image = this.attackRight2;
+                    if (spriteNum == 1)
+                        image = right1;
+                    if (spriteNum == 2)
+                        image = right2;
+                } if(attacking == true) {
+                    if (spriteNum == 1)
+                        image = attackright1;
+                    if (spriteNum == 2)
+                        image = attackright2;
                 }
 
                 break;
         }
-        this.spriteCounter++; // switches between sprite 1 and 2 for the direction.
-        if (this.spriteCounter > 90) { // serves as an idle animation. The player image
+        spriteCounter++; // switches between sprite 1 and 2 for the direction.
+        if (spriteCounter > 90) { // serves as an idle animation. The player image
             // will change every 12 frames.
-            if (this.spriteNum == 1) {
-                this.spriteNum = 2;
-            } else if (this.spriteNum == 2) {
-                this.spriteNum = 1;
+            if (spriteNum == 1) {
+                spriteNum = 2;
+            } else if (spriteNum == 2) {
+                spriteNum = 1;
             }
-            this.spriteCounter = 0;
+            spriteCounter = 0;
         }
-        return this.image;
+        return image;
 
     }
 
     public String getDirection() {
-        return this.direction;
+        return direction;
     }
 
-    abstract float foeAttack() throws IOException;
 
     /**
      * @param imagePath the name of the image
@@ -219,30 +224,54 @@ abstract class AbstractEntity {
     public void setup() {
         UtilityTools uTool = new UtilityTools();
         try {
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/up1.png"));
-            this.up1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/up1.png"));
+            up1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
 
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/up2.png"));
-            this.up2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/up2.png"));
+            up2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
 
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/down1.png"));
-            this.down1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/down2.png"));
-            this.down2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/down1.png"));
+            down1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/down2.png"));
+            down2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
 
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/left1.png"));
-            this.left1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/left1.png"));
+            left1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
 
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/left2.png"));
-            this.left2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/left2.png"));
+            left2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
 
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/right1.png"));
-            this.right1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/right1.png"));
+            right1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
 
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + this.getName() + "/right2.png"));
-            this.right2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/right2.png"));
+            right2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
+            if (name == "player") {
+                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackup1.png"));
+                attackup1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize * 2);
 
-            System.out.println("Finished loading assets for " + this.getName());
+                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackup2.png"));
+                attackup2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize * 2);
+
+                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackdown1.png"));
+                attackdown1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize * 2);
+                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackdown2.png"));
+                attackdown2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize * 2);
+
+                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackleft1.png"));
+                attackleft1 = uTool.scaleImage(image, Window.tileSize * 2, Window.tileSize);
+
+                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackleft2.png"));
+                attackleft2 = uTool.scaleImage(image, Window.tileSize * 2, Window.tileSize);
+
+                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackright1.png"));
+                attackright1 = uTool.scaleImage(image, Window.tileSize * 2, Window.tileSize);
+
+                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackright2.png"));
+                attackright2 = uTool.scaleImage(image, Window.tileSize * 2, Window.tileSize);
+            }
+
+            System.out.println("Finished loading assets for " + getName());
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -258,14 +287,28 @@ abstract class AbstractEntity {
                 worldY - Window.tileSize < Window.player.getWorldY() + Window.player.SCREEN_Y) { // only render tiles in
                                                                                                  // the
             // camera view
-            g2.drawImage(this.getImage(), screenX, screenY, Window.tileSize, Window.tileSize, null);
+            g2.drawImage(getImage(), screenX, screenY, null);
+       
         }
+        //HP BAR
+        if(this.maxHealth != this.health)
+            drawHealthBar(g2,screenX, screenY);
+        
     }
 
     public BufferedImage getUp1() {
         return up1;
     }
 
+    public void drawHealthBar(Graphics2D g2,int screenX,int screenY) {
+        g2.setColor(Color.red);
+        g2.fillRoundRect(screenX, screenY- 5, Window.tileSize, 10,2,2);
+        g2.setColor(Color.green);
+
+        g2.fillRoundRect(screenX, screenY - 5, (int)(Window.tileSize *this.getHealth()/this.getMaxHealth()), 10,2,2);
+        g2.setColor(new Color(26,26,26));
+        g2.drawRoundRect(screenX, screenY- 5, Window.tileSize, 10,2,2);
+    }
     public void setUp1(BufferedImage up1) {
         this.up1 = up1;
     }
@@ -357,8 +400,6 @@ abstract class AbstractEntity {
     public void setDirection(String direction) {
         this.direction = direction;
     }
-
-
 
     public int getSpeed() {
         return speed;

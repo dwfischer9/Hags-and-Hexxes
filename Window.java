@@ -1,20 +1,19 @@
 
 import java.awt.*;
 import java.io.IOException;
-
 import javax.swing.*;
 
 public class Window extends JPanel implements Runnable {
     protected final static Color backgroundColor = new Color(26, 26, 26);
+    // ||---Screen Settings---||\\
     private static final int originalTileSize = 16;// 16x16 tiles
-    private static final int scale = 3; // 768 x 576
+    private static final int scale = 3; // 960 x 576
     protected static final int tileSize = originalTileSize * scale;
-    public final static int maxScreenCol = 16;
+    public final static int maxScreenCol = 20;
     public final static int maxScreenRow = 12;
     public final static int screenWidth = tileSize * maxScreenCol;
     public final static int screenHeight = tileSize * maxScreenRow;
     private static final int FPS = 60;
-
     public static KeyHandler keyH = new KeyHandler();
     public static Window victoryPanel = new Window();
     public static Window overWorldPanel = new Window();
@@ -29,13 +28,13 @@ public class Window extends JPanel implements Runnable {
     public static JLabel foeHealth = new JLabel();
     public static JLabel victoryLabel = new JLabel("Victory!");
     public static Window gamePanel = new Window();
-    public static JFrame frame = new JFrame(); // Initialization of the window
-    public static Thread gameThread;
+
+    public  Thread gameThread = new Thread(this);
 
     public UI ui = new UI(this);
     public AssetSetter assetSetter = new AssetSetter(overWorldPanel);
     public static CollisionDetection cDetection = new CollisionDetection(overWorldPanel);
-
+    public Entity monster[] = new Entity[10];
     public Entity npc[] = new Entity[10];
     public static Entity testEntity = new Entity("Entity", 5, 90,
             90);
@@ -43,12 +42,14 @@ public class Window extends JPanel implements Runnable {
     int playerSpeed = 4;
     public static TileManager tileM = new TileManager(overWorldPanel);
     // WORLD SETTINGS
+
     public final int maxWorldCol = 50;
     public final int maxWorldRow = 50;
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
 
     public static int gameState;
+    private static JFrame frame = new JFrame();
     public final static int dialogueState = 0;
     public final static int playState = 1;
     public final static int pauseState = 2;
@@ -73,21 +74,24 @@ public class Window extends JPanel implements Runnable {
         assetSetter.setNPC();
         assetSetter.setPlayer();
         gameState = playState;
+    
+        
     }
 
     public void initialize() throws IOException {
-        // set up assets BEFORE thread starts
-
+        setupGame();
+        
         startGameThread();
         player.setDefaultValues();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // set close behavior to stop the program when the window
-                                                              // // is closed
+                                         // // is closed
         frame.setResizable(false); // I don't want to allow resizing of the window yet
         frame.setTitle("Hags and Hexxes "); // setting the title of the window, this is pretty temporary
         overWorldPanel();
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+   
     }
 
     /**
@@ -102,22 +106,12 @@ public class Window extends JPanel implements Runnable {
     /**
      * Initiates the game thread. Called in Game's main method
      */
-    public void startGameThread() {
+    public void startGameThread() { 
+        
         gameThread = new Thread(this);
         gameThread.start();
         System.out.println("Started game thread");
     }
-
-    public void statusBarInit(Window window) {
-        // this.add(statusBar);
-        statusBar.setBounds(0, 0, tileSize * 5, tileSize * 2);
-        statusBar.setVisible(true);
-        statusBar.add(playerHealth);
-
-        // overWorldPanel.add(statusBar);
-
-    }
-
 
     /**
      * update graphics
@@ -137,11 +131,8 @@ public class Window extends JPanel implements Runnable {
     public void run() {
         double drawInterval = 1000000000 / FPS; // 0.01666 seconds
         double nextDrawTime = System.nanoTime() + drawInterval;
-        statusBarInit(overWorldPanel);
-
         while (gameThread != null) {
             if (gameState == playState) {
-
                 overWorldPanel.update();
                 overWorldPanel.repaint();
             }
@@ -161,11 +152,6 @@ public class Window extends JPanel implements Runnable {
             }
         }
     }
-
-    /*
-     * (non-Javadoc)
-     * Paint method is called when repaint is called
-     */
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         long drawStart = System.nanoTime();
@@ -187,6 +173,12 @@ public class Window extends JPanel implements Runnable {
                 npc[i].draw(g2);
             }
         }
+        
+        //Monsters
+        for(int i = 0; i < monster.length; i++) {
+            if(monster[i] != null) {
+                monster[i].draw(g2);
+            }
 
         // Player
         player.draw(g2);
@@ -196,4 +188,6 @@ public class Window extends JPanel implements Runnable {
         g2.drawString("Draw Time:" + passed, 10, 400);
         ui.draw(g2);
     }
+   
+}
 }
