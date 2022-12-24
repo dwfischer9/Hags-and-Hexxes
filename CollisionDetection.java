@@ -1,6 +1,6 @@
 
 /**
- * This class handles collisions between entities and {@link Item}s or
+ * This class handles collisions between {@link Entities} and {@link Item}s or
  * {@link Tile}s.
  * 
  */
@@ -87,7 +87,8 @@ public class CollisionDetection {
                                 entity.collisionOn = true;
                             if (player)
                                 index = i;
-                        ]\                            break;
+                        }
+                        break;
                     case "left":
                         entity.hitBox.x -= entity.getSpeed();
                         if (entity.hitBox.intersects(window.items[i].HITBOX)) {
@@ -112,8 +113,108 @@ public class CollisionDetection {
                 window.items[i].HITBOX.x = window.items[i].HITBOXDEFAULTX;
                 window.items[i].HITBOX.y = window.items[i].HITBOXDEFAULTY;
             }
-
         }
+
         return index;
+
+    }
+
+    public int checkEntity(Entity entity, Entity[] target) {
+        int index = 999;
+
+        for (int i = 0; i < target.length; i++) {
+            if (target[i] != null) {
+                // get solid area position for both entity and object
+                entity.hitBox.x += entity.getWorldX();
+                entity.hitBox.y += entity.getWorldY();
+
+                target[i].hitBox.x += target[i].getWorldX();
+                target[i].hitBox.y += target[i].getWorldY();
+                switch (entity.direction) {
+                    case "up":
+
+                        entity.hitBox.y -= entity.getSpeed();
+                        if (entity.hitBox.intersects(target[i].hitBox)) {
+                            System.out.println("Collision detected");
+                            entity.collisionOn = true;
+                            index = i;
+                        }
+                        break;
+                    case "down":
+
+                        entity.hitBox.y += entity.getSpeed();
+                        if (entity.hitBox.intersects(target[i].hitBox)) {
+                            index = i;
+                            entity.collisionOn = true;
+
+                        }
+                        break;
+                    case "left":
+                        entity.hitBox.x -= entity.getSpeed();
+                        if (entity.hitBox.intersects(target[i].hitBox)) {
+                            System.out.println("Collision detected");
+                            entity.collisionOn = true;
+                            index = i;
+                        }
+                        break;
+                    case "right":
+                        entity.hitBox.x += entity.getSpeed();
+                        if (entity.hitBox.intersects(target[i].hitBox)) {
+                            System.out.println("Collision detected");
+                            entity.collisionOn = true;
+                            index = i;
+                        }
+                        break;
+                }
+                entity.hitBox.x = entity.hitBoxDefeaultX;
+                entity.hitBox.y = entity.hitBoxDefeaultY;
+                target[i].hitBox.x = target[i].hitBoxDefeaultX;
+                target[i].hitBox.y = target[i].hitBoxDefeaultX;
+            }
+        }
+
+        return index;
+    }
+
+    public void checkPlayer(Entity entity) {
+        // get solid area position for both entity and object
+        entity.hitBox.x += entity.getWorldX();
+        entity.hitBox.y += entity.getWorldY();
+
+        Window.player.hitBox.x = Window.player.getWorldX() + Window.player.hitBox.x;
+        Window.player.hitBox.y = Window.player.getWorldY() + Window.player.hitBox.y;
+        switch (entity.direction) {
+            case "up":
+                entity.hitBox.y -= entity.getSpeed();
+                if (entity.hitBox.intersects(Window.player.hitBox)) {
+                    entity.collisionOn = true;
+
+                }
+                break;
+            case "down":
+                entity.hitBox.y += entity.getSpeed();
+                if (entity.hitBox.intersects(Window.player.hitBox)) {
+                    entity.collisionOn = true;
+
+                }
+                break;
+            case "left":
+                entity.hitBox.x -= entity.getSpeed();
+                if (entity.hitBox.intersects(Window.player.hitBox)) {
+                    entity.collisionOn = true;
+                }
+                break;
+            case "right":
+                entity.hitBox.x += entity.getSpeed();
+                if (entity.hitBox.intersects(Window.player.hitBox)) {
+                    entity.collisionOn = true;
+
+                }
+                break;
+        }
+        entity.hitBox.x = entity.hitBoxDefeaultX;
+        entity.hitBox.y = entity.hitBoxDefeaultY;
+        Window.player.hitBox.x = Window.player.hitBoxDefeaultX;
+        Window.player.hitBox.y = Window.player.hitBoxDefeaultY;
     }
 }

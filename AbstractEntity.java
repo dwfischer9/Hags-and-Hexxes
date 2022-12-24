@@ -1,3 +1,4 @@
+import java.awt.Rectangle;
 import java.awt.Graphics2D;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -7,7 +8,8 @@ import java.awt.image.BufferedImage;
  * This class is used to serve as a parent class to the {@link Entity} class.
  */
 abstract class AbstractEntity {
-    public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2;
+    public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, attackUp1, attackUp2, attackDown1,
+            attackDown2, attackLeft1, attackLeft2, attackRight1, attackRight2;
     private int worldX, worldY;
     public boolean collisionOn;
     private String name;
@@ -15,14 +17,16 @@ abstract class AbstractEntity {
     private float maxHealth;
     String direction;
     private float health;
-    private Move[] moves;
+    public boolean attacking = false;
+
+
     private BufferedImage image;
     int spriteCounter = 0;
     int spriteNum = 1;
-    public final int HITBOXDEFAULTX = 0;
-    public final int HITBOXDEFAULTY = 0;
     public Window window;
-    private int speed;
+    private int speed = 2;
+    public Rectangle hitBox = new Rectangle(8, 16, 32, 32);
+
     public final int SCREEN_X = Window.screenWidth / 2 - Window.tileSize / 2;
     public final int SCREEN_Y = Window.screenHeight / 2 - Window.tileSize / 2;
 
@@ -35,28 +39,18 @@ abstract class AbstractEntity {
      * @param maxHealth The maximum health of the creature.
      * 
      */
-    public AbstractEntity(String name, Type type, Move[] moves, int level, float health, float maxHealth) {
+    public AbstractEntity(String name, int level, float health, float maxHealth) {
         this.name = name;
         this.health = health;
         this.level = level;
         this.direction = "down";
         this.maxHealth = maxHealth;
-        this.moves = moves;
+
         this.image = getImage();
     }
 
     public String toString() {
         return String.format("%s, HP: %.0f / %.0f\n", this.getName(), this.getHealth(), this.getMaxHealth());
-    }
-
-    /**
-     * Retreive the name of the creature.
-     * 
-     * @return the name of the creature.
-     */
-
-    public Move[] getMoves() {
-        return this.moves;
     }
 
     /**
@@ -142,28 +136,60 @@ abstract class AbstractEntity {
     public BufferedImage getImage() {
         switch (this.getDirection()) { // handles the direction that the sprite is facing.
             case "up":
-                if (this.spriteNum == 1)
-                    this.image = this.up1;
-                if (this.spriteNum == 2)
-                    this.image = this.up2;
+                if (attacking == false) {
+                    if (this.spriteNum == 1)
+                        this.image = this.up1;
+                    if (this.spriteNum == 2)
+                        this.image = this.up2;
+                } else {
+                    if (this.spriteNum == 1)
+                        this.image = this.attackUp1;
+                    if (this.spriteNum == 2)
+                        this.image = this.attackUp2;
+                }
+
                 break;
             case "down":
-                if (this.spriteNum == 1)
-                    this.image = this.down1;
-                if (this.spriteNum == 2)
-                    this.image = this.down2;
+                if (attacking == false) {
+                    if (this.spriteNum == 1)
+                        this.image = this.down1;
+                    if (this.spriteNum == 2)
+                        this.image = this.down2;
+                } else {
+                    if (this.spriteNum == 1)
+                        this.image = this.attackDown1;
+                    if (this.spriteNum == 2)
+                        this.image = this.attackDown2;
+                }
+
                 break;
             case "left":
-                if (this.spriteNum == 1)
-                    this.image = this.left1;
-                if (this.spriteNum == 2)
-                    this.image = this.left2;
+                if (attacking == false) {
+                    if (this.spriteNum == 1)
+                        this.image = this.left1;
+                    if (this.spriteNum == 2)
+                        this.image = this.left2;
+                } else {
+                    if (this.spriteNum == 1)
+                        this.image = this.attackLeft1;
+                    if (this.spriteNum == 2)
+                        this.image = this.attackLeft2;
+                }
+
                 break;
             case "right":
-                if (this.spriteNum == 1)
-                    this.image = this.right1;
-                if (this.spriteNum == 2)
-                    this.image = this.right2;
+                if (attacking == false) {
+                    if (this.spriteNum == 1)
+                        this.image = this.right1;
+                    if (this.spriteNum == 2)
+                        this.image = this.right2;
+                } else {
+                    if (this.spriteNum == 1)
+                        this.image = this.attackRight1;
+                    if (this.spriteNum == 2)
+                        this.image = this.attackRight2;
+                }
+
                 break;
         }
         this.spriteCounter++; // switches between sprite 1 and 2 for the direction.
@@ -229,8 +255,9 @@ abstract class AbstractEntity {
         if (worldX + Window.tileSize > Window.player.getWorldX() - Window.player.SCREEN_X &&
                 worldX - Window.tileSize < Window.player.getWorldX() + Window.player.SCREEN_X &&
                 worldY + Window.tileSize > Window.player.getWorldY() - Window.player.SCREEN_Y &&
-                worldY - Window.tileSize < Window.player.getWorldY() + Window.player.SCREEN_Y) { // only render tiles in the
-                                                                                           // camera view
+                worldY - Window.tileSize < Window.player.getWorldY() + Window.player.SCREEN_Y) { // only render tiles in
+                                                                                                 // the
+            // camera view
             g2.drawImage(this.getImage(), screenX, screenY, Window.tileSize, Window.tileSize, null);
         }
     }
@@ -331,9 +358,8 @@ abstract class AbstractEntity {
         this.direction = direction;
     }
 
-    public void setMoves(Move[] moves) {
-        this.moves = moves;
-    }
+
+
     public int getSpeed() {
         return speed;
     }

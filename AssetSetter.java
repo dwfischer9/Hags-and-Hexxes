@@ -32,10 +32,16 @@ public class AssetSetter {
      * Instatntiates and sets the world position of each NPC to appear on the map.
      */
     public void setNPC() {
-        window.npc[0] = new Entity("boxguy", Type.normal, new Move[] { Move.slap, Move.tackle }, 10, 40, 40);
+        window.npc[0] = Window.boxGuy;
+        window.npc[0].dialogues[0] = "HI!";
         window.npc[0].setup();
         window.npc[0].setWorldX(Window.tileSize * 23);
         window.npc[0].setWorldY(Window.tileSize * 20);
+        window.npc[1] = Window.slime;
+        window.npc[1].setup();
+        window.npc[1].setSpeed(1);
+        window.npc[1].setWorldX(Window.tileSize * 29);
+        window.npc[1].setWorldY(Window.tileSize * 20);
     }
 
     public void setPlayer() {

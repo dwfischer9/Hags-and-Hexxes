@@ -19,10 +19,10 @@ public class Window extends JPanel implements Runnable {
     public static Window victoryPanel = new Window();
     public static Window overWorldPanel = new Window();
     public static JPanel statusBar = new JPanel();
-    public static Player player = new Player(overWorldPanel, keyH, "player", Type.normal,
-            new Move[] { Move.slap, Move.tackle, Move.sword, Move.bow }, 5, 90,
-            90);
-
+    public static Player player = new Player(overWorldPanel, keyH, "player", 1,
+            90, 90);
+    public static Entity slime = new Entity("slime", 4, 90, 90);
+    public static Entity boxGuy = new Entity("boxguy", 10, 40, 40);
     public static BattleManager battleManager = new BattleManager();
     public static JLabel playerHealth = new JLabel(player.toString());
     public static JPanel foeBar = new JPanel();
@@ -31,12 +31,13 @@ public class Window extends JPanel implements Runnable {
     public static Window gamePanel = new Window();
     public static JFrame frame = new JFrame(); // Initialization of the window
     public static Thread gameThread;
-    public static ActionPanel ap = new ActionPanel(gamePanel, player, battleManager);
+
+    public UI ui = new UI(this);
     public AssetSetter assetSetter = new AssetSetter(overWorldPanel);
     public static CollisionDetection cDetection = new CollisionDetection(overWorldPanel);
 
-    public AbstractEntity npc[] = new AbstractEntity[10];
-    public static Entity testEntity = new Entity("Entity", Type.normal, new Move[] { Move.slap, Move.tackle }, 5, 90,
+    public Entity npc[] = new Entity[10];
+    public static Entity testEntity = new Entity("Entity", 5, 90,
             90);
     private final Dimension winSize = new Dimension(screenWidth, screenHeight);
     int playerSpeed = 4;
@@ -48,6 +49,7 @@ public class Window extends JPanel implements Runnable {
     public final int worldHeight = tileSize * maxWorldRow;
 
     public static int gameState;
+    public final static int dialogueState = 0;
     public final static int playState = 1;
     public final static int pauseState = 2;
     public final static int battleState = 3;
@@ -107,29 +109,25 @@ public class Window extends JPanel implements Runnable {
     }
 
     public void statusBarInit(Window window) {
-        this.add(statusBar);
+        // this.add(statusBar);
         statusBar.setBounds(0, 0, tileSize * 5, tileSize * 2);
         statusBar.setVisible(true);
         statusBar.add(playerHealth);
 
-        overWorldPanel.add(statusBar);
+        // overWorldPanel.add(statusBar);
 
     }
 
-    public void startBattle(Player player, Entity entity) {
-        ap.setup(ap);
-        overWorldPanel.setVisible(false);
-        gameState = battleState;
-        battleManager.playerTurn();
-
-    }
 
     /**
      * update graphics
      */
     public void update() {
-        if (gameState == playState)
+        if (gameState == playState) {
+            boxGuy.update();
+            slime.update();
             player.update();
+        }
     }
 
     /**
@@ -196,18 +194,6 @@ public class Window extends JPanel implements Runnable {
         long passed = drawEnd - drawStart;
         g2.setColor(backgroundColor);
         g2.drawString("Draw Time:" + passed, 10, 400);
-
+        ui.draw(g2);
     }
-
-    public static void endBattle() {
-        battleManager.waitingForAttack = false;
-        battleManager.isPlayerTurn = false;
-        gameState = playState;
-        overWorldPanel.setVisible(true);
-        frame.remove(ap);
-
-    }
-
-    // g2.dispose();
-    // }
 }
