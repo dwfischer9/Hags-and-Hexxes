@@ -29,7 +29,7 @@ abstract class AbstractEntity {
     int spriteNum = 1;
     public boolean invincible = false;
     public int invincibleCounter = 0;
-    public Window window = new Window();
+    public Window window;
     private int speed = 2;
     public Rectangle hitBox = new Rectangle(8, 16, 32, 32);
     public final int SCREEN_X = window.screenWidth / 2 - window.tileSize / 2;
@@ -51,7 +51,7 @@ abstract class AbstractEntity {
         this.window = window;
         this.direction = "down";
         this.maxHealth = maxHealth;
-        this.image = up1;
+        this.image = image;
     }
 
     public String toString() {

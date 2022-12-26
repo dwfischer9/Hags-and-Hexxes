@@ -10,14 +10,15 @@ import java.awt.image.BufferedImage;
  */
 public class Player extends Entity {
     KeyHandler keyH;
+
     public int attack = 10;
     public boolean attacking = false;
     public Rectangle attackArea;
     // new Rectangle(8, 16, window.tileSize, window.tileSize);
     public int hasKey = 0;
     public BufferedImage image = getImage();
-    int tempScreenX = getSCREEN_X();
-    int tempScreenY = getSCREEN_Y();
+    int tempScreenX = SCREEN_X;
+    int tempScreenY = SCREEN_Y;
     public Weapon longSword = new Weapon(new Rectangle(0, 0, window.tileSize * 3, window.tileSize * 1),
             new Rectangle(0, 0, window.tileSize * 3, window.tileSize * 1),
             new Rectangle(0, 0, window.tileSize * 1, window.tileSize * 3),
@@ -26,11 +27,11 @@ public class Player extends Entity {
 
     public Player(Window window, KeyHandler keyH, String name, int level, float health,
             float maxHealth) {
-        super(window,name, level, health, maxHealth);
+        super(window, name, level, health, maxHealth);
         this.keyH = keyH;
         this.weapon = longSword;
-        this.image = getImage();
         this.window = window;
+        this.image = getImage();
         this.attackArea = this.weapon.hitBoxLeft;
         setDefaultValues();
         // attackArea.width = 36;
@@ -114,8 +115,8 @@ public class Player extends Entity {
     }
 
     public BufferedImage getImage() {
-        tempScreenX = getSCREEN_X();
-        tempScreenY = getSCREEN_Y();
+        tempScreenX = SCREEN_X;
+        tempScreenY = SCREEN_Y;
         switch (getDirection()) { // handles the direction that the sprite is facing.
             case "up":
                 if (attacking == false) {
@@ -125,7 +126,7 @@ public class Player extends Entity {
                         image = up2;
                 }
                 if (attacking == true) {
-                    tempScreenY = getSCREEN_Y() - window.tileSize;
+                    tempScreenY = SCREEN_Y - window.tileSize;
                     if (spriteNum == 1)
                         image = attackup1;
                     if (spriteNum == 2)
@@ -156,7 +157,7 @@ public class Player extends Entity {
                             image = left2;
                 }
                 if (attacking == true) {
-                    tempScreenX = getSCREEN_X() - window.tileSize;
+                    tempScreenX = SCREEN_X - window.tileSize;
                     if (spriteNum == 1)
                         image = attackleft1;
                     if (spriteNum == 2)
@@ -265,20 +266,20 @@ public class Player extends Entity {
     public void draw(Graphics2D g2) {
         // DEBUG
         // AttackArea
-        tempScreenX = getSCREEN_X() + attackArea.x;
-        tempScreenY = getSCREEN_Y() + attackArea.y;
+        tempScreenX = SCREEN_X + attackArea.x;
+        tempScreenY = SCREEN_Y + attackArea.y;
         switch (direction) {
             case "up":
-                tempScreenY = getSCREEN_Y() - attackArea.height;
+                tempScreenY = SCREEN_Y - attackArea.height;
                 break;
             case "down":
-                tempScreenY = getSCREEN_Y() + window.tileSize;
+                tempScreenY = SCREEN_Y + window.tileSize;
                 break;
             case "left":
-                tempScreenX = getSCREEN_X() - attackArea.width;
+                tempScreenX = SCREEN_X - attackArea.width;
                 break;
             case "right":
-                tempScreenX = getSCREEN_X() + window.tileSize;
+                tempScreenX = SCREEN_X + window.tileSize;
                 break;
         }
         g2.setColor(Color.red);

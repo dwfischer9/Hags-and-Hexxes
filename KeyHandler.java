@@ -9,10 +9,7 @@ public class KeyHandler implements KeyListener {
     public boolean ePressed = false;
     public boolean escapePressed;
     public boolean spacePressed = false;
-    private Window window;
-    public KeyHandler(Window window){
-        this.window = window;
-    }
+
     @Override
     public void keyTyped(KeyEvent e) {
         // TODO Auto-generated method stub
@@ -22,7 +19,7 @@ public class KeyHandler implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
-        if (window.gameState == window.playState) {
+        if (Window.gameState == Window.playState) {
 
             if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP)
                 upPressed = true;
@@ -35,7 +32,7 @@ public class KeyHandler implements KeyListener {
 
             if (code == KeyEvent.VK_ESCAPE) {
                 escapePressed = true;
-                window.gameState = window.pauseState;
+                Window.gameState = Window.pauseState;
                 System.out.println("Game is paused.");
             }
             if (code == KeyEvent.VK_SPACE) {
@@ -47,15 +44,15 @@ public class KeyHandler implements KeyListener {
             }
         }
         // Pause state
-        if (window.gameState == window.pauseState) {
+        if (Window.gameState == Window.pauseState) {
             if (code == KeyEvent.VK_ESCAPE) {
                 escapePressed = true;
-                window.gameState = window.playState;
+                Window.gameState = Window.playState;
             }
         }
-        if (window.gameState == window.dialogueState) {
+        if (Window.gameState == Window.dialogueState) {
             if (code == KeyEvent.VK_E)
-                window.gameState = window.playState;
+                Window.gameState = Window.playState;
         }
 
         // if (code == KeyEvent.VK_W || code == KeyEvent.VK_E || code == KeyEvent.VK_S

@@ -15,7 +15,6 @@ public class Entity extends AbstractEntity {
 
     public Entity(Window window, String name, int level, float health, float maxHealth) {
         super(window, name, 5, (float) 90, (float) 90);
-        this.window = window;
     }
 
     public void update() {
