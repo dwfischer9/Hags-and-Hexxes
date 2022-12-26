@@ -1,5 +1,7 @@
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 /**
@@ -8,22 +10,32 @@ import java.awt.image.BufferedImage;
  */
 public class Player extends Entity {
     KeyHandler keyH;
-
     public int attack = 10;
     public boolean attacking = false;
-    public Rectangle attackArea = new Rectangle(8, 16, Window.tileSize, Window.tileSize);
+    public Rectangle attackArea;
+    // new Rectangle(8, 16, window.tileSize, window.tileSize);
     public int hasKey = 0;
     public BufferedImage image = getImage();
+    int tempScreenX = getSCREEN_X();
+    int tempScreenY = getSCREEN_Y();
+    public Weapon longSword = new Weapon(new Rectangle(0, 0, window.tileSize * 3, window.tileSize * 1),
+            new Rectangle(0, 0, window.tileSize * 3, window.tileSize * 1),
+            new Rectangle(0, 0, window.tileSize * 1, window.tileSize * 3),
+            new Rectangle(0, 0, window.tileSize, window.tileSize * 3), "Longsword",
+            30);
 
     public Player(Window window, KeyHandler keyH, String name, int level, float health,
             float maxHealth) {
-        super(name, level, health, maxHealth);
+        super(window,name, level, health, maxHealth);
         this.keyH = keyH;
-        this.window = window;
+        this.weapon = longSword;
         this.image = getImage();
+        this.window = window;
+        this.attackArea = this.weapon.hitBoxLeft;
         setDefaultValues();
-        attackArea.width = 36;
-        attackArea.height = 36;
+        // attackArea.width = 36;
+
+        // attackArea.height = 36;
 
     }
 
@@ -35,17 +47,16 @@ public class Player extends Entity {
         this.hitBoxDefeaultY = 16;
         this.hitBoxDefeaultX = 8;
         this.hitBox = new Rectangle(8, 16, 32, 32);
-        this.setWorldX(Window.tileSize * 23);
-        this.setWorldY(Window.tileSize * 21);
+        this.setWorldX(window.tileSize * 23);
+        this.setWorldY(window.tileSize * 21);
         this.setSpeed(4);
-        this.direction = "down";
         attacking = false;
     }
 
     public void damageMonster(int index) {
         if (index != 999 && window.monster[index].invincible != true) {
 
-            window.monster[index].setHealth(window.monster[index].getHealth() - this.attack);
+            window.monster[index].setHealth(window.monster[index].getHealth() - 10);
             window.monster[index].invincible = true;
             System.out.println("Hit detected");
             System.out.println(window.monster[index].getHealth());
@@ -83,11 +94,9 @@ public class Player extends Entity {
                     this.setWorldX(this.getWorldX() + attackArea.width);
                     break;
             }
-            hitBox.width = attackArea.width;
-            hitBox.height = attackArea.height;
 
             // check collision
-            int monsterIndex = Window.cDetection.checkAttackEntity(this, window.monster);
+            int monsterIndex = window.cDetection.checkAttackEntity(this, window.monster);
             damageMonster(monsterIndex);
 
             this.setWorldX(currentWorldX);
@@ -105,6 +114,8 @@ public class Player extends Entity {
     }
 
     public BufferedImage getImage() {
+        tempScreenX = getSCREEN_X();
+        tempScreenY = getSCREEN_Y();
         switch (getDirection()) { // handles the direction that the sprite is facing.
             case "up":
                 if (attacking == false) {
@@ -114,6 +125,7 @@ public class Player extends Entity {
                         image = up2;
                 }
                 if (attacking == true) {
+                    tempScreenY = getSCREEN_Y() - window.tileSize;
                     if (spriteNum == 1)
                         image = attackup1;
                     if (spriteNum == 2)
@@ -144,6 +156,7 @@ public class Player extends Entity {
                             image = left2;
                 }
                 if (attacking == true) {
+                    tempScreenX = getSCREEN_X() - window.tileSize;
                     if (spriteNum == 1)
                         image = attackleft1;
                     if (spriteNum == 2)
@@ -187,42 +200,47 @@ public class Player extends Entity {
             if (this.invincibleCounter > 60) {
                 this.invincible = false;
                 this.invincibleCounter = 0;
-
             }
         }
-        if (Window.keyH.spacePressed == true) {
+        if (window.keyH.spacePressed == true) {
             this.attacking = true;
         }
         if (attacking == true) {
             attacking();
         } else {
-            if (keyH.upPressed == true)
-                direction = "up";
-            else if (keyH.downPressed == true)
-                direction = "down";
+            if (keyH.upPressed == true) {
 
-            else if (keyH.leftPressed == true)
+                direction = "up";
+                this.attackArea = this.weapon.hitBoxUp;
+            } else if (keyH.downPressed == true) {
+
+                direction = "down";
+                this.attackArea = this.weapon.hitBoxDown;
+            } else if (keyH.leftPressed == true) {
+
                 direction = "left";
-            else if (keyH.rightPressed == true) {
+                this.attackArea = this.weapon.hitBoxLeft;
+            } else if (keyH.rightPressed == true) {
+
                 direction = "right";
-            } else {
-                direction = "";
+                this.attackArea = this.weapon.hitBoxRight;
             }
             // Checking tile colllision
             collisionOn = false;
-            Window.cDetection.checkTile(this);
+            window.cDetection.checkTile(this);
 
             // checking object collision
-            int objIndex = Window.cDetection.checkObject(this, true);
+            int objIndex = window.cDetection.checkObject(this, true);
             pickUpObject(objIndex);
 
-            int npcIndex = Window.cDetection.checkEntity(this, window.npc);
+            int npcIndex = window.cDetection.checkEntity(this, window.npc);
             interactNPC(npcIndex);
             if (this.getName() != "player")
-                Window.cDetection.checkPlayer(this);
+                window.cDetection.checkPlayer(this);
 
-            int monsterIndex = Window.cDetection.checkEntity(this, window.monster);
+            int monsterIndex = window.cDetection.checkEntity(this, window.monster);
             contactMonster(monsterIndex);
+
             // if collision is flase, player can move
             if (collisionOn == false && keyH.spacePressed == false) {
                 switch (direction) {
@@ -245,24 +263,43 @@ public class Player extends Entity {
     }
 
     public void draw(Graphics2D g2) {
-        g2.drawImage(this.getImage(), SCREEN_X, SCREEN_Y, null);
+        // DEBUG
+        // AttackArea
+        tempScreenX = getSCREEN_X() + attackArea.x;
+        tempScreenY = getSCREEN_Y() + attackArea.y;
+        switch (direction) {
+            case "up":
+                tempScreenY = getSCREEN_Y() - attackArea.height;
+                break;
+            case "down":
+                tempScreenY = getSCREEN_Y() + window.tileSize;
+                break;
+            case "left":
+                tempScreenX = getSCREEN_X() - attackArea.width;
+                break;
+            case "right":
+                tempScreenX = getSCREEN_X() + window.tileSize;
+                break;
+        }
+        g2.setColor(Color.red);
+        g2.setStroke(new BasicStroke(1));
+        g2.drawRect(tempScreenX, tempScreenY, attackArea.width, attackArea.height);
+
+        // Draw player
+        g2.drawImage(this.getImage(), tempScreenX, tempScreenY, null);
 
     }
 
     public void interactNPC(int i) {
-        if (i != 999) {
+        if (i != 999)
             if (keyH.ePressed) {
-
-                Window.gameState = Window.dialogueState;
+                window.gameState = window.dialogueState;
                 window.npc[i].speak();
-
             }
-        }
-
     }
 
     /**
-     * @param i the index of the object in {@link Window#items}
+     * @param i the index of the object in {@link window#items}
      */
     public void pickUpObject(int i) {
         if (i != 999) { // Must exclude the obejcts that we don't want picked

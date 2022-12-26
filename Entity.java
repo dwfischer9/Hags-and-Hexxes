@@ -9,24 +9,23 @@ import java.util.Random;
 public class Entity extends AbstractEntity {
     public int actionLock = 0;
     public boolean isMonster;
-
-    public Window window = new Window();
+    public Weapon weapon;
     public int hitBoxDefeaultX = 8, hitBoxDefeaultY = 16;
     String dialogues[] = new String[20];
 
-    public Entity(String name, int level, float health, float maxHealth) {
-
-        super(name, 5, (float) 90, (float) 90);
+    public Entity(Window window, String name, int level, float health, float maxHealth) {
+        super(window, name, 5, (float) 90, (float) 90);
+        this.window = window;
     }
 
     public void update() {
         setAction();
 
         collisionOn = false;
-        Window.cDetection.checkTile(this);
-        Window.cDetection.checkEntity(this, window.npc);
-        Window.cDetection.checkEntity(this, window.monster);
-        Window.cDetection.checkObject(this, false);
+        window.cDetection.checkTile(this);
+        window.cDetection.checkEntity(this, window.npc);
+        window.cDetection.checkEntity(this, window.monster);
+        window.cDetection.checkObject(this, false);
         if (collisionOn == false) {
             switch (direction) {
                 case "up":

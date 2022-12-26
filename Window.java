@@ -6,41 +6,41 @@ import javax.swing.*;
 public class Window extends JPanel implements Runnable {
     protected final static Color backgroundColor = new Color(26, 26, 26);
     // ||---Screen Settings---||\\
+
     private static final int originalTileSize = 16;// 16x16 tiles
     private static final int scale = 3; // 960 x 576
-    protected static final int tileSize = originalTileSize * scale;
+    protected final int tileSize = originalTileSize * scale;
     public final static int maxScreenCol = 20;
     public final static int maxScreenRow = 12;
-    public final static int screenWidth = tileSize * maxScreenCol;
-    public final static int screenHeight = tileSize * maxScreenRow;
-    private static final int FPS = 60;
-    public static KeyHandler keyH = new KeyHandler();
-    public static Window victoryPanel = new Window();
-    public static Window overWorldPanel = new Window();
-    public static JPanel statusBar = new JPanel();
-    public static Player player = new Player(overWorldPanel, keyH, "player", 1,
-            90, 90);
-    public static Entity slime = new Entity("slime", 4, 90, 90);
-    public static Entity boxGuy = new Entity("boxguy", 10, 40, 40);
-    public static BattleManager battleManager = new BattleManager();
-    public static JLabel playerHealth = new JLabel(player.toString());
-    public static JPanel foeBar = new JPanel();
-    public static JLabel foeHealth = new JLabel();
-    public static JLabel victoryLabel = new JLabel("Victory!");
-    public static Window gamePanel = new Window();
+    public final int screenWidth = tileSize * maxScreenCol;
+    public final int screenHeight = tileSize * maxScreenRow;
 
-    public  Thread gameThread = new Thread(this);
+    public final int SCREEN_X = screenWidth / 2 - tileSize / 2;
+    public final int SCREEN_Y = screenHeight / 2 - tileSize / 2;
+    private final int FPS = 60;
+    public KeyHandler keyH = new KeyHandler(this);
+    public Game game = new Game();
+    public Window overWorldPanel = game.window;
+    public JPanel statusBar = new JPanel();
+    public Player player = new Player(this, keyH, "player", 1,
+            90, 90);
+    public Entity slime = new Entity(this, "slime", 4, 90, 90);
+    public Entity boxGuy = new Entity(this, "boxguy", 10, 40, 40);
+    public JLabel playerHealth = new JLabel(player.toString());
+    public JPanel foeBar = new JPanel();
+    public JLabel foeHealth = new JLabel();
+    public JLabel victoryLabel = new JLabel("Victory!");
+
+    public Thread gameThread = new Thread(this);
 
     public UI ui = new UI(this);
-    public AssetSetter assetSetter = new AssetSetter(overWorldPanel);
-    public static CollisionDetection cDetection = new CollisionDetection(overWorldPanel);
+    public AssetSetter assetSetter = new AssetSetter(this);
+    public CollisionDetection cDetection = new CollisionDetection(this);
     public Entity monster[] = new Entity[10];
     public Entity npc[] = new Entity[10];
-    public static Entity testEntity = new Entity("Entity", 5, 90,
-            90);
     private final Dimension winSize = new Dimension(screenWidth, screenHeight);
     int playerSpeed = 4;
-    public static TileManager tileM = new TileManager(overWorldPanel);
+    public TileManager tileM = new TileManager(this);
     // WORLD SETTINGS
 
     public final int maxWorldCol = 50;
@@ -48,12 +48,13 @@ public class Window extends JPanel implements Runnable {
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
 
-    public static int gameState;
-    private static JFrame frame = new JFrame();
-    public final static int dialogueState = 0;
-    public final static int playState = 1;
-    public final static int pauseState = 2;
+    public int gameState;
+    static JFrame frame = new JFrame();
+    public final int dialogueState = 0;
+    public final int playState = 1;
+    public final int pauseState = 2;
     public final static int battleState = 3;
+    public final int startState = 4;
     int menuState;
     public Item items[] = new Item[20];
 
@@ -61,43 +62,43 @@ public class Window extends JPanel implements Runnable {
      * Constructs a new instance of Window and sets some defeault properties
      */
     public Window() {
+        this.setLayout(null);
         this.setPreferredSize(winSize);
         this.setBackground(backgroundColor);
         this.setDoubleBuffered(true);
-        this.setLayout(null);
         this.setFocusable(true);
         this.addKeyListener(keyH);
+        this.setVisible(true);
     }
 
     public void setupGame() throws IOException {
+        player.setDefaultValues();
         assetSetter.setObject();
         assetSetter.setNPC();
         assetSetter.setPlayer();
-        gameState = playState;
-    
-        
+        gameState = startState;
+        ui.startMenu();
     }
 
     public void initialize() throws IOException {
         setupGame();
-        
         startGameThread();
         player.setDefaultValues();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // set close behavior to stop the program when the window
-                                         // // is closed
+        // // is closed
         frame.setResizable(false); // I don't want to allow resizing of the window yet
         frame.setTitle("Hags and Hexxes "); // setting the title of the window, this is pretty temporary
         overWorldPanel();
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-   
+
     }
 
     /**
      * initializes the overworld panel. Should be called at the end of a battle
      */
-    public static void overWorldPanel() {
+    public void overWorldPanel() {
         overWorldPanel.setName("overWorldPanel");
         frame.add(overWorldPanel);
         overWorldPanel.setVisible(true);
@@ -106,11 +107,12 @@ public class Window extends JPanel implements Runnable {
     /**
      * Initiates the game thread. Called in Game's main method
      */
-    public void startGameThread() { 
-        
+    public void startGameThread() {
+
         gameThread = new Thread(this);
         gameThread.start();
         System.out.println("Started game thread");
+        System.out.println(gameState);
     }
 
     /**
@@ -152,42 +154,45 @@ public class Window extends JPanel implements Runnable {
             }
         }
     }
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         long drawStart = System.nanoTime();
-        Graphics2D g2 = (Graphics2D) g;
-        // Tilesheet
-        tileM.draw(g2);
-        // Objects
-        for (int i = 0; i < items.length; i++) // for each item we have loaded in ,
-        // we need to draw it to the screen
-        {
-            if (items[i] != null) {
-                items[i].draw(g2, this);
-            }
-        }
-
-        // NPC
-        for (int i = 0; i < npc.length; i++) {
-            if (npc[i] != null) {
-                npc[i].draw(g2);
-            }
-        }
-        
-        //Monsters
-        for(int i = 0; i < monster.length; i++) {
-            if(monster[i] != null) {
-                monster[i].draw(g2);
+        Graphics2D g2 = (Graphics2D) g.create();
+        if (gameState == playState) { // Tilesheet
+            tileM.draw(g2);
+            // Objects
+            for (int i = 0; i < items.length; i++) // for each item we have loaded in ,
+            // we need to draw it to the screen
+            {
+                if (items[i] != null) {
+                    items[i].draw(g2, this);
+                }
             }
 
-        // Player
-        player.draw(g2);
-        long drawEnd = System.nanoTime();
-        long passed = drawEnd - drawStart;
-        g2.setColor(backgroundColor);
-        g2.drawString("Draw Time:" + passed, 10, 400);
+            // NPC
+            for (int i = 0; i < npc.length; i++) {
+                if (npc[i] != null) {
+                    npc[i].draw(g2);
+                }
+            }
+
+            // Monsters
+            for (int i = 0; i < monster.length; i++) {
+                if (monster[i] != null) {
+                    monster[i].draw(g2);
+                }
+
+                // Player
+                player.draw(g2);
+                long drawEnd = System.nanoTime();
+                long passed = drawEnd - drawStart;
+                g2.setColor(backgroundColor);
+                g2.drawString("Draw Time:" + passed, 10, 400);
+            }
+
+        }
         ui.draw(g2);
+        g2.dispose();
     }
-   
-}
 }

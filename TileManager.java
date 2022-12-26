@@ -63,7 +63,7 @@ public class TileManager {
     public void setup(int index, String imagePath, boolean collision) throws IOException {
         UtilityTools uTool = new UtilityTools();
         BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/assets/" + imagePath + ".png"));
-        BufferedImage scaledImg = uTool.scaleImage(img, Window.tileSize, Window.tileSize);
+        BufferedImage scaledImg = uTool.scaleImage(img, tileWindow.tileSize, tileWindow.tileSize);
         tiles[index] = new Tile(scaledImg, collision);
     }
 
@@ -111,20 +111,21 @@ public class TileManager {
 
         while (worldCol < tileWindow.maxWorldCol && worldRow < tileWindow.maxWorldRow) {
 
-            int worldX = worldCol * Window.tileSize;
-            int worldY = worldRow * Window.tileSize;
-            int screenX = worldX - Window.player.getWorldX() + Window.player.SCREEN_X;
-            int screenY = worldY - Window.player.getWorldY() + Window.player.SCREEN_Y;
+            int worldX = worldCol * tileWindow.tileSize;
+            int worldY = worldRow * tileWindow.tileSize;
+            int screenX = worldX - tileWindow.player.getWorldX() + tileWindow.SCREEN_X;
+            int screenY = worldY - tileWindow.player.getWorldY() + tileWindow.SCREEN_Y;
 
             int tileNum = mapTileNum[worldCol][worldRow];
             if (tileWindow.isVisible() == true && tileWindow.getName() == "overWorldPanel") {
-                if (worldX + Window.tileSize > Window.player.getWorldX() - Window.player.SCREEN_X &&
-                        worldX - Window.tileSize < Window.player.getWorldX() + Window.player.SCREEN_X &&
-                        worldY + Window.tileSize > Window.player.getWorldY() - Window.player.SCREEN_Y &&
-                        worldY - Window.tileSize < Window.player.getWorldY() + Window.player.SCREEN_Y) // only render tiles
-                                                                                                  // in
-                                                                                                  // the camera view
-                    g2.drawImage(tiles[tileNum].image, screenX, screenY, Window.tileSize, Window.tileSize, null);
+                if (worldX + tileWindow.tileSize > tileWindow.player.getWorldX() - tileWindow.SCREEN_X &&
+                        worldX - tileWindow.tileSize < tileWindow.player.getWorldX() + tileWindow.SCREEN_X &&
+                        worldY + tileWindow.tileSize > tileWindow.player.getWorldY() - tileWindow.SCREEN_Y &&
+                        worldY - tileWindow.tileSize < tileWindow.player.getWorldY() + tileWindow.SCREEN_Y) // only render
+                                                                                                       // tiles
+                    // in
+                    // the camera view
+                    g2.drawImage(tiles[tileNum].image, screenX, screenY, tileWindow.tileSize, tileWindow.tileSize, null);
             }
             worldCol++;
             if (worldCol == tileWindow.maxWorldCol) {

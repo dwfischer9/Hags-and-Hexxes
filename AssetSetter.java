@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.awt.Rectangle;
+
 /**
  * 
  * This class handles creating various assets and placing them
@@ -10,7 +11,7 @@ import java.awt.Rectangle;
 public class AssetSetter {
 
     Window window;
-    Player player = Window.player;
+    Player player = window.player;
 
     public AssetSetter(Window window) {
         this.window = window;
@@ -22,9 +23,9 @@ public class AssetSetter {
      * @throws IOException
      */
     public void setObject() {
-        window.items[0] = new Item(window, "chest", true, Window.tileSize * 20, Window.tileSize * 20);
-        window.items[1] = new Item(window, "lockeddoor", true, Window.tileSize * 23, Window.tileSize * 25);
-        window.items[2] = new Item(window, "key", true, Window.tileSize * 21, Window.tileSize * 20);
+        window.items[0] = new Item(window, "chest", true, window.tileSize * 20, window.tileSize * 20);
+        window.items[1] = new Item(window, "lockeddoor", true, window.tileSize * 23, window.tileSize * 25);
+        window.items[2] = new Item(window, "key", true, window.tileSize * 21, window.tileSize * 20);
 
     }
 
@@ -32,21 +33,21 @@ public class AssetSetter {
      * Instatntiates and sets the world position of each NPC to appear on the map.
      */
     public void setNPC() {
-        window.npc[0] = Window.boxGuy;
+        window.npc[0] = window.boxGuy;
         window.npc[0].dialogues[0] = "HI!";
         window.npc[0].setup();
-        window.npc[0].setWorldX(Window.tileSize * 23);
-        window.npc[0].setWorldY(Window.tileSize * 20);
+        window.npc[0].setWorldX(window.tileSize * 23);
+        window.npc[0].setWorldY(window.tileSize * 20);
 
-        window.monster[0] = Window.slime;
+        window.monster[0] = window.slime;
         window.monster[0].isMonster = true;
         window.monster[0].hitBoxDefeaultX = 6;
         window.monster[0].hitBoxDefeaultY = 18;
-        window.monster[0].hitBox = new Rectangle(6,18,38,30);
+        window.monster[0].hitBox = new Rectangle(6, 18, 38, 30);
         window.monster[0].setup();
-        window.monster[0].setSpeed(1);
-        window.monster[0].setWorldX(Window.tileSize * 24);
-        window.monster[0].setWorldY(Window.tileSize * 20);
+        window.monster[0].setSpeed(0);
+        window.monster[0].setWorldX(window.tileSize * 24);
+        window.monster[0].setWorldY(window.tileSize * 18);
     }
 
     public void setPlayer() {
