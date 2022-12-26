@@ -35,8 +35,8 @@ public class UI {
         final int y = Window.tileSize * 1;
         final int width = Window.tileSize * 5;
         final int height = Window.tileSize * 1;
-        final int[] xPts = { 1, width, width - Window.tileSize, 1 };
-        final int[] yPts = { 1, 1, Window.tileSize, Window.tileSize };
+        final int[] xPts = { 1, width, width - height, 1 };
+        final int[] yPts = { 1, 1, height, height };
         g2.setColor(new Color(121, 5, 232, 200));
         g2.fillPolygon(xPts, yPts, 4);
         g2.setStroke(new BasicStroke(5));
