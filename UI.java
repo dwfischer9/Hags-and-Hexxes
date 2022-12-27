@@ -2,51 +2,36 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 
-import javax.swing.JButton;
 import java.awt.Graphics2D;
 
 /**
  * UI
  */
 public class UI {
-    public void startMenu() {
-        final JButton startGameButton = new JButton("Start Game");
-        final JButton optionsButton = new JButton("Options");
-        final JButton exitButton = new JButton("Exit to Desktop");
-        startGameButton.setVisible(true);
-        startGameButton.setBounds(window.screenWidth / 2 - 70, window.screenHeight / 2 - 20, 150, 20);
-        window.add(startGameButton);
-        optionsButton.setVisible(true);
-        optionsButton.setBounds(window.screenWidth / 2 - 70, window.screenHeight / 2 + 10, 150, 20);
-        window.add(optionsButton);
-        exitButton.setVisible(true);
-        exitButton.setBounds(window.screenWidth / 2 - 70, window.screenHeight / 2 + 50, 150, 20);
-        window.add(exitButton);
-    }
 
+    int commandNum = 1;
     public static String currentDialogue;
     Window window;
     Graphics2D g2;
+    KeyHandler keyH = new KeyHandler();
 
-    public UI(final Window window) {
-        this.window = window;
+    public void startMenu(Window window) {
+
     }
 
     public void draw(final Graphics2D g2) {
         this.g2 = g2;
 
-        g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Helvetica", Font.PLAIN, 40));
         // PlayState
-        if (window.gameState == window.startState) {
+        if (Window.gameState == Window.startState) {
             drawStartScreen();
 
         }
-        if (window.gameState == window.playState) {
+        if (Window.gameState == Window.playState) {
             drawStatus();
         }
         // dialogue state
-        if (window.gameState == window.dialogueState) {
+        if (Window.gameState == Window.dialogueState) {
             drawDialogueScreen();
         }
     }
@@ -56,19 +41,37 @@ public class UI {
         int x = 0;
         int y = 0;
         g2.setColor(new Color(157, 0, 255));
-        g2.fillRect(x, y, window.screenWidth, window.screenHeight);
-        x = window.screenWidth / 3;
-        y = window.screenHeight / 3;
+        g2.fillRect(x, y, Window.screenWidth, Window.screenHeight);
+        x = Window.screenWidth / 3;
+        y = Window.screenHeight / 3;
         g2.setFont(new Font("Helvetica", Font.PLAIN, 40));
         g2.setColor(Color.white);
         g2.drawString("Hags & Hexxes", x, y);
+        y = Window.screenHeight / 3 + 100;
+        g2.setFont(new Font("Helvetica", Font.PLAIN, 30));
+        g2.drawString("New Game", x, y);
+        System.out.println(commandNum);
+        if (commandNum == 0)
+            g2.drawString(">", x - 25, y);
+        y = Window.screenHeight / 3 + 150;
+        g2.drawString("Load Game", x, y);
+        if (commandNum == 1)
+            g2.drawString(">", x - 25, y);
+        y = Window.screenHeight / 3 + 200;
+        if (commandNum == 2)
+            g2.drawString(">", x - 25, y);
+        g2.drawString("Options", x, y);
+        y = Window.screenHeight / 3 + 250;
+        if (commandNum == 3)
+            g2.drawString(">", x - 25, y);
 
+        g2.drawString("Exit to Desktop", x, y);
         g2.dispose();
     }
 
     public void drawStatus() {
-        final int width = window.tileSize * 5;
-        final int height = window.tileSize * 1;
+        final int width = Window.tileSize * 5;
+        final int height = Window.tileSize * 1;
         final int[] xPts = { 1, width, width - height, 1 };
         final int[] yPts = { 1, 1, height, height };
         g2.setColor(new Color(121, 5, 232, 200));
@@ -77,6 +80,7 @@ public class UI {
         g2.setColor(Color.black);
         g2.drawPolygon(xPts, yPts, 4);
         drawHealthBar();
+        g2.dispose();
     }
 
     /**
@@ -84,28 +88,28 @@ public class UI {
      * method for {@link}
      */
     private void drawHealthBar() {
-        final int x = window.tileSize / 2;
-        final int y = window.tileSize / 2;
-        final int width = window.tileSize * 3;
-        final int height = window.tileSize / 4;
+        final int x = Window.tileSize / 2;
+        final int y = Window.tileSize / 2;
+        final int width = Window.tileSize * 3;
+        final int height = Window.tileSize / 4;
         g2.setColor(new Color(30, 0, 0));
         g2.fillRoundRect(x, y, width, height, 3, 3);
         g2.setColor(Color.green);
-        g2.fillRect(x, y, (int) (width * ((window.player.getHealth() / window.player.getMaxHealth()))), height);
+        g2.fillRect(x, y, (int) (width * ((Window.player.getHealth() / Window.player.getMaxHealth()))), height);
         g2.setColor(Color.white);
         g2.setFont(new Font("Helvetica", Font.PLAIN, 12));
-        g2.drawString(String.format("%.0f/%.0f", window.player.getHealth(), window.player.getMaxHealth()), x, y - 5);
+        g2.drawString(String.format("%.0f/%.0f", Window.player.getHealth(), Window.player.getMaxHealth()), x, y - 5);
         g2.dispose();
     }
 
     public void drawDialogueScreen() {
-        int x = window.tileSize * 2;
-        int y = window.tileSize / 2;
-        final int width = window.screenWidth - (window.tileSize * 4);
-        final int height = window.screenHeight - (window.tileSize * 9);
+        int x = Window.tileSize * 2;
+        int y = Window.tileSize / 2;
+        final int width = Window.screenWidth - (Window.tileSize * 4);
+        final int height = Window.screenHeight - (Window.tileSize * 9);
         drawSubWindow(x, y, width, height);
-        x += window.tileSize;
-        y += window.tileSize;
+        x += Window.tileSize;
+        y += Window.tileSize;
         g2.drawString(currentDialogue, x, y);
         g2.dispose();
     }
@@ -118,6 +122,17 @@ public class UI {
 
         g2.drawRoundRect(x, y, width, height, 25, 25);
 
+    }
+
+    public static void selectOption(int commandNum) {
+        if(Window.gameState == Window.startState){
+            if(commandNum == 0)
+                Window.gameState = Window.playState;
+            else if(commandNum == 3){
+                Window.frame.dispose();
+                
+            }
+        }
     }
 
 }

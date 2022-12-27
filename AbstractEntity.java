@@ -12,14 +12,12 @@ abstract class AbstractEntity {
     public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, attackup1, attackup2, attackdown1,
             attackdown2, attackleft1, attackleft2, attackright1, attackright2;
     private int worldX, worldY;
-    public boolean collisionOn;
     private String name;
 
     public Rectangle attackArea;
     public int attackAreaDefaultx = 0;
     public int attackAreaDefaulty = 0;
-    private int level;
-    private float maxHealth;
+    
     String direction;
     private float health;
     public boolean attacking;
@@ -27,13 +25,23 @@ abstract class AbstractEntity {
     protected BufferedImage image;
     int spriteCounter = 0;
     int spriteNum = 1;
-    public boolean invincible = false;
     public int invincibleCounter = 0;
     public Window window;
-    private int speed = 2;
     public Rectangle hitBox = new Rectangle(8, 16, 32, 32);
-    public final int SCREEN_X = window.screenWidth / 2 - window.tileSize / 2;
-    public final int SCREEN_Y = window.screenHeight / 2 - window.tileSize / 2;
+    public final int SCREEN_X = Window.screenWidth / 2 - Window.tileSize / 2;
+    public final int SCREEN_Y = Window.screenHeight / 2 - Window.tileSize / 2;
+    //Entity Properties
+    public boolean collisionOn; // true if the entity is currently colliding with something.
+    public boolean invincible;//true if the entity is currently invincible, typically enabled due to taking damage. 
+    //Stats 
+    private int level; // Level is a rough representation of an entity's power and capabilities. The player's goal is to levl up and accrue more stat and skill points.
+    private int maxHealth; // The maxiumum amount of hit points that an entity can have, even it was healed for a value that overflows.
+    private int speed = 2; // Sets speed in the overworld as well as impoving the chance of moving first. Default value is 2.
+    private int strength = 2; // Strength modifies the damage that the entity deals with physical based attacks.
+    private int defense = 2; //Defense reduces the damge that the entity takes from attacks.
+    private int magic = 0; //Magic modifies the damage that the entity deals with magic based attacks. It also increases the entity's maximum mana.
+    private int mana = 20; // Mana is used to case spells and is harder to restore than health. 
+
 
     /**
      * @param name      The name of the creature.
@@ -44,14 +52,14 @@ abstract class AbstractEntity {
      * @param maxHealth The maximum health of the creature.
      * 
      */
-    public AbstractEntity(Window window,String name, int level, float health, float maxHealth) {
+    public AbstractEntity(Window window,String name, int level, int health, int maxHealth) {
         this.name = name;
         this.health = health;
         this.level = level;
         this.window = window;
         this.direction = "down";
         this.maxHealth = maxHealth;
-        this.image = image;
+        this.image = up1;
     }
 
     public String toString() {
@@ -227,50 +235,50 @@ abstract class AbstractEntity {
         UtilityTools uTool = new UtilityTools();
         try {
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/up1.png"));
-            up1 = uTool.scaleImage(image, window.tileSize, window.tileSize);
+            up1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
 
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/up2.png"));
-            up2 = uTool.scaleImage(image, window.tileSize, window.tileSize);
+            up2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
 
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/down1.png"));
-            down1 = uTool.scaleImage(image, window.tileSize, window.tileSize);
+            down1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/down2.png"));
-            down2 = uTool.scaleImage(image, window.tileSize, window.tileSize);
+            down2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
 
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/left1.png"));
-            left1 = uTool.scaleImage(image, window.tileSize, window.tileSize);
+            left1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
 
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/left2.png"));
-            left2 = uTool.scaleImage(image, window.tileSize, window.tileSize);
+            left2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
 
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/right1.png"));
-            right1 = uTool.scaleImage(image, window.tileSize, window.tileSize);
+            right1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
 
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/right2.png"));
-            right2 = uTool.scaleImage(image, window.tileSize, window.tileSize);
+            right2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize);
             if (name == "player") {
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackup1.png"));
-                attackup1 = uTool.scaleImage(image, window.tileSize, window.tileSize * 2);
+                attackup1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize * 2);
 
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackup2.png"));
-                attackup2 = uTool.scaleImage(image, window.tileSize, window.tileSize * 2);
+                attackup2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize * 2);
 
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackdown1.png"));
-                attackdown1 = uTool.scaleImage(image, window.tileSize, window.tileSize * 2);
+                attackdown1 = uTool.scaleImage(image, Window.tileSize, Window.tileSize * 2);
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackdown2.png"));
-                attackdown2 = uTool.scaleImage(image, window.tileSize, window.tileSize * 2);
+                attackdown2 = uTool.scaleImage(image, Window.tileSize, Window.tileSize * 2);
 
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackleft1.png"));
-                attackleft1 = uTool.scaleImage(image, window.tileSize * 2, window.tileSize);
+                attackleft1 = uTool.scaleImage(image, Window.tileSize * 2, Window.tileSize);
 
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackleft2.png"));
-                attackleft2 = uTool.scaleImage(image, window.tileSize * 2, window.tileSize);
+                attackleft2 = uTool.scaleImage(image, Window.tileSize * 2, Window.tileSize);
 
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackright1.png"));
-                attackright1 = uTool.scaleImage(image, window.tileSize * 2, window.tileSize);
+                attackright1 = uTool.scaleImage(image, Window.tileSize * 2, Window.tileSize);
 
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackright2.png"));
-                attackright2 = uTool.scaleImage(image, window.tileSize * 2, window.tileSize);
+                attackright2 = uTool.scaleImage(image, Window.tileSize * 2, Window.tileSize);
             }
 
             System.out.println("Finished loading assets for " + getName());
@@ -281,12 +289,12 @@ abstract class AbstractEntity {
     }
 
     public void draw(Graphics2D g2) {
-        int screenX = worldX - window.player.getWorldX() + this.SCREEN_X;
-        int screenY = worldY - window.player.getWorldY() + this.SCREEN_Y;
-        if (worldX + window.tileSize > window.player.getWorldX() - this.SCREEN_X &&
-                worldX - window.tileSize < window.player.getWorldX() + this.SCREEN_X &&
-                worldY + window.tileSize > window.player.getWorldY() - this.SCREEN_Y &&
-                worldY - window.tileSize < window.player.getWorldY() + this.SCREEN_Y) { // only render tiles in
+        int screenX = worldX - Window.player.getWorldX() + this.SCREEN_X;
+        int screenY = worldY - Window.player.getWorldY() + this.SCREEN_Y;
+        if (worldX + Window.tileSize > Window.player.getWorldX() - this.SCREEN_X &&
+                worldX - Window.tileSize < Window.player.getWorldX() + this.SCREEN_X &&
+                worldY + Window.tileSize > Window.player.getWorldY() - this.SCREEN_Y &&
+                worldY - Window.tileSize < Window.player.getWorldY() + this.SCREEN_Y) { // only render tiles in
                                                                                                  // the
             // camera view
             g2.drawImage(getImage(), screenX, screenY, null);
@@ -304,13 +312,13 @@ abstract class AbstractEntity {
 
     public void drawHealthBar(Graphics2D g2, int screenX, int screenY) {
         g2.setColor(Color.red);
-        g2.fillRoundRect(screenX, screenY - 5, window.tileSize, 10, 2, 2);
+        g2.fillRoundRect(screenX, screenY - 5, Window.tileSize, 10, 2, 2);
         g2.setColor(Color.green);
 
-        g2.fillRoundRect(screenX, screenY - 5, (int) (window.tileSize * this.getHealth() / this.getMaxHealth()), 10, 2,
+        g2.fillRoundRect(screenX, screenY - 5, (int) (Window.tileSize * this.getHealth() / this.getMaxHealth()), 10, 2,
                 2);
         g2.setColor(new Color(26, 26, 26));
-        g2.drawRoundRect(screenX, screenY - 5, window.tileSize, 10, 2, 2);
+        g2.drawRoundRect(screenX, screenY - 5, Window.tileSize, 10, 2, 2);
     }
 
     public void setUp1(BufferedImage up1) {
@@ -397,7 +405,7 @@ abstract class AbstractEntity {
         this.collisionOn = collisionOn;
     }
 
-    public void setMaxHealth(float maxHealth) {
+    public void setMaxHealth(int maxHealth) {
         this.maxHealth = maxHealth;
     }
 

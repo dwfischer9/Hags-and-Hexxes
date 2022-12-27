@@ -13,8 +13,8 @@ public class Entity extends AbstractEntity {
     public int hitBoxDefeaultX = 8, hitBoxDefeaultY = 16;
     String dialogues[] = new String[20];
 
-    public Entity(Window window, String name, int level, float health, float maxHealth) {
-        super(window, name, 5, (float) 90, (float) 90);
+    public Entity(Window window, String name, int level, int health, int maxHealth) {
+        super(window, name, 5, 90,  90);
     }
 
     public void update() {
@@ -22,8 +22,8 @@ public class Entity extends AbstractEntity {
 
         collisionOn = false;
         window.cDetection.checkTile(this);
-        window.cDetection.checkEntity(this, window.npc);
-        window.cDetection.checkEntity(this, window.monster);
+        window.cDetection.checkEntity(this, Window.npc);
+        window.cDetection.checkEntity(this, Window.monster);
         window.cDetection.checkObject(this, false);
         if (collisionOn == false) {
             switch (direction) {

@@ -9,24 +9,27 @@ import java.awt.image.BufferedImage;
  * the player character
  */
 public class Player extends Entity {
-    KeyHandler keyH;
-
+    KeyHandler keyH = new KeyHandler();
+    
     public int attack = 10;
     public boolean attacking = false;
     public Rectangle attackArea;
+    public Entity[] friends = {Window.player};
+    public Entity[] foes = {window.boxGuy};
+    private BattleManager bm = new BattleManager(window, friends,foes);
     // new Rectangle(8, 16, window.tileSize, window.tileSize);
     public int hasKey = 0;
     public BufferedImage image = getImage();
     int tempScreenX = SCREEN_X;
     int tempScreenY = SCREEN_Y;
-    public Weapon longSword = new Weapon(new Rectangle(0, 0, window.tileSize * 3, window.tileSize * 1),
-            new Rectangle(0, 0, window.tileSize * 3, window.tileSize * 1),
-            new Rectangle(0, 0, window.tileSize * 1, window.tileSize * 3),
-            new Rectangle(0, 0, window.tileSize, window.tileSize * 3), "Longsword",
+    public Weapon longSword = new Weapon(new Rectangle(0, 0, Window.tileSize * 3, Window.tileSize * 1),
+            new Rectangle(0, 0, Window.tileSize * 3, Window.tileSize * 1),
+            new Rectangle(0, 0, Window.tileSize * 1, Window.tileSize * 3),
+            new Rectangle(0, 0, Window.tileSize, Window.tileSize * 3), "Longsword",
             30);
 
-    public Player(Window window, KeyHandler keyH, String name, int level, float health,
-            float maxHealth) {
+    public Player(Window window, KeyHandler keyH, String name, int level, int health,
+            int maxHealth) {
         super(window, name, level, health, maxHealth);
         this.keyH = keyH;
         this.weapon = longSword;
@@ -48,21 +51,21 @@ public class Player extends Entity {
         this.hitBoxDefeaultY = 16;
         this.hitBoxDefeaultX = 8;
         this.hitBox = new Rectangle(8, 16, 32, 32);
-        this.setWorldX(window.tileSize * 23);
-        this.setWorldY(window.tileSize * 21);
+        this.setWorldX(Window.tileSize * 23);
+        this.setWorldY(Window.tileSize * 21);
         this.setSpeed(4);
         attacking = false;
     }
 
     public void damageMonster(int index) {
-        if (index != 999 && window.monster[index].invincible != true) {
+        if (index != 999 && Window.monster[index].invincible != true) {
 
-            window.monster[index].setHealth(window.monster[index].getHealth() - 10);
-            window.monster[index].invincible = true;
+            Window.monster[index].setHealth(Window.monster[index].getHealth() - 10);
+            Window.monster[index].invincible = true;
             System.out.println("Hit detected");
-            System.out.println(window.monster[index].getHealth());
-            if (window.monster[index].getHealth() == 0) {
-                window.monster[index] = null;
+            System.out.println(Window.monster[index].getHealth());
+            if (Window.monster[index].getHealth() == 0) {
+                Window.monster[index] = null;
 
             }
         }
@@ -97,7 +100,7 @@ public class Player extends Entity {
             }
 
             // check collision
-            int monsterIndex = window.cDetection.checkAttackEntity(this, window.monster);
+            int monsterIndex = window.cDetection.checkAttackEntity(this, Window.monster);
             damageMonster(monsterIndex);
 
             this.setWorldX(currentWorldX);
@@ -126,7 +129,7 @@ public class Player extends Entity {
                         image = up2;
                 }
                 if (attacking == true) {
-                    tempScreenY = SCREEN_Y - window.tileSize;
+                    tempScreenY = SCREEN_Y - Window.tileSize;
                     if (spriteNum == 1)
                         image = attackup1;
                     if (spriteNum == 2)
@@ -157,7 +160,7 @@ public class Player extends Entity {
                             image = left2;
                 }
                 if (attacking == true) {
-                    tempScreenX = SCREEN_X - window.tileSize;
+                    tempScreenX = SCREEN_X - Window.tileSize;
                     if (spriteNum == 1)
                         image = attackleft1;
                     if (spriteNum == 2)
@@ -209,22 +212,22 @@ public class Player extends Entity {
         if (attacking == true) {
             attacking();
         } else {
-            if (keyH.upPressed == true) {
+            switch (direction) {
+                case "up":
 
-                direction = "up";
-                this.attackArea = this.weapon.hitBoxUp;
-            } else if (keyH.downPressed == true) {
+                    this.attackArea = this.weapon.hitBoxUp;
 
-                direction = "down";
-                this.attackArea = this.weapon.hitBoxDown;
-            } else if (keyH.leftPressed == true) {
+                    break;
+                case "down":
 
-                direction = "left";
-                this.attackArea = this.weapon.hitBoxLeft;
-            } else if (keyH.rightPressed == true) {
-
-                direction = "right";
-                this.attackArea = this.weapon.hitBoxRight;
+                    this.attackArea = this.weapon.hitBoxDown;
+                    break;
+                case "left":
+                    this.attackArea = this.weapon.hitBoxLeft;
+                    break;
+                case "right":
+                    this.attackArea = this.weapon.hitBoxRight;
+                    break;
             }
             // Checking tile colllision
             collisionOn = false;
@@ -234,12 +237,13 @@ public class Player extends Entity {
             int objIndex = window.cDetection.checkObject(this, true);
             pickUpObject(objIndex);
 
-            int npcIndex = window.cDetection.checkEntity(this, window.npc);
+            int npcIndex = window.cDetection.checkEntity(this, Window.npc);
+            System.out.println(npcIndex);
             interactNPC(npcIndex);
             if (this.getName() != "player")
                 window.cDetection.checkPlayer(this);
 
-            int monsterIndex = window.cDetection.checkEntity(this, window.monster);
+            int monsterIndex = window.cDetection.checkEntity(this, Window.monster);
             contactMonster(monsterIndex);
 
             // if collision is flase, player can move
@@ -266,20 +270,20 @@ public class Player extends Entity {
     public void draw(Graphics2D g2) {
         // DEBUG
         // AttackArea
-        tempScreenX = SCREEN_X + attackArea.x;
-        tempScreenY = SCREEN_Y + attackArea.y;
+        tempScreenX = getSCREEN_X() + attackArea.x;
+        tempScreenY = getSCREEN_Y() + attackArea.y;
         switch (direction) {
             case "up":
-                tempScreenY = SCREEN_Y - attackArea.height;
+                tempScreenY = getSCREEN_Y() - attackArea.height;
                 break;
             case "down":
-                tempScreenY = SCREEN_Y + window.tileSize;
+                tempScreenY = getSCREEN_Y() + Window.tileSize;
                 break;
             case "left":
                 tempScreenX = SCREEN_X - attackArea.width;
                 break;
             case "right":
-                tempScreenX = SCREEN_X + window.tileSize;
+                tempScreenX = SCREEN_X + Window.tileSize;
                 break;
         }
         g2.setColor(Color.red);
@@ -293,9 +297,10 @@ public class Player extends Entity {
 
     public void interactNPC(int i) {
         if (i != 999)
-            if (keyH.ePressed) {
-                window.gameState = window.dialogueState;
-                window.npc[i].speak();
+            if (keyH.ePressed == true) {
+                System.out.println("hit!!");
+                bm.startBattle();
+
             }
     }
 
@@ -304,17 +309,17 @@ public class Player extends Entity {
      */
     public void pickUpObject(int i) {
         if (i != 999) { // Must exclude the obejcts that we don't want picked
-            String objectName = window.items[i].getName();
+            String objectName = Window.items[i].getName();
             switch (objectName) {
                 case "chest":
                     break;
                 case "key":
-                    window.items[i] = null;
+                    Window.items[i] = null;
                     this.hasKey++;
                     break;
                 case "lockeddoor":
                     if (this.hasKey > 0) {
-                        window.items[i] = null;
+                        Window.items[i] = null;
                         this.hasKey--;
                     }
                     break;

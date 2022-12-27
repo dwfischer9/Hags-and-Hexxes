@@ -6,7 +6,7 @@ import javax.swing.*;
 public class Window extends JPanel implements Runnable {
     protected final static Color backgroundColor = new Color(26, 26, 26);
     // ||---Screen Settings---||\\
-    
+
     private static final int originalTileSize = 16;// 16x16 tiles
     private static final int scale = 3; // 960 x 576
     protected final static int tileSize = originalTileSize * scale;
@@ -18,27 +18,26 @@ public class Window extends JPanel implements Runnable {
     public final int SCREEN_X = screenWidth / 2 - tileSize / 2;
     public final int SCREEN_Y = screenHeight / 2 - tileSize / 2;
     private static final int FPS = 60;
-    public static KeyHandler keyH = new KeyHandler();
+    public  KeyHandler keyH = new KeyHandler();
     public static Window overWorldPanel = new Window();
     public static JPanel statusBar = new JPanel();
-    public static  Player player = new Player(overWorldPanel, keyH, "player", 1,
-            90, 90);
-    public Entity slime = new Entity(this,"slime", 4, 90, 90);
-    public Entity boxGuy = new Entity(this,"boxguy", 10, 40, 40);
+    public static Player player;
+    public Entity slime = new Entity(this, "slime", 4, 90, 90);
+    public  Entity boxGuy = new Entity(this, "boxguy", 10, 40, 40);
     public JPanel foeBar = new JPanel();
     public JLabel foeHealth = new JLabel();
     public JLabel victoryLabel = new JLabel("Victory!");
 
     public Thread gameThread = new Thread(this);
 
-    public UI ui = new UI(this);
+    public static UI ui = new UI();
     public AssetSetter assetSetter = new AssetSetter(overWorldPanel);
-    public CollisionDetection cDetection = new CollisionDetection(overWorldPanel);
-    public Entity monster[] = new Entity[10];
-    public Entity npc[] = new Entity[10];
+    public CollisionDetection cDetection = new CollisionDetection();
+    public static Entity monster[] = new Entity[10];
+    public static Entity npc[] = new Entity[10];
     private final Dimension winSize = new Dimension(screenWidth, screenHeight);
     int playerSpeed = 4;
-    public TileManager tileM = new TileManager(this);
+    public static TileManager tileM = new TileManager();
     // WORLD SETTINGS
 
     public final int maxWorldCol = 50;
@@ -54,7 +53,7 @@ public class Window extends JPanel implements Runnable {
     public final static int battleState = 3;
     public final static int startState = 4;
     int menuState;
-    public Item items[] = new Item[20];
+    public static Item items[] = new Item[20];
 
     /**
      * Constructs a new instance of Window and sets some defeault properties
@@ -66,33 +65,22 @@ public class Window extends JPanel implements Runnable {
         this.setFocusable(true);
         this.addKeyListener(keyH);
         this.setVisible(true);
-        this.setLayout(null);
-        try {
-            this.setupGame();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        try {
-            this.initialize();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+
     }
 
     public void setupGame() throws IOException {
+        player = new Player(overWorldPanel, keyH, "player", 1,
+                90, 90);
         player.setDefaultValues();
         assetSetter.setObject();
         assetSetter.setNPC();
         assetSetter.setPlayer();
         gameState = startState;
-        ui.startMenu();
+        
+        initialize();
     }
 
-
     public void initialize() throws IOException {
-        setupGame();
 
         startGameThread();
         player.setDefaultValues();
@@ -149,6 +137,11 @@ public class Window extends JPanel implements Runnable {
             if (gameState == playState) {
                 overWorldPanel.update();
                 overWorldPanel.repaint();
+                player.update();
+            }
+            if(gameState == startState){
+                overWorldPanel.update();
+                overWorldPanel.repaint();
             }
 
             try {
@@ -172,6 +165,7 @@ public class Window extends JPanel implements Runnable {
         long drawStart = System.nanoTime();
         Graphics2D g2 = (Graphics2D) g.create();
         if (gameState == playState) { // Tilesheet
+            
             tileM.draw(g2);
             // Objects
             for (int i = 0; i < items.length; i++) // for each item we have loaded in ,
@@ -204,6 +198,7 @@ public class Window extends JPanel implements Runnable {
             }
 
         }
+        
         ui.draw(g2);
         g2.dispose();
     }

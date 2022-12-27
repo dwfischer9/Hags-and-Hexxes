@@ -15,8 +15,8 @@ public class TileManager {
 
     public final int SCREEN_X = Window.screenWidth / 2 - Window.tileSize / 2;
     public final int SCREEN_Y = Window.screenHeight / 2 - Window.tileSize / 2;
-    public TileManager(Window window) {
-        this.window = window;
+    public TileManager() {
+        this.window = Window.overWorldPanel;
         tiles = new Tile[20];
         mapTileNum = new int[window.maxWorldCol][window.maxWorldRow];
         getTileImage();
