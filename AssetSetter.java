@@ -23,10 +23,10 @@ public class AssetSetter {
      * @throws IOException
      */
     public void setObject() {
-        Window.items[0] = new Item(Window.overWorldPanel, "chest", true, Window.tileSize * 20, Window.tileSize * 20);
-        Window.items[1] = new Item(Window.overWorldPanel, "lockeddoor", true, Window.tileSize * 23,
-                Window.tileSize * 25);
-        Window.items[2] = new Item(Window.overWorldPanel, "key", true, Window.tileSize * 21, Window.tileSize * 20);
+        Window.items[0] = new Item(Window.overWorldPanel, "chest", true, Window.TILESIZE * 20, Window.TILESIZE * 20);
+        Window.items[1] = new Item(Window.overWorldPanel, "lockeddoor", true, Window.TILESIZE * 23,
+                Window.TILESIZE * 25);
+        Window.items[2] = new Item(Window.overWorldPanel, "key", true, Window.TILESIZE * 21, Window.TILESIZE * 20);
 
     }
 
@@ -34,20 +34,24 @@ public class AssetSetter {
      * Instantiates and sets the world position of each NPC to appear on the map.
      */
     public void setNPC() {
-        Window.npc[0] = window.boxGuy;
-        Window.npc[0].dialogues[0] = "HI!";
-        Window.npc[0].setup();
-        Window.npc[0].setWorldX(Window.tileSize * 23);
-        Window.npc[0].setWorldY(Window.tileSize * 20);
-        Window.monster[0] = window.slime;
-        Window.monster[0].isMonster = true;
-        Window.monster[0].hitBoxDefeaultX = 6;
-        Window.monster[0].hitBoxDefeaultY = 18;
-        Window.monster[0].hitBox = new Rectangle(6, 18, 38, 30);
-        Window.monster[0].setup();
-        Window.monster[0].setSpeed(2);
-        Window.monster[0].setWorldX(Window.tileSize * 24);
-        Window.monster[0].setWorldY(Window.tileSize * 28);
+        window.npc[0] = window.tutorialNPC;
+        window.npc[0].dialogues[0] = "Hi there adventurer! Welcome to the tavern.\n We have cold drinks, warm beds, and food that you can eat.";
+        window.npc[0].dialogues[1] = "But I can see that you're not here for just food.\n Your lot comes to me looking for rumors.";
+        window.npc[0].dialogues[2] = "Go take a look at the quest board over in the dining area.\n I'll get you a drink in the meantime.";
+        window.npc[0].currentDialogue = window.npc[0].dialogues[0];
+        window.npc[0].setSpeed(0);
+        window.npc[0].setup();
+        window.npc[0].setWorldX(Window.TILESIZE * 23);
+        window.npc[0].setWorldY(Window.TILESIZE * 20);
+        window.monster[0] = window.slime;
+        window.monster[0].isMonster = true;
+        window.monster[0].hitBoxDefeaultX = 6;
+        window.monster[0].hitBoxDefeaultY = 18;
+        window.monster[0].hitBox = new Rectangle(6, 18, Window.TILESIZE, Window.TILESIZE);
+        window.monster[0].setup();
+        window.monster[0].setWorldX(Window.TILESIZE * 24);
+        window.monster[0].setWorldY(Window.TILESIZE * 28);
+        window.monster[0].setSpeed(2);
     }
 
     public void setPlayer() {

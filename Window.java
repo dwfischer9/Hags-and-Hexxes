@@ -1,66 +1,82 @@
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.io.IOException;
-import javax.swing.*;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 public class Window extends JPanel implements Runnable {
-    protected final static Color backgroundColor = new Color(26, 26, 26);
+    protected final static Color BG = new Color(26, 26, 26);
     // ||---Screen Settings---||\\
 
-    private static final int originalTileSize = 16;// 16x16 tiles
-    private static final int scale = 3; // 960 x 576
-    protected final static int tileSize = originalTileSize * scale;
-    public final static int maxScreenCol = 20;
-    public final static int maxScreenRow = 12;
-    public final static int screenWidth = tileSize * maxScreenCol;
-    public final static int screenHeight = tileSize * maxScreenRow;
+    private static final int ORIGINALTILESIZE = 16;// 16x16 tiles
+    private static final int SCALING = 3; // 960 x 576
+    protected final static int TILESIZE = ORIGINALTILESIZE * SCALING;
+    public final static int MAXSCREENCOL = 20;
+    public final static int MAXSCREENROW = 12;
+    public final static int SCREENWIDTH = TILESIZE * MAXSCREENCOL;
+    public final static int SCREENHEIGHT = TILESIZE * MAXSCREENROW;
 
-    public final int SCREEN_X = screenWidth / 2 - tileSize / 2;
-    public final int SCREEN_Y = screenHeight / 2 - tileSize / 2;
     private static final int FPS = 60;
-    public  KeyHandler keyH = new KeyHandler();
+    public static KeyHandler keyH = new KeyHandler();
     public static Window overWorldPanel = new Window();
     public static JPanel statusBar = new JPanel();
     public static Player player;
+    public static UI ui = new UI();
+    public static TileManager tileM = new TileManager();
+    // WORLD SETTINGS
+    public static int gameState;
+    static JFrame frame = new JFrame();
+    public final static int DIALOGUESTATE = 0;
+    public final static int PLAYSTATE = 1;
+    public final static int PAUSESTATE = 2;
+    public final static int BATTLESTATE = 3;
+    public final static int STARTSTATE = 4;
+    public final static int MENUSTATE = 5;
+    public static Item items[] = new Item[20];
+
+    /**
+     * initializes the overworld panel. Should be called at the end of a battle
+     */
+    public static void overWorldPanel() {
+        overWorldPanel.setName("overWorldPanel");
+        frame.add(overWorldPanel);
+        overWorldPanel.setVisible(true);
+    }
+
+    public final int SCREEN_X = SCREENWIDTH / 2 - TILESIZE / 2;
+    public final int SCREEN_Y = SCREENHEIGHT / 2 - TILESIZE / 2;
     public Entity slime = new Entity(this, "slime", 4, 90, 90);
-    public  Entity boxGuy = new Entity(this, "boxguy", 10, 40, 40);
+    public Entity tutorialNPC = new Entity(this, "tutorialNPC", 10, 40, 40);
+
     public JPanel foeBar = new JPanel();
     public JLabel foeHealth = new JLabel();
     public JLabel victoryLabel = new JLabel("Victory!");
-
     public Thread gameThread = new Thread(this);
 
-    public static UI ui = new UI();
     public AssetSetter assetSetter = new AssetSetter(overWorldPanel);
     public CollisionDetection cDetection = new CollisionDetection();
-    public static Entity monster[] = new Entity[10];
-    public static Entity npc[] = new Entity[10];
-    private final Dimension winSize = new Dimension(screenWidth, screenHeight);
+    public Entity monster[] = new Entity[10];
+    public Entity npc[] = new Entity[10];
+    private final Dimension winSize = new Dimension(SCREENWIDTH, SCREENHEIGHT);
     int playerSpeed = 4;
-    public static TileManager tileM = new TileManager();
-    // WORLD SETTINGS
-
     public final int maxWorldCol = 50;
     public final int maxWorldRow = 50;
-    public final int worldWidth = tileSize * maxWorldCol;
-    public final int worldHeight = tileSize * maxWorldRow;
+    public final int worldWidth = TILESIZE * maxWorldCol;
 
-    public static int gameState;
-    static JFrame frame = new JFrame();
-    public final static int dialogueState = 0;
-    public final static int playState = 1;
-    public final static int pauseState = 2;
-    public final static int battleState = 3;
-    public final static int startState = 4;
-    int menuState;
-    public static Item items[] = new Item[20];
+    public final int worldHeight = TILESIZE * maxWorldRow;
 
     /**
      * Constructs a new instance of Window and sets some defeault properties
      */
     public Window() {
+        setFocusTraversalKeysEnabled(false);
         this.setPreferredSize(winSize);
-        this.setBackground(backgroundColor);
+        this.setBackground(BG);
         this.setDoubleBuffered(true);
         this.setFocusable(true);
         this.addKeyListener(keyH);
@@ -75,8 +91,8 @@ public class Window extends JPanel implements Runnable {
         assetSetter.setObject();
         assetSetter.setNPC();
         assetSetter.setPlayer();
-        gameState = startState;
-        
+        gameState = STARTSTATE;
+        player.isPlayer = true;
         initialize();
     }
 
@@ -96,15 +112,6 @@ public class Window extends JPanel implements Runnable {
     }
 
     /**
-     * initializes the overworld panel. Should be called at the end of a battle
-     */
-    public static void overWorldPanel() {
-        overWorldPanel.setName("overWorldPanel");
-        frame.add(overWorldPanel);
-        overWorldPanel.setVisible(true);
-    }
-
-    /**
      * Initiates the game thread. Called in Game's main method
      */
     public void startGameThread() {
@@ -119,8 +126,8 @@ public class Window extends JPanel implements Runnable {
      * update graphics
      */
     public void update() {
-        if (gameState == playState) {
-            boxGuy.update();
+        if (gameState == PLAYSTATE) {
+            tutorialNPC.update();
             slime.update();
             player.update();
         }
@@ -131,75 +138,70 @@ public class Window extends JPanel implements Runnable {
      */
     @Override
     public void run() {
-        double drawInterval = 1000000000 / FPS; // 0.01666 seconds
+        final double drawInterval = 1000000000 / FPS; // 0.01666 seconds
         double nextDrawTime = System.nanoTime() + drawInterval;
         while (gameThread != null) {
-            if (gameState == playState) {
+            overWorldPanel.repaint();
+            if (gameState == PLAYSTATE) {
                 overWorldPanel.update();
-                overWorldPanel.repaint();
                 player.update();
             }
-            if(gameState == startState){
-                overWorldPanel.update();
-                overWorldPanel.repaint();
-            }
+            if (gameState == DIALOGUESTATE)
+                if (keyH.ePressed) {
+                    keyH.ePressed = false;
+                    if (player.currentInteraction.dialogues[player.currentInteraction.dialogueCounter] != null) {
+                        ui.currentDialogue = player.currentInteraction.dialogues[player.currentInteraction.dialogueCounter++];
+
+                    } else
+                        gameState = PLAYSTATE;
+                }
 
             try {
                 double remainingTime = nextDrawTime - System.nanoTime();
                 remainingTime = remainingTime / 1000000;
-                if (remainingTime < 0) {
+                if (remainingTime < 0)
                     remainingTime = 0; // we don't need a sleep if the time is used up
-                }
+
                 Thread.sleep((long) remainingTime);
                 nextDrawTime += drawInterval;
                 // pause the game loop so that we only draw 60 times per second
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 e.printStackTrace();
                 System.err.println("Something went wrong when drawing the timer");
             }
+
         }
     }
 
-    public void paintComponent(Graphics g) {
+    public void paintComponent(final Graphics g) {
         super.paintComponent(g);
-        long drawStart = System.nanoTime();
-        Graphics2D g2 = (Graphics2D) g.create();
-        if (gameState == playState) { // Tilesheet
-            
-            tileM.draw(g2);
-            // Objects
-            for (int i = 0; i < items.length; i++) // for each item we have loaded in ,
+        final long drawStart = System.nanoTime();
+        final Graphics2D g2 = (Graphics2D) g.create();
+        // Tilesheet
+        tileM.draw(g2);
+        // Objects
+        for (int i = 0; i < items.length; i++) // for each item we have loaded in ,
             // we need to draw it to the screen
-            {
-                if (items[i] != null) {
-                    items[i].draw(g2, this);
-                }
-            }
+            if (items[i] != null)
+                items[i].draw(g2, this);
 
-            // NPC
-            for (int i = 0; i < npc.length; i++) {
-                if (npc[i] != null) {
-                    npc[i].draw(g2);
-                }
-            }
+        // NPC
+        for (int i = 0; i < npc.length; i++)
+            if (npc[i] != null)
+                npc[i].draw(g2);
 
-            // Monsters
-            for (int i = 0; i < monster.length; i++) {
-                if (monster[i] != null) {
-                    monster[i].draw(g2);
-                }
+        // Monsters
+        for (int i = 0; i < monster.length; i++)
+            if (monster[i] != null)
+                monster[i].draw(g2);
 
-                // Player
-                player.draw(g2);
-                long drawEnd = System.nanoTime();
-                long passed = drawEnd - drawStart;
-                g2.setColor(backgroundColor);
-                g2.drawString("Draw Time:" + passed, 10, 400);
-            }
+        // Player
+        player.draw(g2);
+        final long drawEnd = System.nanoTime();
+        final long passed = drawEnd - drawStart;
+        g2.setColor(BG);
+        g2.drawString("Draw Time:" + passed, 10, 400);
 
-        }
-        
         ui.draw(g2);
-        g2.dispose();
     }
 }

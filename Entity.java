@@ -10,11 +10,16 @@ public class Entity extends AbstractEntity {
     public int actionLock = 0;
     public boolean isMonster;
     public Weapon weapon;
+    public String currentDialogue = "";
+    public int dialogueCounter = 0;
+    public boolean interactable;
     public int hitBoxDefeaultX = 8, hitBoxDefeaultY = 16;
     String dialogues[] = new String[20];
+    public boolean highlight = false;
 
     public Entity(Window window, String name, int level, int health, int maxHealth) {
-        super(window, name, 5, 90,  90);
+        super(window, name, 5, 90, 90);
+        this.interactable = true;
     }
 
     public void update() {
@@ -22,10 +27,13 @@ public class Entity extends AbstractEntity {
 
         collisionOn = false;
         window.cDetection.checkTile(this);
-        window.cDetection.checkEntity(this, Window.npc);
-        window.cDetection.checkEntity(this, Window.monster);
+
+        window.cDetection.checkPlayer(this);
+
+        window.cDetection.checkEntity(this, window.npc);
+        window.cDetection.checkEntity(this, window.monster);
         window.cDetection.checkObject(this, false);
-        if (collisionOn == false) {
+        if (collisionOn == false && Window.gameState == Window.PLAYSTATE) {
             switch (direction) {
                 case "up":
                     this.setWorldY(this.getWorldY() - this.getSpeed());
@@ -58,33 +66,20 @@ public class Entity extends AbstractEntity {
 
     public void setAction() {
         actionLock++;
-        if (actionLock == 50) {
+        if (actionLock == 50 && Window.gameState == Window.PLAYSTATE) {
             Random rand = new Random();
             int i = rand.nextInt(100) + 1;// generate random number from 1 to 100
             if (i <= 25)
-                direction = "up";
+                this.direction = "up";
             if (i > 25 && i <= 50)
-                direction = "down";
+                this.direction = "down";
             if (i > 50 && i <= 75)
-                direction = "left";
+                this.direction = "left";
             if (i > 75 && i < 100)
-                direction = "right";
+                this.direction = "right";
             actionLock = 0;
-        }
-
-    }
-
-    public void contactMonster(int index) {
-        if (index != 999 && invincible == false) {
-            this.setHealth(this.getHealth() - 10);
-            System.out.println("Damage taken");
-            this.invincible = true;
 
         }
-    }
-
-    public void speak() {
-        UI.currentDialogue = this.dialogues[0];
     }
 
     // abstract float attack(Move moveChoice) throws IOException;

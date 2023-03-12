@@ -7,7 +7,7 @@
 public class CollisionDetection {
     Window window;
 
-    public CollisionDetection(){
+    public CollisionDetection() {
         this.window = Window.overWorldPanel;
     }
 
@@ -17,40 +17,40 @@ public class CollisionDetection {
         int entityTopWorldY = entity.getWorldY() + entity.hitBox.y;
         int entityBottomWorldY = entity.getWorldY() + entity.hitBox.y + entity.hitBox.height;
 
-        int entityLeftCol = entityLeftWorldX / Window.tileSize;
-        int entityRightCol = entityRightWorldX / Window.tileSize;
-        int entityTopRow = entityTopWorldY / Window.tileSize;
-        int entityBottomRow = entityBottomWorldY / Window.tileSize;
+        int entityLeftCol = entityLeftWorldX / Window.TILESIZE;
+        int entityRightCol = entityRightWorldX / Window.TILESIZE;
+        int entityTopRow = entityTopWorldY / Window.TILESIZE;
+        int entityBottomRow = entityBottomWorldY / Window.TILESIZE;
 
         int tileNum1, tileNum2;
 
         switch (entity.direction) {
             case "up":
-                entityTopRow = (entityTopWorldY - entity.getSpeed()) / Window.tileSize;
+                entityTopRow = (entityTopWorldY - entity.getSpeed()) / Window.TILESIZE;
                 tileNum1 = Window.tileM.mapTileNum[entityLeftCol][entityTopRow];
                 tileNum2 = Window.tileM.mapTileNum[entityRightCol][entityTopRow];
-                if (Window.tileM.tiles[tileNum1].collision == true || Window.tileM.tiles[tileNum2].collision == true)
+                if (Window.tileM.tiles[tileNum1].isCollision() == true || Window.tileM.tiles[tileNum2].isCollision() == true)
                     entity.collisionOn = true;
                 break;
             case "down":
-                entityBottomRow = (entityBottomWorldY + entity.getSpeed()) / Window.tileSize;
+                entityBottomRow = (entityBottomWorldY + entity.getSpeed()) / Window.TILESIZE;
                 tileNum1 = Window.tileM.mapTileNum[entityLeftCol][entityBottomRow];
                 tileNum2 = Window.tileM.mapTileNum[entityRightCol][entityBottomRow];
-                if (Window.tileM.tiles[tileNum1].collision == true || Window.tileM.tiles[tileNum2].collision == true)
+                if (Window.tileM.tiles[tileNum1].isCollision() == true || Window.tileM.tiles[tileNum2].isCollision()== true)
                     entity.collisionOn = true;
                 break;
             case "left":
-                entityLeftCol = (entityLeftWorldX - entity.getSpeed()) / Window.tileSize;
+                entityLeftCol = (entityLeftWorldX - entity.getSpeed()) / Window.TILESIZE;
                 tileNum1 = Window.tileM.mapTileNum[entityLeftCol][entityTopRow];
                 tileNum2 = Window.tileM.mapTileNum[entityLeftCol][entityBottomRow];
-                if (Window.tileM.tiles[tileNum1].collision == true || Window.tileM.tiles[tileNum2].collision == true)
+                if (Window.tileM.tiles[tileNum1].isCollision()== true || Window.tileM.tiles[tileNum2].isCollision()== true)
                     entity.collisionOn = true;
                 break;
             case "right":
-                entityRightCol = (entityRightWorldX + entity.getSpeed()) / Window.tileSize;
+                entityRightCol = (entityRightWorldX + entity.getSpeed()) / Window.TILESIZE;
                 tileNum1 = Window.tileM.mapTileNum[entityRightCol][entityTopRow];
                 tileNum2 = Window.tileM.mapTileNum[entityRightCol][entityBottomRow];
-                if (Window.tileM.tiles[tileNum1].collision == true || Window.tileM.tiles[tileNum2].collision == true)
+                if (Window.tileM.tiles[tileNum1].isCollision()== true || Window.tileM.tiles[tileNum2].isCollision() == true)
                     entity.collisionOn = true;
                 break;
 
@@ -123,7 +123,7 @@ public class CollisionDetection {
         int index = 999;
 
         for (int i = 0; i < target.length; i++) {
-            if (target[i] != null) {
+            if (target[i] != null && entity != target[i]) {
                 // get solid area position for both entity and object
                 entity.hitBox.x += entity.getWorldX();
                 entity.hitBox.y += entity.getWorldY();
@@ -192,17 +192,15 @@ public class CollisionDetection {
 
                         if (player.attackArea.intersects(target[i].hitBox)) {
 
-                            System.out.println("Up collision");
                             player.collisionOn = true;
                             index = i;
                         }
                         break;
                     case "down":
                         player.attackArea.y += player.getSpeed();
-                        player.attackArea.y -= 2 * Window.tileSize;
+                        player.attackArea.y -= 2 * Window.TILESIZE;
                         if (player.attackArea.intersects(target[i].hitBox)) {
 
-                            System.out.println("Down collision");
                             index = i;
                             player.collisionOn = true;
 
@@ -212,17 +210,15 @@ public class CollisionDetection {
                         player.attackArea.x -= player.getSpeed();
                         if (player.attackArea.intersects(target[i].hitBox)) {
                             player.collisionOn = true;
-                            System.out.println("Left collision");
                             index = i;
                         }
                         break;
                     case "right":
                         player.attackArea.x += player.getSpeed();
-                        player.attackArea.x -= 2 * Window.tileSize;
+                        player.attackArea.x -= 2 * Window.TILESIZE;
                         if (player.attackArea.intersects(target[i].hitBox)) {
                             player.collisionOn = true;
                             index = i;
-                            System.out.println("Right collision");
                         }
                         break;
                 }
@@ -241,7 +237,7 @@ public class CollisionDetection {
         entity.hitBox.x += entity.getWorldX();
         entity.hitBox.y += entity.getWorldY();
 
-       Window.player.hitBox.x = Window.player.getWorldX() + Window.player.hitBox.x;
+        Window.player.hitBox.x = Window.player.getWorldX() + Window.player.hitBox.x;
         Window.player.hitBox.y = Window.player.getWorldY() + Window.player.hitBox.y;
         switch (entity.direction) {
             case "up":
