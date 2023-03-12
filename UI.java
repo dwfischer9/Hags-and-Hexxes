@@ -18,7 +18,7 @@ public class UI {
     static Entity currentInteract;
     static int dialogueNumber = 0;
     Graphics2D g2;
-    KeyHandler keyH = new KeyHandler();
+    KeyHandler keyH = Window.keyH;
 
     public void startMenu(Window window) {
 
@@ -49,6 +49,29 @@ public class UI {
         if (Window.gameState == Window.MENUSTATE) {
             drawMenuScreen();
         }
+    }
+
+    private void naviagteMenus() {
+        if (Window.gameState == Window.STARTSTATE) {
+            if (keyH.upPressed) {
+                if (commandNum >= 0) {
+                    commandNum--;
+                }
+            } else if (keyH.downPressed) {
+                if (commandNum <= 3) {
+                    commandNum++;
+                }
+            }
+            if (keyH.spacePressed) {
+                selectOption(commandNum);
+            }
+            if (commandNum < 0) {
+                commandNum = 3;
+            } else if (commandNum > 3) {
+                commandNum = 0;
+            }
+        }
+
     }
 
     /**
@@ -157,7 +180,9 @@ public class UI {
         y = Window.SCREENHEIGHT / 3 + 100;
         g2.setFont(new Font("Helvetica", Font.PLAIN, 30));
         g2.drawString("New Game", x, y);
+        // update keys in the menu.
         System.out.println(commandNum);
+        naviagteMenus();
         if (commandNum == 0)
             g2.drawString(">", x - 25, y);
         y = Window.SCREENHEIGHT / 3 + 150;

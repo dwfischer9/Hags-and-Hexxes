@@ -44,10 +44,6 @@ public class Player extends Entity {
         this.isFriendly = true;
         this.attackArea = this.weapon.hitBoxLeft;
         setDefaultValues();
-        // attackArea.width = 36;
-
-        // attackArea.height = 36;
-
     }
 
     public String toString() {
@@ -64,7 +60,7 @@ public class Player extends Entity {
         attacking = false;
     }
 
-    public void damageMonster(int index) {
+    private void damageMonster(int index) {
         if (index != 999 && window.monster[index].invincible != true) {
 
             window.monster[index].setHealth(window.monster[index].getHealth() - calculateDamage(window.monster[index]));
@@ -106,55 +102,48 @@ public class Player extends Entity {
                 case "right":
                     this.setWorldX(this.getWorldX() + attackArea.width);
                     break;
-
             }
-
             // check collision
-            int monsterIndex = window.cDetection.checkAttackEntity(this, window.monster);
-            damageMonster(monsterIndex);
-
+            damageMonster(window.cDetection.checkAttackEntity(this, window.monster));
             this.setWorldX(currentWorldX);
             this.setWorldY(currentWorldY);
             hitBox.width = hitBoxWidth;
             hitBox.height = hitBoxHeight;
-
         }
         if (spriteCounter > 80) {
             spriteNum = 1;
             spriteCounter = 0;
             attacking = false;
         }
-
     }
 
     public BufferedImage getImage() {
         tempScreenX = SCREEN_X;
         tempScreenY = SCREEN_Y;
-        switch (getDirection()) { // handles the direction that the sprite is facing.
+        switch (direction) { // handles the direction that the sprite is facing.
             case "up":
-                if (attacking == false) {
+                if (!attacking) {
                     if (spriteNum == 1)
                         image = up1;
                     if (spriteNum == 2)
                         image = up2;
                 }
-                if (attacking == true) {
+                if (attacking) {
                     tempScreenY = SCREEN_Y - Window.TILESIZE;
                     if (spriteNum == 1)
                         image = attackup1;
                     if (spriteNum == 2)
                         image = attackup2;
                 }
-
                 break;
             case "down":
-                if (attacking == false) {
+                if (!attacking) {
                     if (spriteNum == 1)
                         image = down1;
                     if (spriteNum == 2)
                         image = down2;
                 }
-                if (attacking == true) {
+                if (attacking) {
                     if (spriteNum == 1)
                         image = attackdown1;
                     if (spriteNum == 2)
@@ -163,13 +152,13 @@ public class Player extends Entity {
 
                 break;
             case "left":
-                if (attacking == false) {
+                if (!attacking) {
                     if (spriteNum == 1)
 
                         if (spriteNum == 2)
                             image = left2;
                 }
-                if (attacking == true) {
+                if (attacking) {
                     tempScreenX = SCREEN_X - Window.TILESIZE;
                     if (spriteNum == 1)
                         image = attackleft1;
@@ -179,19 +168,18 @@ public class Player extends Entity {
 
                 break;
             case "right":
-                if (attacking == false) {
+                if (!attacking) {
                     if (spriteNum == 1)
                         image = right1;
                     if (spriteNum == 2)
                         image = right2;
                 }
-                if (attacking == true) {
+                if (attacking) {
                     if (spriteNum == 1)
                         image = attackright1;
                     if (spriteNum == 2)
                         image = attackright2;
                 }
-
                 break;
         }
         spriteCounter++; // switches between sprite 1 and 2 for the direction.
@@ -208,18 +196,43 @@ public class Player extends Entity {
 
     }
 
-    public void update() {
-        if (this.invincible == true) {
-            this.invincibleCounter++;
-            if (this.invincibleCounter > 60) {
-                this.invincible = false;
-                this.invincibleCounter = 0;
+    /**
+     * Checks if if any bound keys have been pressed, and if so, changes the
+     * property direction of the player object
+     */
+    private void updateKeys() {
+        if (keyH.upPressed) {
+            this.direction = "up";
+        } else if (keyH.downPressed) {
+            this.direction = "down";
+        } else if (keyH.leftPressed) {
+            this.direction = "left";
+        } else if (keyH.rightPressed) {
+            this.direction = "right";
+        } else if (keyH.tabPressed) {
+            if (Window.gameState == Window.PLAYSTATE) {
+                Window.gameState = Window.MENUSTATE;
+            } else if (Window.gameState == Window.MENUSTATE) {
+                Window.gameState = Window.PLAYSTATE;
             }
         }
-        if (Window.keyH.spacePressed == true) {
-            this.attacking = true;
+    }
+
+    public void update() {
+        if (Window.gameState == Window.PLAYSTATE) {
+            this.updateKeys();
+            if (this.invincible == true) {
+                this.invincibleCounter++;
+                if (this.invincibleCounter > 60) {
+                    this.invincible = false;
+                    this.invincibleCounter = 0;
+                }
+            }
+            if (Window.keyH.spacePressed == true) {
+                this.attacking = true;
+            }
         }
-        if(this.getHealth() == 0){
+        if (this.getHealth() == 0) {
             Window.gameState = Window.STARTSTATE;
         }
         if (this.attacking == true) {
@@ -244,29 +257,32 @@ public class Player extends Entity {
             window.cDetection.checkTile(this);
 
             // checking object collision
-            int objIndex = window.cDetection.checkObject(this, true);
-            pickUpObject(objIndex);
-
-            int npcIndex = window.cDetection.checkEntity(this, window.npc);
-            interactNPC(npcIndex);
+            pickUpObject(window.cDetection.checkObject(this, true));
+            interactNPC(window.cDetection.checkEntity(this, window.npc));
             if (this.getName() != "player") // we don't want to check if the player is colliding with itself.
                 window.cDetection.checkPlayer(this);
-
-            int monsterIndex = window.cDetection.checkEntity(this, window.monster);
-            contactMonster(monsterIndex);
+            contactMonster(window.cDetection.checkEntity(this, window.monster));
 
             // if collision is false, player can move
             // TODO: ensure that number of keys is limited to 2, and adjust speed
             // accordingly. should multiply speed by half for each key pressed
             if (collisionOn == false && keyH.spacePressed == false) {
-                if (keyH.upPressed)
-                    this.setWorldY(this.getWorldY() - this.getSpeed());
-                else if (keyH.downPressed)
-                    this.setWorldY(this.getWorldY() + this.getSpeed());
-                else if (keyH.leftPressed)
-                    this.setWorldX(this.getWorldX() - this.getSpeed());
-                else if (keyH.rightPressed)
-                    this.setWorldX(this.getWorldX() + this.getSpeed());
+                switch (direction) {
+                    case "up":
+                        this.setWorldY(this.getWorldY() - this.getSpeed());
+                        break;
+                    case "down":
+                        this.setWorldY(this.getWorldY() + this.getSpeed());
+                        break;
+                    case "left":
+                        this.setWorldX(this.getWorldX() - this.getSpeed());
+                        break;
+                    case "right":
+                        this.setWorldX(this.getWorldX() + this.getSpeed());
+                        break;
+                    default:
+                        break;
+                }
 
             }
         }
@@ -295,13 +311,12 @@ public class Player extends Entity {
         g2.setColor(Color.red);
         g2.setStroke(new BasicStroke(1));
         g2.drawRect(tempScreenX, tempScreenY, attackArea.width, attackArea.height);
-
         // Draw player
-        g2.drawImage(this.getImage(), tempScreenX, tempScreenY, null);
+        g2.drawImage(getImage(), tempScreenX, tempScreenY, null);
 
     }
 
-    public void interactNPC(int i) {
+    private void interactNPC(int i) {
         if (i != 999) {
             if (keyH.ePressed == true && Window.gameState != Window.BATTLESTATE) {
                 Window.gameState = Window.DIALOGUESTATE;
@@ -314,7 +329,7 @@ public class Player extends Entity {
     /**
      * @param i the index of the object in {@link window#items}
      */
-    public void pickUpObject(int i) {
+    private void pickUpObject(int i) {
         if (i != 999) { // Must exclude the obejcts that we don't want picked
             String objectName = Window.items[i].getName();
             switch (objectName) {
@@ -322,15 +337,15 @@ public class Player extends Entity {
                     break;
                 case "key":
 
-                    this.inventory.put(Window.items[i], 1);
+                    inventory.put(Window.items[i], 1);
                     Window.items[i] = null;
                     System.out.println("Key obtained.");
-                    this.hasKey++;
+                    hasKey++;
                     break;
                 case "lockeddoor":
-                    if (this.hasKey > 0) {
+                    if (hasKey > 0) {
                         Window.items[i] = null;
-                        this.hasKey--;
+                        hasKey--;
                     }
                     break;
 
@@ -338,10 +353,10 @@ public class Player extends Entity {
         }
     }
 
-    public void contactMonster(int index) {
+    private void contactMonster(int index) {
         if (index != 999 && invincible == false) {
-            this.invincible = true;
-            this.setHealth(this.getHealth() - 10);
+            invincible = true;
+            setHealth(getHealth() - 10);
         }
     }
 
@@ -356,7 +371,7 @@ public class Player extends Entity {
         int damage = 0;
         if (checkHit(monster)) {
             int weaponRoll = ThreadLocalRandom.current().nextInt(weapon.damageLowerBound, weapon.damageUpperBound + 1);
-            damage = (int) ((Window.player.strength * (.05 * weaponRoll)) / (monster.defense));
+            damage = (int) ((strength * (.05 * weaponRoll)) / (monster.defense));
             System.out.println(damage);
         }
         return damage;
