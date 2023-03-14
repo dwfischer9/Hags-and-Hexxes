@@ -7,8 +7,8 @@
 public class CollisionDetection {
     Window window;
 
-    public CollisionDetection() {
-        this.window = Window.overWorldPanel;
+    public CollisionDetection(Window window) {
+        this.window = window;
     }
 
     public void checkTile(Entity entity) {
@@ -27,30 +27,30 @@ public class CollisionDetection {
         switch (entity.direction) {
             case "up":
                 entityTopRow = (entityTopWorldY - entity.getSpeed()) / Window.TILESIZE;
-                tileNum1 = Window.tileM.mapTileNum[entityLeftCol][entityTopRow];
-                tileNum2 = Window.tileM.mapTileNum[entityRightCol][entityTopRow];
-                if (Window.tileM.tiles[tileNum1].isCollision() == true || Window.tileM.tiles[tileNum2].isCollision() == true)
+                tileNum1 = window.tileM.mapTileNum[entityLeftCol][entityTopRow];
+                tileNum2 = window.tileM.mapTileNum[entityRightCol][entityTopRow];
+                if (window.tileM.tiles[tileNum1].isCollision() == true || window.tileM.tiles[tileNum2].isCollision() == true)
                     entity.collisionOn = true;
                 break;
             case "down":
                 entityBottomRow = (entityBottomWorldY + entity.getSpeed()) / Window.TILESIZE;
-                tileNum1 = Window.tileM.mapTileNum[entityLeftCol][entityBottomRow];
-                tileNum2 = Window.tileM.mapTileNum[entityRightCol][entityBottomRow];
-                if (Window.tileM.tiles[tileNum1].isCollision() == true || Window.tileM.tiles[tileNum2].isCollision()== true)
+                tileNum1 = window.tileM.mapTileNum[entityLeftCol][entityBottomRow];
+                tileNum2 = window.tileM.mapTileNum[entityRightCol][entityBottomRow];
+                if (window.tileM.tiles[tileNum1].isCollision() == true || window.tileM.tiles[tileNum2].isCollision()== true)
                     entity.collisionOn = true;
                 break;
             case "left":
                 entityLeftCol = (entityLeftWorldX - entity.getSpeed()) / Window.TILESIZE;
-                tileNum1 = Window.tileM.mapTileNum[entityLeftCol][entityTopRow];
-                tileNum2 = Window.tileM.mapTileNum[entityLeftCol][entityBottomRow];
-                if (Window.tileM.tiles[tileNum1].isCollision()== true || Window.tileM.tiles[tileNum2].isCollision()== true)
+                tileNum1 = window.tileM.mapTileNum[entityLeftCol][entityTopRow];
+                tileNum2 = window.tileM.mapTileNum[entityLeftCol][entityBottomRow];
+                if (window.tileM.tiles[tileNum1].isCollision()== true || window.tileM.tiles[tileNum2].isCollision()== true)
                     entity.collisionOn = true;
                 break;
             case "right":
                 entityRightCol = (entityRightWorldX + entity.getSpeed()) / Window.TILESIZE;
-                tileNum1 = Window.tileM.mapTileNum[entityRightCol][entityTopRow];
-                tileNum2 = Window.tileM.mapTileNum[entityRightCol][entityBottomRow];
-                if (Window.tileM.tiles[tileNum1].isCollision()== true || Window.tileM.tiles[tileNum2].isCollision() == true)
+                tileNum1 = window.tileM.mapTileNum[entityRightCol][entityTopRow];
+                tileNum2 = window.tileM.mapTileNum[entityRightCol][entityBottomRow];
+                if (window.tileM.tiles[tileNum1].isCollision()== true || window.tileM.tiles[tileNum2].isCollision() == true)
                     entity.collisionOn = true;
                 break;
 

@@ -27,7 +27,7 @@ public class Window extends JPanel implements Runnable {
     public static JPanel statusBar = new JPanel();
     public static Player player;
     public static UI ui = new UI();
-    public static TileManager tileM = new TileManager();
+    public  TileManager tileM = new TileManager(this);
     // WORLD SETTINGS
     public static int gameState;
     static JFrame frame = new JFrame();
@@ -59,7 +59,7 @@ public class Window extends JPanel implements Runnable {
     public Thread gameThread = new Thread(this);
 
     public AssetSetter assetSetter = new AssetSetter(overWorldPanel);
-    public CollisionDetection cDetection = new CollisionDetection();
+    public CollisionDetection cDetection = new CollisionDetection(this);
     public Entity monster[] = new Entity[10];
     public Entity npc[] = new Entity[10];
     private final Dimension winSize = new Dimension(SCREENWIDTH, SCREENHEIGHT);

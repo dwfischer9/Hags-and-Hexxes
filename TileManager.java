@@ -1,6 +1,4 @@
-
 import java.io.BufferedReader;
-
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,15 +7,20 @@ import java.awt.Graphics2D;
 import javax.imageio.ImageIO;
 
 public class TileManager {
-    Window window;
-    Tile[] tiles;
-    int mapTileNum[][];
 
+    public Window window;
+    Tile[] tiles;
+    String[] tileNames = { "grass", "grass1", "path", "wall", "tree", "tree", "water", "edgeofwater-left",
+            "water-corner-bottom-left", "edgeofwater-right", "water-corner-top-right", "water-corner-top-left",
+            "water-corner-bottom-right", "edgeofwater-top", "edgeofwater-bottom" };
+    boolean[] tileCollisions = { false, false, false, true, true, true, true, true, true, true, true, true, true, true,
+            true };
+    int mapTileNum[][];
     public final int SCREEN_X = Window.SCREENWIDTH / 2 - Window.TILESIZE / 2;
     public final int SCREEN_Y = Window.SCREENHEIGHT / 2 - Window.TILESIZE / 2;
 
-    public TileManager() {
-        this.window = Window.overWorldPanel;
+    public TileManager(Window window) {
+        this.window = window;
         tiles = new Tile[20];
         mapTileNum = new int[window.maxWorldCol][window.maxWorldRow];
         getTileImage();
@@ -25,27 +28,15 @@ public class TileManager {
     }
 
     public void getTileImage() {
+        if (tileNames.length != tileCollisions.length) {
+            System.out.println("Error: tileNames and tileCollisions are not the same length");
+            System.out.println(tileNames.length);
+            System.out.println(tileCollisions.length);
+        }
         try {
-            // Grass tiles
-            setup(0, "grass", false);
-            setup(1, "grass1", false);
-            // Walking path tiles
-            setup(2, "path", false);
-            // Wall tiles
-            setup(3, "wall", true);
-            // Tree tiles
-            setup(4, "tree", true);
-            setup(5, "tree", true);
-            // Water tiles
-            setup(6, "water", true);
-            setup(7, "edgeofwater-left", true);
-            setup(8, "water-corner-bottom-left", true);
-            setup(9, "edgeofwater-right", true);
-            setup(10, "water-corner-top-right", true);
-            setup(11, "water-corner-top-left", true);
-            setup(12, "water-corner-bottom-right", true);
-            setup(13, "edgeofwater-top", true);
-            setup(14, "edgeofwater-bottom", true);
+            for (int i = 0; i < tileNames.length; i++) {
+                setup(i, tileNames[i], tileCollisions[i]);
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
