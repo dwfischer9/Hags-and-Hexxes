@@ -11,10 +11,10 @@ import java.util.concurrent.ThreadLocalRandom;
  * the player character
  */
 public class Player extends Entity {
-    KeyHandler keyH = Window.keyH;
+    private KeyHandler keyH = Window.keyH;
     public Entity currentInteraction;
-    public int strength = 10;
-    public boolean attacking = false;
+    private int strength = 10;
+    private boolean attacking = false;
     public Rectangle attackArea;
     // new Rectangle(8, 16, window.tileSize, window.tileSize);
     public int hasKey = 0;
@@ -61,14 +61,16 @@ public class Player extends Entity {
     }
 
     private void damageMonster(int index) {
+
         if (index != 999 && window.monster[index].invincible != true) {
 
-            window.monster[index].setHealth(window.monster[index].getHealth() - calculateDamage(window.monster[index]));
-            window.monster[index].invincible = true;
+            Entity entity = window.monster[index];
+            entity.setHealth(entity.getHealth() - calculateDamage(entity));
+            entity.invincible = true;
             System.out.println("Hit detected");
-            System.out.println(window.monster[index].getHealth());
+            System.out.println(entity.getHealth());
 
-            if (window.monster[index].getHealth() == 0) { // makes the enemy disappear if it's dead
+            if (entity.getHealth() == 0) { // makes the enemy disappear if it's dead
                 window.monster[index] = null;
             }
             // knockback
@@ -84,23 +86,23 @@ public class Player extends Entity {
         if (spriteCounter > 5 && spriteCounter <= 80) {
             spriteNum = 2;
             // save hitbox before the attack
-            int currentWorldX = this.getWorldX();
-            int currentWorldY = this.getWorldY();
-            int hitBoxWidth = this.hitBox.width;
-            int hitBoxHeight = this.hitBox.height;
+            int currentWorldX = getWorldX();
+            int currentWorldY = getWorldY();
+            int hitBoxWidth = hitBox.width;
+            int hitBoxHeight = hitBox.height;
             // adjust hitbox for the attack area
             switch (direction) {
                 case "up":
-                    this.setWorldY(this.getWorldY() - attackArea.height);
+                    setWorldY(getWorldY() - attackArea.height);
                     break;
                 case "down":
-                    this.setWorldY(this.getWorldY() + attackArea.height);
+                    setWorldY(getWorldY() + attackArea.height);
                     break;
                 case "left":
-                    this.setWorldX(this.getWorldX() - attackArea.width);
+                    setWorldX(getWorldX() - attackArea.width);
                     break;
                 case "right":
-                    this.setWorldX(this.getWorldX() + attackArea.width);
+                    setWorldX(getWorldX() + attackArea.width);
                     break;
             }
             // check collision
@@ -202,13 +204,13 @@ public class Player extends Entity {
      */
     private void updateKeys() {
         if (keyH.upPressed) {
-            this.direction = "up";
+            direction = "up";
         } else if (keyH.downPressed) {
-            this.direction = "down";
+            direction = "down";
         } else if (keyH.leftPressed) {
-            this.direction = "left";
+            direction = "left";
         } else if (keyH.rightPressed) {
-            this.direction = "right";
+            direction = "right";
         } else if (keyH.tabPressed) {
             if (Window.gameState == Window.PLAYSTATE) {
                 Window.gameState = Window.MENUSTATE;
@@ -220,36 +222,36 @@ public class Player extends Entity {
 
     public void update() {
         if (Window.gameState == Window.PLAYSTATE) {
-            this.updateKeys();
-            if (this.invincible == true) {
-                this.invincibleCounter++;
-                if (this.invincibleCounter > 60) {
-                    this.invincible = false;
-                    this.invincibleCounter = 0;
+            updateKeys();
+            if (invincible == true) {
+                invincibleCounter++;
+                if (invincibleCounter > 60) {
+                    invincible = false;
+                    invincibleCounter = 0;
                 }
             }
             if (Window.keyH.spacePressed == true) {
-                this.attacking = true;
+                attacking = true;
             }
         }
-        if (this.getHealth() == 0) {
+        if (getHealth() == 0) {
             Window.gameState = Window.STARTSTATE;
         }
-        if (this.attacking == true) {
+        if (attacking == true) {
             attacking();
         } else {
             switch (direction) {
                 case "up":
-                    this.attackArea = this.weapon.hitBoxUp;
+                    attackArea = weapon.hitBoxUp;
                     break;
                 case "down":
-                    this.attackArea = this.weapon.hitBoxDown;
+                    attackArea = weapon.hitBoxDown;
                     break;
                 case "left":
-                    this.attackArea = this.weapon.hitBoxLeft;
+                    attackArea = weapon.hitBoxLeft;
                     break;
                 case "right":
-                    this.attackArea = this.weapon.hitBoxRight;
+                    attackArea = weapon.hitBoxRight;
                     break;
             }
             // Checking tile colllision
@@ -259,7 +261,7 @@ public class Player extends Entity {
             // checking object collision
             pickUpObject(window.cDetection.checkObject(this, true));
             interactNPC(window.cDetection.checkEntity(this, window.npc));
-            if (this.getName() != "player") // we don't want to check if the player is colliding with itself.
+            if (getName() != "player") // we don't want to check if the player is colliding with itself.
                 window.cDetection.checkPlayer(this);
             contactMonster(window.cDetection.checkEntity(this, window.monster));
 
@@ -269,16 +271,16 @@ public class Player extends Entity {
             if (collisionOn == false && keyH.spacePressed == false) {
                 switch (direction) {
                     case "up":
-                        this.setWorldY(this.getWorldY() - this.getSpeed());
+                        setWorldY(getWorldY() - getSpeed());
                         break;
                     case "down":
-                        this.setWorldY(this.getWorldY() + this.getSpeed());
+                        setWorldY(getWorldY() + getSpeed());
                         break;
                     case "left":
-                        this.setWorldX(this.getWorldX() - this.getSpeed());
+                        setWorldX(getWorldX() - getSpeed());
                         break;
                     case "right":
-                        this.setWorldX(this.getWorldX() + this.getSpeed());
+                        setWorldX(getWorldX() + getSpeed());
                         break;
                     default:
                         break;
@@ -384,5 +386,13 @@ public class Player extends Entity {
     private boolean checkHit(Entity monster) {
         boolean hit = true;
         return hit;
+    }
+
+    public int getStrength() {
+        return strength;
+    }
+
+    public int getDefense() {
+        return defense;
     }
 }

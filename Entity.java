@@ -24,15 +24,12 @@ public class Entity extends AbstractEntity {
 
     public void update() {
         setAction();
-
         collisionOn = false;
-        window.cDetection.checkTile(this);
-
-        window.cDetection.checkPlayer(this);
-
-        window.cDetection.checkEntity(this, window.npc);
-        window.cDetection.checkEntity(this, window.monster);
-        window.cDetection.checkObject(this, false);
+        cDetection.checkTile(this);
+        cDetection.checkPlayer(this);
+        cDetection.checkEntity(this, window.npc);
+        cDetection.checkEntity(this, window.monster);
+        cDetection.checkObject(this, false);
         if (collisionOn == false && Window.gameState == Window.PLAYSTATE) {
             switch (direction) {
                 case "up":

@@ -10,7 +10,7 @@ import java.awt.Rectangle;
  */
 public class AssetSetter {
 
-    Window window = Window.overWorldPanel;
+    Window window;
     Player player = Window.player;
 
     public AssetSetter(Window window) {
@@ -23,10 +23,10 @@ public class AssetSetter {
      * @throws IOException
      */
     public void setObject() {
-        Window.items[0] = new Item(Window.overWorldPanel, "chest", true, Window.TILESIZE * 20, Window.TILESIZE * 20);
-        Window.items[1] = new Item(Window.overWorldPanel, "lockeddoor", true, Window.TILESIZE * 23,
+        Window.items[0] = new Item("chest", true, 20, 20);
+        Window.items[1] = new Item("lockeddoor", true, 23,
                 Window.TILESIZE * 25);
-        Window.items[2] = new Item(Window.overWorldPanel, "key", true, Window.TILESIZE * 21, Window.TILESIZE * 20);
+        Window.items[2] = new Item("key", true, 21, 20);
 
     }
 

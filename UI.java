@@ -15,8 +15,8 @@ public class UI {
     int commandNum = 0;
     public String currentDialogue = "";
     Window window;
-    static Entity currentInteract;
-    static int dialogueNumber = 0;
+    Entity currentInteract;
+    int dialogueNumber = 0;
     Graphics2D g2;
     KeyHandler keyH = Window.keyH;
 
@@ -31,23 +31,22 @@ public class UI {
 
     public void draw(final Graphics2D g2) {
         this.g2 = g2;
-
-        // PlayState
-        if (Window.gameState == Window.STARTSTATE) {
-            drawStartScreen();
-        }
-        if (Window.gameState == Window.PLAYSTATE) {
-            drawStatus();
-        }
-        // dialogue state
-        if (Window.gameState == Window.DIALOGUESTATE) {
-            drawDialogueScreen();
-        }
-        if (Window.gameState == Window.PAUSESTATE) {
-            drawPauseScreen();
-        }
-        if (Window.gameState == Window.MENUSTATE) {
-            drawMenuScreen();
+        switch (Window.gameState) {
+            case Window.STARTSTATE:
+                drawStartScreen();
+                break;
+            case Window.PLAYSTATE:
+                drawStatus();
+                break;
+            case Window.DIALOGUESTATE:
+                drawDialogueScreen();
+                break;
+            case Window.PAUSESTATE:
+                drawPauseScreen();
+                break;
+            case Window.MENUSTATE:
+                drawMenuScreen();
+                break;
         }
     }
 
@@ -100,9 +99,9 @@ public class UI {
         g2.drawString(String.format("Health: %.0f/%.0f", Window.player.getHealth(), Window.player.getMaxHealth()), x,
                 y); // draw health
         y += 25;
-        g2.drawString(String.format("Defense: %d", Window.player.defense), x, y);// draw defense
+        g2.drawString(String.format("Defense: %d", Window.player.getDefense()), x, y);// draw defense
         y += 25;
-        g2.drawString(String.format("Strength: %d", Window.player.strength), x, y); // draw strength
+        g2.drawString(String.format("Strength: %d", Window.player.getStrength()), x, y); // draw strength
         y += 25;
         g2.drawString(String.format("Speed: %d", Window.player.getSpeed()), x, y); // draw speed
         // Draw the dividing line between stats and inventory.
@@ -181,7 +180,6 @@ public class UI {
         g2.setFont(new Font("Helvetica", Font.PLAIN, 30));
         g2.drawString("New Game", x, y);
         // update keys in the menu.
-        System.out.println(commandNum);
         naviagteMenus();
         if (commandNum == 0)
             g2.drawString(">", x - 25, y);
@@ -256,7 +254,6 @@ public class UI {
         g2.fillRoundRect(x, y, width, height, 40, 40);
         g2.setColor(new Color(26, 26, 26, 255));
         g2.setStroke(new BasicStroke(5));
-
         g2.drawRoundRect(x, y, width, height, 25, 25);
 
     }

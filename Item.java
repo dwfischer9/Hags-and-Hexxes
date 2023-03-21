@@ -20,10 +20,10 @@ public class Item {
     protected Integer worldX, worldY;
     protected final UtilityTools uTool = new UtilityTools();
 
-    public Item(Window window, String name, boolean collision, int worldX, int worldY) {
+    public Item(String name, boolean collision, int worldX, int worldY) {
         this.name = name;
-        this.worldX = worldX;
-        this.worldY = worldY;
+        this.worldX = worldX * Window.TILESIZE;
+        this.worldY = worldY * Window.TILESIZE;
         this.collision = collision;
         this.image = setup();
     }

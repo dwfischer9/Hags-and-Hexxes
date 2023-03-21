@@ -14,12 +14,12 @@ abstract class AbstractEntity {
             attackdown2, attackleft1, attackleft2, attackright1, attackright2;
     private int worldX, worldY;
     private String name;
-
+    public CollisionDetection cDetection;
     public Rectangle attackArea;
     public int attackAreaDefaultx = 0;
     public int attackAreaDefaulty = 0;
     public boolean isFriendly = false;
-    String direction;
+    public String direction;
     private float health;
     public boolean attacking;
     public int dialogueCounter = 0;
@@ -58,7 +58,8 @@ abstract class AbstractEntity {
      * @param maxHealth The maximum health of the creature.
      * 
      */
-    public AbstractEntity(final Window window, final String name, final int level, final int health, final int maxHealth) {
+    public AbstractEntity(final Window window, final String name, final int level, final int health,
+            final int maxHealth) {
         this.name = name;
         this.health = health;
         this.level = level;
@@ -66,6 +67,7 @@ abstract class AbstractEntity {
         this.direction = "down";
         this.maxHealth = maxHealth;
         this.image = up1;
+        this.cDetection = window.cDetection;
     }
 
     public String toString() {

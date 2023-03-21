@@ -10,9 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Window extends JPanel implements Runnable {
-    protected final static Color BG = new Color(26, 26, 26);
     // ||---Screen Settings---||\\
-
     private static final int ORIGINALTILESIZE = 16;// 16x16 tiles
     private static final int SCALING = 3; // 960 x 576
     protected final static int TILESIZE = ORIGINALTILESIZE * SCALING;
@@ -20,36 +18,33 @@ public class Window extends JPanel implements Runnable {
     public final static int MAXSCREENROW = 12;
     public final static int SCREENWIDTH = TILESIZE * MAXSCREENCOL;
     public final static int SCREENHEIGHT = TILESIZE * MAXSCREENROW;
-
-    private static final int FPS = 60;
-    public static KeyHandler keyH = new KeyHandler();
-    public static Window overWorldPanel = new Window();
-    public static JPanel statusBar = new JPanel();
-    public static Player player;
-    public static UI ui = new UI();
-    public  TileManager tileM = new TileManager(this);
-    // WORLD SETTINGS
-    public static int gameState;
-    static JFrame frame = new JFrame();
+    // ||---Defining Constants---||\\
     public final static int DIALOGUESTATE = 0;
     public final static int PLAYSTATE = 1;
     public final static int PAUSESTATE = 2;
     public final static int BATTLESTATE = 3;
     public final static int STARTSTATE = 4;
     public final static int MENUSTATE = 5;
-    public static Item items[] = new Item[20];
-
-    /**
-     * initializes the overworld panel. Should be called at the end of a battle
-     */
-    public static void overWorldPanel() {
-        overWorldPanel.setName("overWorldPanel");
-        frame.add(overWorldPanel);
-        overWorldPanel.setVisible(true);
-    }
-
+    private static final int FPS = 60;
+    public final int maxWorldCol = 50;
+    public final int maxWorldRow = 50;
+    public final int worldWidth = TILESIZE * maxWorldCol;
+    public final int worldHeight = TILESIZE * maxWorldRow;
     public final int SCREEN_X = SCREENWIDTH / 2 - TILESIZE / 2;
     public final int SCREEN_Y = SCREENHEIGHT / 2 - TILESIZE / 2;
+    protected final static Color BG = new Color(26, 26, 26);
+
+    public CollisionDetection cDetection = new CollisionDetection(this);
+    public static KeyHandler keyH = new KeyHandler();
+    public static JPanel statusBar = new JPanel();
+    public static Player player;
+    public static UI ui = new UI();
+    public TileManager tileM = new TileManager(this);
+    // WORLD SETTINGS
+    public static int gameState;
+    static JFrame frame = new JFrame();
+    public static Item items[] = new Item[20];
+
     public Entity slime = new Entity(this, "slime", 4, 90, 90);
     public Entity tutorialNPC = new Entity(this, "tutorialNPC", 10, 40, 40);
 
@@ -58,17 +53,11 @@ public class Window extends JPanel implements Runnable {
     public JLabel victoryLabel = new JLabel("Victory!");
     public Thread gameThread = new Thread(this);
 
-    public AssetSetter assetSetter = new AssetSetter(overWorldPanel);
-    public CollisionDetection cDetection = new CollisionDetection(this);
+    public AssetSetter assetSetter = new AssetSetter(this);
     public Entity monster[] = new Entity[10];
     public Entity npc[] = new Entity[10];
     private final Dimension winSize = new Dimension(SCREENWIDTH, SCREENHEIGHT);
     int playerSpeed = 4;
-    public final int maxWorldCol = 50;
-    public final int maxWorldRow = 50;
-    public final int worldWidth = TILESIZE * maxWorldCol;
-
-    public final int worldHeight = TILESIZE * maxWorldRow;
 
     /**
      * Constructs a new instance of Window and sets some defeault properties
@@ -85,26 +74,26 @@ public class Window extends JPanel implements Runnable {
     }
 
     public void setupGame() throws IOException {
-        player = new Player(overWorldPanel, keyH, "player", 1,
+        player = new Player(this, keyH, "player", 1,
                 90, 90);
-        player.setDefaultValues();
         assetSetter.setObject();
         assetSetter.setNPC();
         assetSetter.setPlayer();
         gameState = STARTSTATE;
-        player.isPlayer = true;
+
         initialize();
     }
 
     public void initialize() throws IOException {
-
+        this.setName("overWorldPanel");
+        frame.add(this);
+        this.setVisible(true);
         startGameThread();
         player.setDefaultValues();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // set close behavior to stop the program when the window
         // // is closed
         frame.setResizable(false); // I don't want to allow resizing of the window yet
         frame.setTitle("Hags and Hexxes "); // setting the title of the window, this is pretty temporary
-        overWorldPanel();
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -119,7 +108,6 @@ public class Window extends JPanel implements Runnable {
         gameThread = new Thread(this);
         gameThread.start();
         System.out.println("Started game thread");
-        System.out.println(gameState);
     }
 
     /**
@@ -141,9 +129,9 @@ public class Window extends JPanel implements Runnable {
         final double drawInterval = 1000000000 / FPS; // 0.01666 seconds
         double nextDrawTime = System.nanoTime() + drawInterval;
         while (gameThread != null) {
-            overWorldPanel.repaint();
+            this.repaint();
             if (gameState == PLAYSTATE) {
-                overWorldPanel.update();
+                this.update();
                 player.update();
             }
             if (gameState == DIALOGUESTATE)

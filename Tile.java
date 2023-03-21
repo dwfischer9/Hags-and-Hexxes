@@ -5,7 +5,7 @@ public class Tile {
     private BufferedImage image;
     private boolean collision = false;
 
-    public Tile(BufferedImage image, boolean collision) {
+    public Tile(final BufferedImage image, final boolean collision) {
         this.image = image;
         this.collision = collision;
     }
@@ -14,7 +14,7 @@ public class Tile {
         return image;
     }
 
-    public void setImage(BufferedImage image) {
+    public void setImage(final BufferedImage image) {
         this.image = image;
     }
 
@@ -22,7 +22,12 @@ public class Tile {
         return collision;
     }
 
-    public void setCollision(boolean collision) {
+    public void setCollision(final boolean collision) {
         this.collision = collision;
+    }
+
+    @Override
+    public String toString() {
+        return "Tile [image=" + image + ", collision=" + collision + "]";
     }
 }

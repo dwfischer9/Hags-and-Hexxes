@@ -12,7 +12,11 @@ public class TileManager {
     Tile[] tiles;
     String[] tileNames = { "grass", "grass1", "path", "wall", "tree", "tree", "water", "edgeofwater-left",
             "water-corner-bottom-left", "edgeofwater-right", "water-corner-top-right", "water-corner-top-left",
-            "water-corner-bottom-right", "edgeofwater-top", "edgeofwater-bottom" };
+            "water-corner-bottom-right", "edgeofwater-top", "edgeofwater-bottom" }; // tilenames and tile collisions
+                                                                                    // must have the same length! to
+                                                                                    // create a new tile, enter the name
+                                                                                    // in tilenames and the collision in
+                                                                                    // tilecollisions
     boolean[] tileCollisions = { false, false, false, true, true, true, true, true, true, true, true, true, true, true,
             true };
     int mapTileNum[][];
@@ -111,7 +115,7 @@ public class TileManager {
             int screenY = worldY - Window.player.getWorldY() + SCREEN_Y;
 
             int tileNum = mapTileNum[worldCol][worldRow];
-            if (window.isVisible() == true && window.getName() == "overWorldPanel") {
+            if (window.isVisible() == true) {
                 if (worldX + Window.TILESIZE > Window.player.getWorldX() - SCREEN_X &&
                         worldX - Window.TILESIZE < Window.player.getWorldX() + SCREEN_X &&
                         worldY + Window.TILESIZE > Window.player.getWorldY() - SCREEN_Y &&
