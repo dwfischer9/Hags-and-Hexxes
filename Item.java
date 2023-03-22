@@ -29,7 +29,7 @@ public class Item {
     }
 
     public BufferedImage getImage() {
-        return this.image;
+        return image;
     }
 
     /**
@@ -44,7 +44,7 @@ public class Item {
             image = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE);
             System.out.println("Loaded assets for item " + name);
         } catch (IOException e) {
-            System.err.println("Error getting image for item: " + this.getName());
+            System.err.println("Error getting image for item: " + name);
             e.printStackTrace();
         }
         return image;
@@ -55,7 +55,7 @@ public class Item {
      * @return the name of the {@link Item}.
      */
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public void draw(Graphics2D g2, Window window) {

@@ -35,13 +35,13 @@ public class Window extends JPanel implements Runnable {
     protected final static Color BG = new Color(26, 26, 26);
 
     public CollisionDetection cDetection = new CollisionDetection(this);
-    public static KeyHandler keyH = new KeyHandler();
+    public KeyHandler keyH = new KeyHandler(this);
     public static JPanel statusBar = new JPanel();
     public static Player player;
-    public static UI ui = new UI();
+    public UI ui = new UI(this);
     public TileManager tileM = new TileManager(this);
     // WORLD SETTINGS
-    public static int gameState;
+    public int gameState;
     static JFrame frame = new JFrame();
     public static Item items[] = new Item[20];
 

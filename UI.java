@@ -14,14 +14,14 @@ public class UI {
     private final Color menuColor = new Color(157, 0, 255, 250);
     int commandNum = 0;
     public String currentDialogue = "";
-    Window window;
-    Entity currentInteract;
     int dialogueNumber = 0;
-    Graphics2D g2;
-    KeyHandler keyH = Window.keyH;
+    private Graphics2D g2;
+    private Window window;
+    private KeyHandler keyH;
 
-    public void startMenu(Window window) {
-
+    public UI(Window window) {
+        this.window = window;
+        keyH = window.keyH;
     }
 
     private void drawString(Graphics g, String text, int x, int y) {
@@ -31,7 +31,7 @@ public class UI {
 
     public void draw(final Graphics2D g2) {
         this.g2 = g2;
-        switch (Window.gameState) {
+        switch (window.gameState) {
             case Window.STARTSTATE:
                 drawStartScreen();
                 break;
@@ -51,7 +51,7 @@ public class UI {
     }
 
     private void naviagteMenus() {
-        if (Window.gameState == Window.STARTSTATE) {
+        if (window.gameState == Window.STARTSTATE) {
             if (keyH.upPressed) {
                 if (commandNum >= 0) {
                     commandNum--;
@@ -258,10 +258,10 @@ public class UI {
 
     }
 
-    public static void selectOption(int commandNum) {
-        if (Window.gameState == Window.STARTSTATE || Window.gameState == Window.PAUSESTATE) {
+    public void selectOption(int commandNum) {
+        if (window.gameState == Window.STARTSTATE || window.gameState == Window.PAUSESTATE) {
             if (commandNum == 0)
-                Window.gameState = Window.PLAYSTATE;
+                window.gameState = Window.PLAYSTATE;
             else if (commandNum == 3) {
                 Window.frame.dispose();
             }

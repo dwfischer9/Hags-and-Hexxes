@@ -1,7 +1,7 @@
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -11,7 +11,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * the player character
  */
 public class Player extends Entity {
-    private KeyHandler keyH = Window.keyH;
+    private KeyHandler keyH = window.keyH;
     public Entity currentInteraction;
     private int strength = 10;
     private boolean attacking = false;
@@ -212,16 +212,16 @@ public class Player extends Entity {
         } else if (keyH.rightPressed) {
             direction = "right";
         } else if (keyH.tabPressed) {
-            if (Window.gameState == Window.PLAYSTATE) {
-                Window.gameState = Window.MENUSTATE;
-            } else if (Window.gameState == Window.MENUSTATE) {
-                Window.gameState = Window.PLAYSTATE;
+            if (window.gameState == Window.PLAYSTATE) {
+                window.gameState = Window.MENUSTATE;
+            } else if (window.gameState == Window.MENUSTATE) {
+                window.gameState = Window.PLAYSTATE;
             }
         }
     }
 
     public void update() {
-        if (Window.gameState == Window.PLAYSTATE) {
+        if (window.gameState == Window.PLAYSTATE) {
             updateKeys();
             if (invincible == true) {
                 invincibleCounter++;
@@ -230,12 +230,12 @@ public class Player extends Entity {
                     invincibleCounter = 0;
                 }
             }
-            if (Window.keyH.spacePressed == true) {
+            if (keyH.spacePressed == true) {
                 attacking = true;
             }
         }
         if (getHealth() == 0) {
-            Window.gameState = Window.STARTSTATE;
+            window.gameState = Window.STARTSTATE;
         }
         if (attacking == true) {
             attacking();
@@ -320,8 +320,8 @@ public class Player extends Entity {
 
     private void interactNPC(int i) {
         if (i != 999) {
-            if (keyH.ePressed == true && Window.gameState != Window.BATTLESTATE) {
-                Window.gameState = Window.DIALOGUESTATE;
+            if (keyH.ePressed == true && window.gameState != Window.BATTLESTATE) {
+                window.gameState = Window.DIALOGUESTATE;
                 currentInteraction = window.npc[i];
                 keyH.ePressed = false;
             }

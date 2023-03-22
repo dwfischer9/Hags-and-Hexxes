@@ -30,7 +30,7 @@ public class Entity extends AbstractEntity {
         cDetection.checkEntity(this, window.npc);
         cDetection.checkEntity(this, window.monster);
         cDetection.checkObject(this, false);
-        if (collisionOn == false && Window.gameState == Window.PLAYSTATE) {
+        if (collisionOn == false && window.gameState == Window.PLAYSTATE) {
             switch (direction) {
                 case "up":
                     this.setWorldY(this.getWorldY() - this.getSpeed());
@@ -63,7 +63,7 @@ public class Entity extends AbstractEntity {
 
     public void setAction() {
         actionLock++;
-        if (actionLock == 50 && Window.gameState == Window.PLAYSTATE) {
+        if (actionLock == 50 && window.gameState == Window.PLAYSTATE) {
             Random rand = new Random();
             int i = rand.nextInt(100) + 1;// generate random number from 1 to 100
             if (i <= 25)

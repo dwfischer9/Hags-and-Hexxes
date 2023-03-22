@@ -43,6 +43,7 @@ public class AssetSetter {
         window.npc[0].setup();
         window.npc[0].setWorldX(Window.TILESIZE * 23);
         window.npc[0].setWorldY(Window.TILESIZE * 20);
+
         window.monster[0] = window.slime;
         window.monster[0].isMonster = true;
         window.monster[0].hitBoxDefeaultX = 6;
