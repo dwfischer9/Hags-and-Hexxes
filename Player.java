@@ -39,7 +39,6 @@ public class Player extends Entity {
         super(window, name, level, health, maxHealth);
         this.keyH = keyH;
         this.weapon = longSword;
-        this.window = window;
         this.image = getImage();
         this.isFriendly = true;
         this.attackArea = this.weapon.hitBoxLeft;

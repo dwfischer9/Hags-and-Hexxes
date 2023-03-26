@@ -34,17 +34,17 @@ public class AssetSetter {
      * Instantiates and sets the world position of each NPC to appear on the map.
      */
     public void setNPC() {
-        window.npc[0] = window.tutorialNPC;
+        window.npc[0] = new Entity(window, "tutorialNPC", 10, 40, 40);
         window.npc[0].dialogues[0] = "Hi there adventurer! Welcome to the tavern.\n We have cold drinks, warm beds, and food that you can eat.";
         window.npc[0].dialogues[1] = "But I can see that you're not here for just food.\n Your lot comes to me looking for rumors.";
-        window.npc[0].dialogues[2] = "Go take a look at the quest board over in the dining area.\n I'll get you a drink in the meantime.";
+        window.npc[0].dialogues[2] = "I've head talk of a slime wandering around the inn. I can't have it hurting my customers. Go take care of it!";
         window.npc[0].currentDialogue = window.npc[0].dialogues[0];
         window.npc[0].setSpeed(0);
         window.npc[0].setup();
         window.npc[0].setWorldX(Window.TILESIZE * 23);
         window.npc[0].setWorldY(Window.TILESIZE * 20);
 
-        window.monster[0] = window.slime;
+        window.monster[0] = new Entity(window, "slime", 4, 90, 90);
         window.monster[0].isMonster = true;
         window.monster[0].hitBoxDefeaultX = 6;
         window.monster[0].hitBoxDefeaultY = 18;

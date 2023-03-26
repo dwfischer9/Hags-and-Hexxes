@@ -45,9 +45,6 @@ public class Window extends JPanel implements Runnable {
     static JFrame frame = new JFrame();
     public static Item items[] = new Item[20];
 
-    public Entity slime = new Entity(this, "slime", 4, 90, 90);
-    public Entity tutorialNPC = new Entity(this, "tutorialNPC", 10, 40, 40);
-
     public JPanel foeBar = new JPanel();
     public JLabel foeHealth = new JLabel();
     public JLabel victoryLabel = new JLabel("Victory!");
@@ -56,6 +53,7 @@ public class Window extends JPanel implements Runnable {
     public AssetSetter assetSetter = new AssetSetter(this);
     public Entity monster[] = new Entity[10];
     public Entity npc[] = new Entity[10];
+    public Quest quest[] = new Quest[10];
     private final Dimension winSize = new Dimension(SCREENWIDTH, SCREENHEIGHT);
     int playerSpeed = 4;
 
@@ -84,12 +82,8 @@ public class Window extends JPanel implements Runnable {
         initialize();
     }
 
-    public void initialize() throws IOException {
-        this.setName("overWorldPanel");
-        frame.add(this);
-        this.setVisible(true);
-        startGameThread();
-        player.setDefaultValues();
+    private void setupFrame() {
+        ;
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // set close behavior to stop the program when the window
         // // is closed
         frame.setResizable(false); // I don't want to allow resizing of the window yet
@@ -97,6 +91,14 @@ public class Window extends JPanel implements Runnable {
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
+        frame.add(this);
+    }
+
+    public void initialize() throws IOException {
+        setupFrame();
+        startGameThread();
+        player.setDefaultValues();
 
     }
 
@@ -115,8 +117,16 @@ public class Window extends JPanel implements Runnable {
      */
     public void update() {
         if (gameState == PLAYSTATE) {
-            tutorialNPC.update();
-            slime.update();
+            for (int i = 0; i < npc.length; i++) {
+                if (npc[i] != null) {
+                    npc[i].update();
+                }
+            }
+            for (int i = 0; i < monster.length; i++) {
+                if (monster[i] != null) {
+                    monster[i].update();
+                }
+            }
             player.update();
         }
     }
@@ -139,17 +149,15 @@ public class Window extends JPanel implements Runnable {
                     keyH.ePressed = false;
                     if (player.currentInteraction.dialogues[player.currentInteraction.dialogueCounter] != null) {
                         ui.currentDialogue = player.currentInteraction.dialogues[player.currentInteraction.dialogueCounter++];
-
-                    } else
+                    } else {
                         gameState = PLAYSTATE;
+                    }
                 }
-
             try {
                 double remainingTime = nextDrawTime - System.nanoTime();
                 remainingTime = remainingTime / 1000000;
                 if (remainingTime < 0)
                     remainingTime = 0; // we don't need a sleep if the time is used up
-
                 Thread.sleep((long) remainingTime);
                 nextDrawTime += drawInterval;
                 // pause the game loop so that we only draw 60 times per second
@@ -157,7 +165,6 @@ public class Window extends JPanel implements Runnable {
                 e.printStackTrace();
                 System.err.println("Something went wrong when drawing the timer");
             }
-
         }
     }
 
@@ -170,26 +177,27 @@ public class Window extends JPanel implements Runnable {
         // Objects
         for (int i = 0; i < items.length; i++) // for each item we have loaded in ,
             // we need to draw it to the screen
-            if (items[i] != null)
+            if (items[i] != null) {
                 items[i].draw(g2, this);
-
+            }
         // NPC
-        for (int i = 0; i < npc.length; i++)
-            if (npc[i] != null)
+        for (int i = 0; i < npc.length; i++) {
+            if (npc[i] != null) {
                 npc[i].draw(g2);
-
+            }
+        }
         // Monsters
-        for (int i = 0; i < monster.length; i++)
-            if (monster[i] != null)
+        for (int i = 0; i < monster.length; i++) {
+            if (monster[i] != null) {
                 monster[i].draw(g2);
-
+            }
+        }
         // Player
         player.draw(g2);
         final long drawEnd = System.nanoTime();
         final long passed = drawEnd - drawStart;
-        g2.setColor(BG);
+        g2.setColor(Color.red);
         g2.drawString("Draw Time:" + passed, 10, 400);
-
         ui.draw(g2);
     }
 }
