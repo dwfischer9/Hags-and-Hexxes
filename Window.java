@@ -42,7 +42,6 @@ public class Window extends JPanel implements Runnable {
     public TileManager tileM = new TileManager(this);
     // WORLD SETTINGS
     public int gameState;
-    static JFrame frame = new JFrame();
     public static Item items[] = new Item[20];
 
     public JPanel foeBar = new JPanel();
@@ -72,6 +71,7 @@ public class Window extends JPanel implements Runnable {
     }
 
     public void setupGame() throws IOException {
+        setupFrame(this);
         player = new Player(this, keyH, "player", 1,
                 90, 90);
         assetSetter.setObject();
@@ -82,21 +82,21 @@ public class Window extends JPanel implements Runnable {
         initialize();
     }
 
-    private void setupFrame() {
-        ;
+    private void setupFrame(Window window) {
+        JFrame frame = new JFrame();
+        frame.setMinimumSize(winSize);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // set close behavior to stop the program when the window
         // // is closed
         frame.setResizable(false); // I don't want to allow resizing of the window yet
         frame.setTitle("Hags and Hexxes "); // setting the title of the window, this is pretty temporary
         frame.pack();
         frame.setLocationRelativeTo(null);
+        frame.add(window);
         frame.setVisible(true);
-
-        frame.add(this);
     }
 
     public void initialize() throws IOException {
-        setupFrame();
+
         startGameThread();
         player.setDefaultValues();
 

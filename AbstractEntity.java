@@ -10,7 +10,7 @@ import javax.imageio.ImageIO;
  * This class is used to serve as a parent class to the {@link Entity} class.
  */
 abstract class AbstractEntity {
-    public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, attackup1, attackup2, attackdown1,
+    protected BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, attackup1, attackup2, attackdown1,
             attackdown2, attackleft1, attackleft2, attackright1, attackright2;
     private int worldX, worldY;
     private String name;
@@ -158,61 +158,89 @@ abstract class AbstractEntity {
         switch (getDirection()) { // handles the direction that the sprite is facing.
             case "up":
                 if (attacking == false) {
-                    if (spriteNum == 1)
-                        image = up1;
-                    if (spriteNum == 2)
-                        image = up2;
-                }
-                if (attacking == true) {
-                    if (spriteNum == 1)
-                        image = attackup1;
-                    if (spriteNum == 2)
-                        image = attackup2;
+                    switch (spriteNum) {
+                        case 1:
+                            image = up1;
+                            break;
+                        case 2:
+                            image = up2;
+                            break;
+                    }
+                } else {
+                    switch (spriteNum) {
+                        case 1:
+                            image = attackup1;
+                            break;
+                        case 2:
+                            image = attackup2;
+                            break;
+                    }
                 }
 
                 break;
             case "down":
-                if (attacking == false) {
-                    if (spriteNum == 1)
-                        image = down1;
-                    if (spriteNum == 2)
-                        image = down2;
+                if (!attacking) {
+                    switch (spriteNum) {
+                        case 1:
+                            image = down1;
+                            break;
+                        case 2:
+                            image = down2;
+                            break;
+                    }
+                } else {
+                    switch (spriteNum) {
+                        case 1:
+                            image = attackdown1;
+                            break;
+                        case 2:
+                            image = attackdown2;
+                            break;
+                    }
                 }
-                if (attacking == true) {
-                    if (spriteNum == 1)
-                        image = attackdown1;
-                    if (spriteNum == 2)
-                        image = attackdown2;
-                }
-
                 break;
-            case "left":
-                if (attacking == false) {
-                    if (spriteNum == 1)
 
-                        if (spriteNum == 2)
+            case "left":
+                if (!attacking) {
+                    switch (spriteNum) {
+                        case 1:
+                            image = left1;
+                            break;
+                        case 2:
                             image = left2;
-                }
-                if (attacking == true) {
-                    if (spriteNum == 1)
-                        image = attackleft1;
-                    if (spriteNum == 2)
-                        image = attackleft2;
+                            break;
+                    }
+                } else {
+                    switch (spriteNum) {
+                        case 1:
+                            image = attackleft1;
+                            break;
+                        case 2:
+                            image = attackleft2;
+                            break;
+                    }
                 }
 
                 break;
             case "right":
-                if (attacking == false) {
-                    if (spriteNum == 1)
-                        image = right1;
-                    if (spriteNum == 2)
-                        image = right2;
-                }
-                if (attacking == true) {
-                    if (spriteNum == 1)
-                        image = attackright1;
-                    if (spriteNum == 2)
-                        image = attackright2;
+                if (!attacking) {
+                    switch (spriteNum) {
+                        case 1:
+                            image = right1;
+                            break;
+                        case 2:
+                            image = right2;
+                            break;
+                    }
+                } else {
+                    switch (spriteNum) {
+                        case 1:
+                            image = attackright1;
+                            break;
+                        case 2:
+                            image = attackright2;
+                            break;
+                    }
                 }
 
                 break;

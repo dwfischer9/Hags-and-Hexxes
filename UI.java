@@ -181,6 +181,7 @@ public class UI {
         g2.drawString("New Game", x, y);
         // update keys in the menu.
         naviagteMenus();
+
         if (commandNum == 0)
             g2.drawString(">", x - 25, y);
         y = Window.SCREENHEIGHT / 3 + 150;
@@ -255,7 +256,6 @@ public class UI {
         g2.setColor(new Color(26, 26, 26, 255));
         g2.setStroke(new BasicStroke(5));
         g2.drawRoundRect(x, y, width, height, 25, 25);
-
     }
 
     public void selectOption(int commandNum) {
@@ -263,7 +263,6 @@ public class UI {
             if (commandNum == 0)
                 window.gameState = Window.PLAYSTATE;
             else if (commandNum == 3) {
-                Window.frame.dispose();
             }
         }
     }

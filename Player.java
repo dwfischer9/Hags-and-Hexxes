@@ -55,7 +55,7 @@ public class Player extends Entity {
         this.hitBox = new Rectangle(8, 16, 32, 32);
         this.setWorldX(Window.TILESIZE * 23);
         this.setWorldY(Window.TILESIZE * 21);
-        this.setSpeed(4);
+        this.setSpeed(3);
         attacking = false;
     }
 
@@ -284,6 +284,8 @@ public class Player extends Entity {
                     default:
                         break;
                 }
+                direction = "none"; // allows the player to stop once input key has been relesased. Without this
+                                    // line the player keeps moving.
 
             }
         }
