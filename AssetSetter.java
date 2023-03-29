@@ -23,10 +23,10 @@ public class AssetSetter {
      * @throws IOException
      */
     public void setObject() {
-        Window.items[0] = new Item("chest", true, 20, 20);
-        Window.items[1] = new Item("lockeddoor", true, 23,
+        window.items[0] = new Item("chest", true, 20, 20);
+        window.items[1] = new Item("lockeddoor", true, 23,
                 Window.TILESIZE * 25);
-        Window.items[2] = new Item("key", true, 21, 20);
+        window.items[2] = new Item("key", true, 21, 20);
 
     }
 
@@ -34,25 +34,28 @@ public class AssetSetter {
      * Instantiates and sets the world position of each NPC to appear on the map.
      */
     public void setNPC() {
-        window.npc[0] = new Entity(window, "tutorialNPC", 10, 40, 40);
-        window.npc[0].dialogues[0] = "Hi there adventurer! Welcome to the tavern.\n We have cold drinks, warm beds, and food that you can eat.";
-        window.npc[0].dialogues[1] = "But I can see that you're not here for just food.\n Your lot comes to me looking for rumors.";
-        window.npc[0].dialogues[2] = "I've head talk of a slime wandering around the inn. I can't have it hurting my customers. Go take care of it!";
-        window.npc[0].currentDialogue = window.npc[0].dialogues[0];
-        window.npc[0].setSpeed(0);
-        window.npc[0].setup();
-        window.npc[0].setWorldX(Window.TILESIZE * 23);
-        window.npc[0].setWorldY(Window.TILESIZE * 20);
+        Entity tutorialNPC = new Entity(window, "tutorialNPC", 10, 40, 40);
+        tutorialNPC.dialogues[0] = "Hi there adventurer! Welcome to the tavern.\n We have cold drinks, warm beds, and food that you can eat.";
+        tutorialNPC.dialogues[1] = "But I can see that you're not here for just food.\n Your lot comes to me looking for rumors.";
+        tutorialNPC.dialogues[2] = "I've heard talk of a slime wandering around the inn.\n I can't have it hurting my customers. Go take care of it!";
+        tutorialNPC.setSpeed(0);
+        tutorialNPC.setup();
+        tutorialNPC.setWorldX(Window.TILESIZE * 23);
+        tutorialNPC.setWorldY(Window.TILESIZE * 20);
+        window.npc[0] = tutorialNPC;
 
-        window.monster[0] = new Entity(window, "slime", 4, 90, 90);
-        window.monster[0].isMonster = true;
-        window.monster[0].hitBoxDefeaultX = 6;
-        window.monster[0].hitBoxDefeaultY = 18;
-        window.monster[0].hitBox = new Rectangle(6, 18, Window.TILESIZE, Window.TILESIZE);
-        window.monster[0].setup();
-        window.monster[0].setWorldX(Window.TILESIZE * 24);
-        window.monster[0].setWorldY(Window.TILESIZE * 28);
-        window.monster[0].setSpeed(2);
+        Entity slime = new Entity(window, "slime", 4, 90, 90);
+        slime.isMonster = true;
+        slime.hitBoxDefeaultX = 6;
+        slime.hitBoxDefeaultY = 18;
+        slime.hitBox = new Rectangle(6, 18, Window.TILESIZE, Window.TILESIZE);
+        slime.setup();
+        slime.setWorldX(Window.TILESIZE * 24);
+        slime.setWorldY(Window.TILESIZE * 28);
+        slime.setSpeed(2);
+        slime.dropTable.put(new Item("key", true, 0, 0), 1.00);
+        window.monster[0] = slime;
+
     }
 
     public void setPlayer() {

@@ -66,12 +66,6 @@ public class Player extends Entity {
             Entity entity = window.monster[index];
             entity.setHealth(entity.getHealth() - calculateDamage(entity));
             entity.invincible = true;
-            System.out.println("Hit detected");
-            System.out.println(entity.getHealth());
-
-            if (entity.getHealth() == 0) { // makes the enemy disappear if it's dead
-                window.monster[index] = null;
-            }
             // knockback
 
         }
@@ -334,20 +328,20 @@ public class Player extends Entity {
      */
     private void pickUpObject(int i) {
         if (i != 999) { // Must exclude the obejcts that we don't want picked
-            String objectName = Window.items[i].getName();
+            String objectName = window.items[i].getName();
             switch (objectName) {
                 case "chest":
                     break;
                 case "key":
 
-                    inventory.put(Window.items[i], 1);
-                    Window.items[i] = null;
+                    inventory.put(window.items[i], 1);
+                    window.items[i] = null;
                     System.out.println("Key obtained.");
                     hasKey++;
                     break;
                 case "lockeddoor":
                     if (hasKey > 0) {
-                        Window.items[i] = null;
+                        window.items[i] = null;
                         hasKey--;
                     }
                     break;

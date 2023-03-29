@@ -3,6 +3,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
@@ -13,6 +14,7 @@ abstract class AbstractEntity {
     protected BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, attackup1, attackup2, attackdown1,
             attackdown2, attackleft1, attackleft2, attackright1, attackright2;
     private int worldX, worldY;
+    HashMap<Item, Double> dropTable = new HashMap<Item, Double>();
     private String name;
     public CollisionDetection cDetection;
     public Rectangle attackArea;
@@ -342,8 +344,18 @@ abstract class AbstractEntity {
 
     }
 
-    public BufferedImage getUp1() {
-        return up1;
+    public void dropItems() {
+        int i;
+        for (i = 0; i < window.items.length && window.items[i] != null; i++) {
+        }
+
+        for (Item item : dropTable.keySet()) {
+            item.worldX = worldX;
+            item.worldY = worldY;
+            window.items[i++] = item;
+            item.setup();
+
+        }
     }
 
     public void drawHealthBar(final Graphics2D g2, final int screenX, final int screenY) {

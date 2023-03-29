@@ -42,7 +42,7 @@ public class Window extends JPanel implements Runnable {
     public TileManager tileM = new TileManager(this);
     // WORLD SETTINGS
     public int gameState;
-    public static Item items[] = new Item[20];
+    public Item items[] = new Item[20];
 
     public JPanel foeBar = new JPanel();
     public JLabel foeHealth = new JLabel();
@@ -119,12 +119,22 @@ public class Window extends JPanel implements Runnable {
         if (gameState == PLAYSTATE) {
             for (int i = 0; i < npc.length; i++) {
                 if (npc[i] != null) {
-                    npc[i].update();
+                    if (npc[i].getHealth() == 0) {
+                        npc[i].dropItems();
+                        npc[i] = null;
+                    } else {
+                        npc[i].update();
+                    }
                 }
             }
             for (int i = 0; i < monster.length; i++) {
                 if (monster[i] != null) {
-                    monster[i].update();
+                    if (monster[i].getHealth() == 0) {
+                        monster[i].dropItems();
+                        monster[i] = null;
+                    } else {
+                        monster[i].update();
+                    }
                 }
             }
             player.update();
@@ -140,32 +150,38 @@ public class Window extends JPanel implements Runnable {
         double nextDrawTime = System.nanoTime() + drawInterval;
         while (gameThread != null) {
             this.repaint();
-            if (gameState == PLAYSTATE) {
-                this.update();
-                player.update();
-            }
-            if (gameState == DIALOGUESTATE)
-                if (keyH.ePressed) {
-                    keyH.ePressed = false;
-                    if (player.currentInteraction.dialogues[player.currentInteraction.dialogueCounter] != null) {
-                        ui.currentDialogue = player.currentInteraction.dialogues[player.currentInteraction.dialogueCounter++];
-                    } else {
-                        gameState = PLAYSTATE;
+            switch (gameState) {
+                case PLAYSTATE:
+                    update();
+                    player.update();
+                    break;
+                case DIALOGUESTATE:
+                    if (keyH.ePressed) {
+                        keyH.ePressed = false;
+                        if (player.currentInteraction.dialogues[player.currentInteraction.dialogueCounter] != null) {
+                            ui.currentDialogue = player.currentInteraction.dialogues[player.currentInteraction.dialogueCounter++];
+                        } else {
+                            gameState = PLAYSTATE;
+                        }
                     }
-                }
+                    break;
+            }
+
             try {
                 double remainingTime = nextDrawTime - System.nanoTime();
-                remainingTime = remainingTime / 1000000;
-                if (remainingTime < 0)
-                    remainingTime = 0; // we don't need a sleep if the time is used up
+                remainingTime /= 1000000;
+                if (remainingTime < 0) {// we don't need a sleep if the time is used up
+                    remainingTime = 0;
+                }
                 Thread.sleep((long) remainingTime);
                 nextDrawTime += drawInterval;
                 // pause the game loop so that we only draw 60 times per second
             } catch (final InterruptedException e) {
                 e.printStackTrace();
-                System.err.println("Something went wrong when drawing the timer");
+                System.err.println("Something went wrong when drawing the timer.");
             }
         }
+
     }
 
     public void paintComponent(final Graphics g) {
@@ -175,17 +191,19 @@ public class Window extends JPanel implements Runnable {
         // Tilesheet
         tileM.draw(g2);
         // Objects
-        for (int i = 0; i < items.length; i++) // for each item we have loaded in ,
+        for (int i = 0; i < items.length; i++) { // for each item we have loaded in ,
             // we need to draw it to the screen
             if (items[i] != null) {
                 items[i].draw(g2, this);
             }
+        }
         // NPC
         for (int i = 0; i < npc.length; i++) {
             if (npc[i] != null) {
                 npc[i].draw(g2);
             }
         }
+
         // Monsters
         for (int i = 0; i < monster.length; i++) {
             if (monster[i] != null) {
