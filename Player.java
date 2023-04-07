@@ -280,7 +280,6 @@ public class Player extends Entity {
                 }
                 direction = "none"; // allows the player to stop once input key has been relesased. Without this
                                     // line the player keeps moving.
-
             }
         }
     }
@@ -330,16 +329,16 @@ public class Player extends Entity {
         if (i != 999) { // Must exclude the obejcts that we don't want picked
             String objectName = window.items[i].getName();
             switch (objectName) {
-                case "chest":
+                case "Chest":
                     break;
-                case "key":
+                case "Key":
 
                     inventory.put(window.items[i], 1);
                     window.items[i] = null;
                     System.out.println("Key obtained.");
                     hasKey++;
                     break;
-                case "lockeddoor":
+                case "Locked Door":
                     if (hasKey > 0) {
                         window.items[i] = null;
                         hasKey--;

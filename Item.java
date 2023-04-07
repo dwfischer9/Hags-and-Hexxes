@@ -16,15 +16,19 @@ public class Item {
     protected BufferedImage image;
 
     protected String name;
-    protected boolean collision = false;
+    protected boolean collision;
     protected Integer worldX, worldY;
+    private String description;
+    private String filename;
     protected final UtilityTools uTool = new UtilityTools();
 
-    public Item(String name, boolean collision, int worldX, int worldY) {
+    public Item(String name, String description, Boolean collision, int gold, int worldX, int worldY,String filename) {
         this.name = name;
+        this.description = description;
         this.worldX = worldX * Window.TILESIZE;
         this.worldY = worldY * Window.TILESIZE;
         this.collision = collision;
+        this.filename = filename;
         this.image = setup();
     }
 
@@ -39,8 +43,7 @@ public class Item {
      */
     public BufferedImage setup() {
         try {
-            image = ImageIO.read(getClass().getResourceAsStream("assets/" + name +
-                    ".png"));
+            image = ImageIO.read(getClass().getResourceAsStream("assets/items/" +filename));
             image = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE);
             System.out.println("Loaded assets for item " + name);
         } catch (IOException e) {

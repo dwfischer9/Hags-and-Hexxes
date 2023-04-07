@@ -49,7 +49,7 @@ public class Window extends JPanel implements Runnable {
     public JLabel victoryLabel = new JLabel("Victory!");
     public Thread gameThread = new Thread(this);
 
-    public AssetSetter assetSetter = new AssetSetter(this);
+    public AssetSetter assetSetter;
     public Entity monster[] = new Entity[10];
     public Entity npc[] = new Entity[10];
     public Quest quest[] = new Quest[10];
@@ -60,6 +60,7 @@ public class Window extends JPanel implements Runnable {
      * Constructs a new instance of Window and sets some defeault properties
      */
     public Window() {
+        assetSetter = new AssetSetter(this);
         setFocusTraversalKeysEnabled(false);
         this.setPreferredSize(winSize);
         this.setBackground(BG);

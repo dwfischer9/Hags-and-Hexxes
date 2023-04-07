@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.awt.Rectangle;
 
@@ -8,13 +11,42 @@ import java.awt.Rectangle;
  * 
  * @author Daniel Fischer
  */
-public class AssetSetter {
 
+public class AssetSetter {
+    private final String itemsFilePath = "assets/items.csv";
     Window window;
     Player player = Window.player;
 
     public AssetSetter(Window window) {
         this.window = window;
+        readItems();
+    }
+
+    private Item[] readItems() {
+        String line = "";
+        Item item;
+        int nItems = 0;
+        Item[] items = new Item[999];
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(itemsFilePath));
+
+            while ((line = reader.readLine()) != null) {
+                String[] itemData = line.split(",");
+                item = new Item(itemData[0], itemData[1], (Integer.parseInt(itemData[2]) == 1),
+                        Integer.parseInt(itemData[3]), Integer.parseInt(itemData[4]), Integer.parseInt(itemData[5]),
+                        itemData[6]);
+                items[nItems++] = item;
+            }
+            reader.close();
+
+        } catch (FileNotFoundException e) {
+            System.err.println("Items file not found.");
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return items;
     }
 
     /**
@@ -23,11 +55,8 @@ public class AssetSetter {
      * @throws IOException
      */
     public void setObject() {
-        window.items[0] = new Item("chest", true, 20, 20);
-        window.items[1] = new Item("lockeddoor", true, 23,
-                Window.TILESIZE * 25);
-        window.items[2] = new Item("key", true, 21, 20);
 
+        window.items = readItems();
     }
 
     /**
@@ -53,7 +82,7 @@ public class AssetSetter {
         slime.setWorldX(Window.TILESIZE * 24);
         slime.setWorldY(Window.TILESIZE * 28);
         slime.setSpeed(2);
-        slime.dropTable.put(new Item("key", true, 0, 0), 1.00);
+        slime.dropTable.put(window.items[0], 1.0);
         window.monster[0] = slime;
 
     }

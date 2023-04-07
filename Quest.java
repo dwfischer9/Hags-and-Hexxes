@@ -2,7 +2,7 @@ public class Quest {
     private int reward;
     private String name;
     private String description;
-
+    public static Entity justKilled;
     public Quest(int reward, String name, String description) {
         this.reward = reward;
         this.name = name;
@@ -31,6 +31,12 @@ public class Quest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+     private void killMonsters(Entity monster, int number) {
+        
+        if (justKilled.getName() == monster.getName()) {
+        }
     }
 
 }
