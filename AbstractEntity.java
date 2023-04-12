@@ -345,16 +345,11 @@ abstract class AbstractEntity {
     }
 
     public void dropItems() {
-        int i;
-        for (i = 0; i < window.items.length && window.items[i] != null; i++) {
-        }
 
         for (Item item : dropTable.keySet()) {
-            item.worldX = worldX;
-            item.worldY = worldY;
-            window.items[i++] = item;
-            item.setup();
-
+            Item dropItem = new Item(item);
+            dropItem.worldX = worldX;
+            dropItem.worldY = worldY;
         }
     }
 

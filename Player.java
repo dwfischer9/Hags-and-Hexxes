@@ -325,28 +325,23 @@ public class Player extends Entity {
     /**
      * @param i the index of the object in {@link window#items}
      */
-    private void pickUpObject(int i) {
-        if (i != 999) { // Must exclude the obejcts that we don't want picked
-            String objectName = window.items[i].getName();
-            switch (objectName) {
+    private void pickUpObject(Item item) {
+
+        if (item != null) {
+            switch (item.getName()) {
                 case "Chest":
                     break;
                 case "Key":
-
-                    inventory.put(window.items[i], 1);
-                    window.items[i] = null;
+                    inventory.put(new Item(item), 1);
+                    item.worldX = -999;
                     System.out.println("Key obtained.");
-                    hasKey++;
                     break;
                 case "Locked Door":
-                    if (hasKey > 0) {
-                        window.items[i] = null;
-                        hasKey--;
-                    }
+                    if(inventory.containsKey(item))
                     break;
-
             }
         }
+
     }
 
     private void contactMonster(int index) {

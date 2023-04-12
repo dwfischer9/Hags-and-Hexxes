@@ -31,7 +31,15 @@ public class Item {
         this.filename = filename;
         this.image = setup();
     }
-
+    public Item(Item original) {
+        this.name = original.name;
+        this.description = original.description;
+        this.worldX = original.worldX;
+        this.worldY = original.worldY;
+        this.collision = original.collision;
+        this.filename = original.filename;
+        this.image = original.image;
+    }
     public BufferedImage getImage() {
         return image;
     }

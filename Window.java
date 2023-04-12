@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -42,8 +43,8 @@ public class Window extends JPanel implements Runnable {
     public TileManager tileM = new TileManager(this);
     // WORLD SETTINGS
     public int gameState;
-    public Item items[] = new Item[20];
 
+    public HashMap<String, Item> items = new HashMap<String, Item>();
     public JPanel foeBar = new JPanel();
     public JLabel foeHealth = new JLabel();
     public JLabel victoryLabel = new JLabel("Victory!");
@@ -192,11 +193,8 @@ public class Window extends JPanel implements Runnable {
         // Tilesheet
         tileM.draw(g2);
         // Objects
-        for (int i = 0; i < items.length; i++) { // for each item we have loaded in ,
-            // we need to draw it to the screen
-            if (items[i] != null) {
-                items[i].draw(g2, this);
-            }
+        for (Item item : items.values()) {
+            item.draw(g2, this);
         }
         // NPC
         for (int i = 0; i < npc.length; i++) {

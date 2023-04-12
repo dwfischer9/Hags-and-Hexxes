@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.awt.Rectangle;
 
 /**
@@ -22,11 +23,11 @@ public class AssetSetter {
         readItems();
     }
 
-    private Item[] readItems() {
+    private HashMap<String, Item> readItems() {
         String line = "";
         Item item;
-        int nItems = 0;
-        Item[] items = new Item[999];
+        HashMap<String, Item> items = new HashMap<String, Item>();
+
         try {
             BufferedReader reader = new BufferedReader(new FileReader(itemsFilePath));
 
@@ -35,7 +36,7 @@ public class AssetSetter {
                 item = new Item(itemData[0], itemData[1], (Integer.parseInt(itemData[2]) == 1),
                         Integer.parseInt(itemData[3]), Integer.parseInt(itemData[4]), Integer.parseInt(itemData[5]),
                         itemData[6]);
-                items[nItems++] = item;
+                items.put(itemData[0], item);
             }
             reader.close();
 
@@ -82,7 +83,7 @@ public class AssetSetter {
         slime.setWorldX(Window.TILESIZE * 24);
         slime.setWorldY(Window.TILESIZE * 28);
         slime.setSpeed(2);
-        slime.dropTable.put(window.items[0], 1.0);
+        slime.dropTable.put(window.items.get("Slime Heart Gem"), 1.0);
         window.monster[0] = slime;
 
     }

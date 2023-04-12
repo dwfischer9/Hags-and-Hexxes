@@ -29,28 +29,32 @@ public class CollisionDetection {
                 entityTopRow = (entityTopWorldY - entity.getSpeed()) / Window.TILESIZE;
                 tileNum1 = window.tileM.mapTileNum[entityLeftCol][entityTopRow];
                 tileNum2 = window.tileM.mapTileNum[entityRightCol][entityTopRow];
-                if (window.tileM.tiles[tileNum1].isCollision() == true || window.tileM.tiles[tileNum2].isCollision() == true)
+                if (window.tileM.tiles[tileNum1].isCollision() == true
+                        || window.tileM.tiles[tileNum2].isCollision() == true)
                     entity.collisionOn = true;
                 break;
             case "down":
                 entityBottomRow = (entityBottomWorldY + entity.getSpeed()) / Window.TILESIZE;
                 tileNum1 = window.tileM.mapTileNum[entityLeftCol][entityBottomRow];
                 tileNum2 = window.tileM.mapTileNum[entityRightCol][entityBottomRow];
-                if (window.tileM.tiles[tileNum1].isCollision() == true || window.tileM.tiles[tileNum2].isCollision()== true)
+                if (window.tileM.tiles[tileNum1].isCollision() == true
+                        || window.tileM.tiles[tileNum2].isCollision() == true)
                     entity.collisionOn = true;
                 break;
             case "left":
                 entityLeftCol = (entityLeftWorldX - entity.getSpeed()) / Window.TILESIZE;
                 tileNum1 = window.tileM.mapTileNum[entityLeftCol][entityTopRow];
                 tileNum2 = window.tileM.mapTileNum[entityLeftCol][entityBottomRow];
-                if (window.tileM.tiles[tileNum1].isCollision()== true || window.tileM.tiles[tileNum2].isCollision()== true)
+                if (window.tileM.tiles[tileNum1].isCollision() == true
+                        || window.tileM.tiles[tileNum2].isCollision() == true)
                     entity.collisionOn = true;
                 break;
             case "right":
                 entityRightCol = (entityRightWorldX + entity.getSpeed()) / Window.TILESIZE;
                 tileNum1 = window.tileM.mapTileNum[entityRightCol][entityTopRow];
                 tileNum2 = window.tileM.mapTileNum[entityRightCol][entityBottomRow];
-                if (window.tileM.tiles[tileNum1].isCollision()== true || window.tileM.tiles[tileNum2].isCollision() == true)
+                if (window.tileM.tiles[tileNum1].isCollision() == true
+                        || window.tileM.tiles[tileNum2].isCollision() == true)
                     entity.collisionOn = true;
                 break;
 
@@ -58,65 +62,64 @@ public class CollisionDetection {
 
     }
 
-    public int checkObject(Entity entity, boolean player) {
-        int index = 999;
+    public Item checkObject(Entity entity, boolean player) {
+        Item contact = null;
+        for (Item item : window.items.values()) {
+            entity.hitBox.x += entity.getWorldX();
+            entity.hitBox.y += entity.getWorldY();
+            item.HITBOX.x += item.worldX;
+            item.HITBOX.y += item.worldY;
 
-        for (int i = 0; i < window.items.length; i++) {
-            if (window.items[i] != null) {
-                // get solid area position for both entity and object
-                entity.hitBox.x += entity.getWorldX();
-                entity.hitBox.y += entity.getWorldY();
-
-                window.items[i].HITBOX.x += window.items[i].worldX;
-                window.items[i].HITBOX.y += window.items[i].worldY;
-
-                switch (entity.direction) {
-                    case "up":
-                        entity.hitBox.y -= entity.getSpeed();
-                        if (entity.hitBox.intersects(window.items[i].HITBOX)) {
-                            if (window.items[i].collision)
-                                entity.collisionOn = true;
-                            if (player)
-                                index = i;
+            switch (entity.direction) {
+                case "up":
+                    entity.hitBox.y -= entity.getSpeed();
+                    if (entity.hitBox.intersects(item.HITBOX)) {
+                        if (item.collision)
+                            entity.collisionOn = true;
+                        if (player) {
+                            contact = item;
                         }
-                        break;
-                    case "down":
-                        entity.hitBox.y += entity.getSpeed();
-                        if (entity.hitBox.intersects(window.items[i].HITBOX)) {
-                            if (window.items[i].collision)
-                                entity.collisionOn = true;
-                            if (player)
-                                index = i;
+                    }
+                    break;
+                case "down":
+                    entity.hitBox.y += entity.getSpeed();
+                    if (entity.hitBox.intersects(item.HITBOX)) {
+                        if (item.collision)
+                            entity.collisionOn = true;
+                        if (player) {
+                            contact = item;
                         }
-                        break;
-                    case "left":
-                        entity.hitBox.x -= entity.getSpeed();
-                        if (entity.hitBox.intersects(window.items[i].HITBOX)) {
-                            if (window.items[i].collision)
-                                entity.collisionOn = true;
-                            if (player)
-                                index = i;
+                    }
+                    break;
+                case "left":
+                    entity.hitBox.x -= entity.getSpeed();
+                    if (entity.hitBox.intersects(item.HITBOX)) {
+                        if (item.collision)
+                            entity.collisionOn = true;
+                        if (player) {
+                            contact = item;
                         }
-                        break;
-                    case "right":
-                        entity.hitBox.x += entity.getSpeed();
-                        if (entity.hitBox.intersects(window.items[i].HITBOX)) {
-                            if (window.items[i].collision)
-                                entity.collisionOn = true;
-                            if (player)
-                                index = i;
+                    }
+                    break;
+                case "right":
+                    entity.hitBox.x += entity.getSpeed();
+                    if (entity.hitBox.intersects(item.HITBOX)) {
+                        if (item.collision)
+                            entity.collisionOn = true;
+                        if (player) {
+                            contact = item;
                         }
-                        break;
-                }
-                entity.hitBox.x = entity.hitBoxDefeaultX;
-                entity.hitBox.y = entity.hitBoxDefeaultY;
-                window.items[i].HITBOX.x = window.items[i].HITBOXDEFAULTX;
-                window.items[i].HITBOX.y = window.items[i].HITBOXDEFAULTY;
+                    }
+                    break;
             }
+
+            entity.hitBox.x = entity.hitBoxDefeaultX;
+            entity.hitBox.y = entity.hitBoxDefeaultY;
+            item.HITBOX.x = item.HITBOXDEFAULTX;
+            item.HITBOX.y = item.HITBOXDEFAULTY;
+
         }
-
-        return index;
-
+        return contact;
     }
 
     public int checkEntity(Entity entity, Entity[] target) {
