@@ -6,27 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-/**
- * This class is a subclass of {@link Entity} to be used for storing the data of
- * the player character
- */
-public class Player extends Entity {
-    private KeyHandler keyH = window.keyH;
-    public Entity currentInteraction;
-    private int strength = 10;
-    private boolean attacking = false;
-    public Rectangle attackArea;
-    // new Rectangle(8, 16, window.tileSize, window.tileSize);
-    public int hasKey = 0;
-    public HashMap<Item, Integer> inventory = new HashMap<Item, Integer>(); // this hashMap will be used to store the
-                                                                            // player's inventory. Item is the item,
-                                                                            // Integer is the quantity of the item.
-    public int inventorySize = 10; // default inventory size.
-    public BufferedImage image = getImage();
-    int tempScreenX = SCREEN_X;
-    int tempScreenY = SCREEN_Y;
-
-    public Weapon longSword = new Weapon(new Rectangle(0, 0, Window.TILESIZE * 3, Window.TILESIZE * 1),
+public Weapon longSword = new Weapon(new Rectangle(0, 0, Window.TILESIZE * 3, Window.TILESIZE * 1),
             new Rectangle(0, 0, Window.TILESIZE * 3, Window.TILESIZE * 1),
             new Rectangle(0, 0, Window.TILESIZE * 1, Window.TILESIZE * 3),
             new Rectangle(0, 0, Window.TILESIZE, Window.TILESIZE * 3), "Longsword",
@@ -37,7 +17,7 @@ public class Player extends Entity {
     public Player(Window window, KeyHandler keyH, String name, int level, int health,
             int maxHealth) {
         super(window, name, level, health, maxHealth);
-        this.keyH = keyH;
+     h.keyH = keyH;
         this.weapon = longSword;
         this.image = getImage();
         this.isFriendly = true;
@@ -362,7 +342,7 @@ public class Player extends Entity {
         int damage = 0;
         if (checkHit(monster)) {
             int weaponRoll = ThreadLocalRandom.current().nextInt(weapon.damageLowerBound, weapon.damageUpperBound + 1);
-            damage = (int) ((strength * (.05 * weaponRoll)) / (monster.defense));
+            damage = (int) ((strength * (2* weaponRoll)) / (monster.defense));
             System.out.println(damage);
         }
         return damage;
