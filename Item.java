@@ -80,4 +80,10 @@ public class Item {
             // camera view
             g2.drawImage(image, screenX, screenY, Window.TILESIZE, Window.TILESIZE, null);
     }
+    /**
+     * 
+     * This method is to be called when an item is picked up from the map.
+     */
+    public void remove(){
+    }
 }

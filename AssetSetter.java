@@ -68,6 +68,9 @@ public class AssetSetter {
         tutorialNPC.dialogues[0] = "Hi there adventurer! Welcome to the tavern.\n We have cold drinks, warm beds, and food that you can eat.";
         tutorialNPC.dialogues[1] = "But I can see that you're not here for just food.\n Your lot comes to me looking for rumors.";
         tutorialNPC.dialogues[2] = "I've heard talk of a slime wandering around the inn.\n I can't have it hurting my customers. Go take care of it!";
+        Quest slimeQuest = new Quest(window, 20, "My First Job",
+                "The inkeeper of Hod's Respite asked me to take care of a wandering slime. I should deal with it soon.",
+                window.items.get("Slime Heart Gem"), 1);
         tutorialNPC.setSpeed(0);
         tutorialNPC.setup();
         tutorialNPC.setWorldX(Window.TILESIZE * 23);

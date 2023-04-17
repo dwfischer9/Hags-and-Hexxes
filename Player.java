@@ -3,10 +3,28 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.BasicStroke;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-public Weapon longSword = new Weapon(new Rectangle(0, 0, Window.TILESIZE * 3, Window.TILESIZE * 1),
+class Player extends Entity {
+    private KeyHandler keyH = window.keyH;
+    public Entity currentInteraction;
+    private int strength = 10;
+    private boolean attacking = false;
+    public Rectangle attackArea;
+    // new Rectangle(8, 16, window.tileSize, window.tileSize);
+    public int hasKey = 0;
+    public ArrayList<Quest> quests = new ArrayList<Quest>();
+    public HashMap<Item, Integer> inventory = new HashMap<Item, Integer>(); // this hashMap will be used to store the
+                                                                            // player's inventory. Item is the item,
+                                                                            // Integer is the quantity of the item.
+    public int inventorySize = 10; // default inventory size.
+    public BufferedImage image = getImage();
+    int tempScreenX = SCREEN_X;
+    int tempScreenY = SCREEN_Y;
+
+    public Weapon longSword = new Weapon(new Rectangle(0, 0, Window.TILESIZE * 3, Window.TILESIZE * 1),
             new Rectangle(0, 0, Window.TILESIZE * 3, Window.TILESIZE * 1),
             new Rectangle(0, 0, Window.TILESIZE * 1, Window.TILESIZE * 3),
             new Rectangle(0, 0, Window.TILESIZE, Window.TILESIZE * 3), "Longsword",
@@ -17,7 +35,7 @@ public Weapon longSword = new Weapon(new Rectangle(0, 0, Window.TILESIZE * 3, Wi
     public Player(Window window, KeyHandler keyH, String name, int level, int health,
             int maxHealth) {
         super(window, name, level, health, maxHealth);
-     h.keyH = keyH;
+        this.keyH = keyH;
         this.weapon = longSword;
         this.image = getImage();
         this.isFriendly = true;
@@ -317,8 +335,8 @@ public Weapon longSword = new Weapon(new Rectangle(0, 0, Window.TILESIZE * 3, Wi
                     System.out.println("Key obtained.");
                     break;
                 case "Locked Door":
-                    if(inventory.containsKey(item))
-                    break;
+                    if (inventory.containsKey(item))
+                        break;
             }
         }
 
@@ -342,7 +360,7 @@ public Weapon longSword = new Weapon(new Rectangle(0, 0, Window.TILESIZE * 3, Wi
         int damage = 0;
         if (checkHit(monster)) {
             int weaponRoll = ThreadLocalRandom.current().nextInt(weapon.damageLowerBound, weapon.damageUpperBound + 1);
-            damage = (int) ((strength * (2* weaponRoll)) / (monster.defense));
+            damage = (int) ((strength * (2 * weaponRoll)) / (monster.defense));
             System.out.println(damage);
         }
         return damage;

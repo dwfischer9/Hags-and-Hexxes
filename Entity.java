@@ -15,7 +15,6 @@ public class Entity extends AbstractEntity {
     public boolean interactable;
     public int hitBoxDefeaultX = 8, hitBoxDefeaultY = 16;
     String dialogues[] = new String[20];
-
     public boolean highlight = false;
 
     public Entity(Window window, String name, int level, int health, int maxHealth) {
@@ -38,16 +37,12 @@ public class Entity extends AbstractEntity {
                     break;
                 case "down":
                     this.setWorldY(this.getWorldY() + this.getSpeed());
-
                     break;
                 case "left":
                     this.setWorldX(this.getWorldX() - this.getSpeed());
-
                     break;
                 case "right":
-
                     this.setWorldX(this.getWorldX() + this.getSpeed());
-
                     break;
             }
         }
