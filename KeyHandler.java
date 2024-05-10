@@ -31,7 +31,7 @@ public class KeyHandler implements KeyListener {
                 break;
             case KeyEvent.VK_S:
             case KeyEvent.VK_DOWN:
-               downPressed = true;
+                downPressed = true;
                 break;
             case KeyEvent.VK_A:
             case KeyEvent.VK_LEFT:
