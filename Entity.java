@@ -17,8 +17,8 @@ public class Entity extends AbstractEntity {
     String dialogues[] = new String[20];
     public boolean highlight = false;
 
-    public Entity(Window window, String name, int level, int health, int maxHealth) {
-        super(window, name, 5, 90, 90);
+    public Entity(String name, int level, int health, int maxHealth) {
+        super(name, 5, 90, 90);
         this.interactable = true;
     }
 
@@ -27,10 +27,11 @@ public class Entity extends AbstractEntity {
         collisionOn = false;
         cDetection.checkTile(this);
         cDetection.checkPlayer(this);
-        cDetection.checkEntity(this, window.npc);
-        cDetection.checkEntity(this, window.monster);
+        cDetection.checkEntity(this, Game.npc);
+        cDetection.checkEntity(this, Game.monster);
         cDetection.checkObject(this, false);
-        if (collisionOn == false && window.gameState == Window.PLAYSTATE) {
+        
+        if (collisionOn == false && Game.gameState == Game.PLAYSTATE) {
             switch (direction) {
                 case "up":
                     this.setWorldY(this.getWorldY() - this.getSpeed());
@@ -59,7 +60,7 @@ public class Entity extends AbstractEntity {
 
     public void setAction() {
         actionLock++;
-        if (actionLock == 50 && window.gameState == Window.PLAYSTATE) {
+        if (actionLock == 50 && Game.gameState == Game.PLAYSTATE) {
             Random rand = new Random();
             int i = rand.nextInt(100) + 1;// generate random number from 1 to 100
             if (i <= 25)

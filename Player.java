@@ -3,19 +3,16 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.BasicStroke;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 class Player extends Entity {
-    private KeyHandler keyH = window.keyH;
     public Entity currentInteraction;
     private int strength = 10;
     private boolean attacking = false;
     public Rectangle attackArea;
-    // new Rectangle(8, 16, window.tileSize, window.tileSize);
+    private UI ui;
     public int hasKey = 0;
-    public ArrayList<Quest> quests = new ArrayList<Quest>();
     public HashMap<Item, Integer> inventory = new HashMap<Item, Integer>(); // this hashMap will be used to store the
                                                                             // player's inventory. Item is the item,
                                                                             // Integer is the quantity of the item.
@@ -24,21 +21,21 @@ class Player extends Entity {
     int tempScreenX = SCREEN_X;
     int tempScreenY = SCREEN_Y;
 
-    public Weapon longSword = new Weapon(new Rectangle(0, 0, Window.TILESIZE * 3, Window.TILESIZE * 1),
-            new Rectangle(0, 0, Window.TILESIZE * 3, Window.TILESIZE * 1),
-            new Rectangle(0, 0, Window.TILESIZE * 1, Window.TILESIZE * 3),
-            new Rectangle(0, 0, Window.TILESIZE, Window.TILESIZE * 3), "Longsword",
-            25, 35);
+    public Weapon longSword = new Weapon(new Rectangle(0, 0, Tile.TILESIZE * 3, Tile.TILESIZE * 1),
+            new Rectangle(0, 0, Tile.TILESIZE * 3, Tile.TILESIZE * 1),
+            new Rectangle(0, 0, Tile.TILESIZE * 1, Tile.TILESIZE * 3),
+            new Rectangle(0, 0, Tile.TILESIZE, Tile.TILESIZE * 3), "Longsword",
+            2, 7);
 
     public boolean isPlayer;
 
-    public Player(Window window, KeyHandler keyH, String name, int level, int health,
+    public Player(String name, int level, int health,
             int maxHealth) {
-        super(window, name, level, health, maxHealth);
-        this.keyH = keyH;
+        super(name, level, health, maxHealth);
         this.weapon = longSword;
         this.image = getImage();
         this.isFriendly = true;
+        this.ui = window.ui;
         this.attackArea = this.weapon.hitBoxLeft;
         setDefaultValues();
     }
@@ -51,18 +48,19 @@ class Player extends Entity {
         this.hitBoxDefeaultY = 16;
         this.hitBoxDefeaultX = 8;
         this.hitBox = new Rectangle(8, 16, 32, 32);
-        this.setWorldX(Window.TILESIZE * 23);
-        this.setWorldY(Window.TILESIZE * 21);
-        this.setSpeed(3);
+        this.setWorldX(Tile.TILESIZE * 23);
+        this.setWorldY(Tile.TILESIZE * 21);
+        this.setSpeed(6);
         attacking = false;
     }
 
     private void damageMonster(int index) {
 
-        if (index != 999 && window.monster[index].invincible != true) {
+        if (index != 999 && Game.monster[index].invincible != true) {
 
-            Entity entity = window.monster[index];
-            entity.setHealth(entity.getHealth() - calculateDamage(entity));
+            Entity entity = Game.monster[index];
+            int damage = calculateDamage(entity);
+            entity.setHealth(entity.getHealth() - damage);
             entity.invincible = true;
             // knockback
 
@@ -97,7 +95,7 @@ class Player extends Entity {
                     break;
             }
             // check collision
-            damageMonster(window.cDetection.checkAttackEntity(this, window.monster));
+            damageMonster(window.cDetection.checkAttackEntity(this, Game.monster));
             this.setWorldX(currentWorldX);
             this.setWorldY(currentWorldY);
             hitBox.width = hitBoxWidth;
@@ -122,7 +120,7 @@ class Player extends Entity {
                         image = up2;
                 }
                 if (attacking) {
-                    tempScreenY = SCREEN_Y - Window.TILESIZE;
+                    tempScreenY = SCREEN_Y - Tile.TILESIZE;
                     if (spriteNum == 1)
                         image = attackup1;
                     if (spriteNum == 2)
@@ -152,7 +150,7 @@ class Player extends Entity {
                             image = left2;
                 }
                 if (attacking) {
-                    tempScreenX = SCREEN_X - Window.TILESIZE;
+                    tempScreenX = SCREEN_X - Tile.TILESIZE;
                     if (spriteNum == 1)
                         image = attackleft1;
                     if (spriteNum == 2)
@@ -192,8 +190,10 @@ class Player extends Entity {
     /**
      * Checks if if any bound keys have been pressed, and if so, changes the
      * property direction of the player object
+     * 
+     * @param keyH
      */
-    private void updateKeys() {
+    private void updateKeys(KeyHandler keyH) {
         if (keyH.upPressed) {
             direction = "up";
         } else if (keyH.downPressed) {
@@ -203,17 +203,15 @@ class Player extends Entity {
         } else if (keyH.rightPressed) {
             direction = "right";
         } else if (keyH.tabPressed) {
-            if (window.gameState == Window.PLAYSTATE) {
-                window.gameState = Window.MENUSTATE;
-            } else if (window.gameState == Window.MENUSTATE) {
-                window.gameState = Window.PLAYSTATE;
-            }
+            if (Game.gameState == Game.PLAYSTATE)
+                Game.gameState = Game.MENUSTATE;
         }
+
     }
 
-    public void update() {
-        if (window.gameState == Window.PLAYSTATE) {
-            updateKeys();
+    public void update(KeyHandler keyH) {
+        if (Game.gameState == Game.PLAYSTATE) {
+            updateKeys(keyH);
             if (invincible == true) {
                 invincibleCounter++;
                 if (invincibleCounter > 60) {
@@ -226,7 +224,7 @@ class Player extends Entity {
             }
         }
         if (getHealth() == 0) {
-            window.gameState = Window.STARTSTATE;
+            Game.gameState = Game.GAMEOVERSTATE; // head to the game over screen.
         }
         if (attacking == true) {
             attacking();
@@ -251,13 +249,12 @@ class Player extends Entity {
 
             // checking object collision
             pickUpObject(window.cDetection.checkObject(this, true));
-            interactNPC(window.cDetection.checkEntity(this, window.npc));
+            interactNPC(window.cDetection.checkEntity(this, Game.npc), keyH);
             if (getName() != "player") // we don't want to check if the player is colliding with itself.
                 window.cDetection.checkPlayer(this);
-            contactMonster(window.cDetection.checkEntity(this, window.monster));
+            contactMonster(window.cDetection.checkEntity(this, Game.monster));
 
-            // if collision is false, player can move
-            // TODO: ensure that number of keys is limited to 2, and adjust speed
+            // if collision is false, player can moves
             // accordingly. should multiply speed by half for each key pressed
             if (collisionOn == false && keyH.spacePressed == false) {
                 switch (direction) {
@@ -292,13 +289,13 @@ class Player extends Entity {
                 tempScreenY = getSCREEN_Y() - attackArea.height;
                 break;
             case "down":
-                tempScreenY = getSCREEN_Y() + Window.TILESIZE;
+                tempScreenY = getSCREEN_Y() + Tile.TILESIZE;
                 break;
             case "left":
                 tempScreenX = SCREEN_X - attackArea.width;
                 break;
             case "right":
-                tempScreenX = SCREEN_X + Window.TILESIZE;
+                tempScreenX = SCREEN_X + Tile.TILESIZE;
                 break;
 
         }
@@ -310,11 +307,11 @@ class Player extends Entity {
 
     }
 
-    private void interactNPC(int i) {
+    private void interactNPC(int i, KeyHandler keyH) {
         if (i != 999) {
-            if (keyH.ePressed == true && window.gameState != Window.BATTLESTATE) {
-                window.gameState = Window.DIALOGUESTATE;
-                currentInteraction = window.npc[i];
+            if (keyH.ePressed == true) {
+                Game.gameState = Game.DIALOGUESTATE;
+                currentInteraction = Game.npc[i];
                 keyH.ePressed = false;
             }
         }
@@ -330,6 +327,7 @@ class Player extends Entity {
                 case "Chest":
                     break;
                 case "Key":
+                case "Key_2":
                     inventory.put(new Item(item), 1);
                     item.worldX = -999;
                     System.out.println("Key obtained.");

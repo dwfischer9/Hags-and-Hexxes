@@ -2,7 +2,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
 
 public class KeyHandler implements KeyListener {
-    private Window window;
     public boolean upPressed = false;
     public boolean downPressed = false;
     public boolean leftPressed = false;
@@ -12,8 +11,7 @@ public class KeyHandler implements KeyListener {
     public boolean spacePressed = false;
     public boolean tabPressed = false;
 
-    public KeyHandler(Window window) {
-        this.window = window;
+    public KeyHandler() {
     }
 
     @Override
@@ -43,7 +41,6 @@ public class KeyHandler implements KeyListener {
                 break;
             case KeyEvent.VK_ESCAPE:
                 escapePressed = true;
-                window.gameState = Window.PLAYSTATE;
                 break;
             case KeyEvent.VK_SPACE:
                 System.out.println("Space pressed");

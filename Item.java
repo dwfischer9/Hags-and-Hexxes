@@ -25,8 +25,8 @@ public class Item {
     public Item(String name, String description, Boolean collision, int gold, int worldX, int worldY,String filename) {
         this.name = name;
         this.description = description;
-        this.worldX = worldX * Window.TILESIZE;
-        this.worldY = worldY * Window.TILESIZE;
+        this.worldX = worldX * Tile.TILESIZE;
+        this.worldY = worldY * Tile.TILESIZE;
         this.collision = collision;
         this.filename = filename;
         this.image = setup();
@@ -52,7 +52,7 @@ public class Item {
     public BufferedImage setup() {
         try {
             image = ImageIO.read(getClass().getResourceAsStream("assets/items/" +filename));
-            image = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE);
+            image = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
             System.out.println("Loaded assets for item " + name);
         } catch (IOException e) {
             System.err.println("Error getting image for item: " + name);
@@ -70,15 +70,15 @@ public class Item {
     }
 
     public void draw(Graphics2D g2, Window window) {
-        int screenX = worldX - Window.player.getWorldX() + window.SCREEN_X;
-        int screenY = worldY - Window.player.getWorldY() + window.SCREEN_Y;
-        if (worldX + Window.TILESIZE > Window.player.getWorldX() - window.SCREEN_X &&
-                worldX - Window.TILESIZE < Window.player.getWorldX() + window.SCREEN_X &&
-                worldY + Window.TILESIZE > Window.player.getWorldY() - window.SCREEN_Y &&
-                worldY - Window.TILESIZE < Window.player.getWorldY() + window.SCREEN_Y) // only render tiles in
+        int screenX = worldX - Game.player.getWorldX() + window.SCREEN_X;
+        int screenY = worldY - Game.player.getWorldY() + window.SCREEN_Y;
+        if (worldX + Tile.TILESIZE > Game.player.getWorldX() - window.SCREEN_X &&
+                worldX - Tile.TILESIZE < Game.player.getWorldX() + window.SCREEN_X &&
+                worldY + Tile.TILESIZE > Game.player.getWorldY() - window.SCREEN_Y &&
+                worldY - Tile.TILESIZE < Game.player.getWorldY() + window.SCREEN_Y) // only render tiles in
                                                                                         // the
             // camera view
-            g2.drawImage(image, screenX, screenY, Window.TILESIZE, Window.TILESIZE, null);
+            g2.drawImage(image, screenX, screenY, Tile.TILESIZE, Tile.TILESIZE, null);
     }
     /**
      * 

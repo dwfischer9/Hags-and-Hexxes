@@ -17,44 +17,44 @@ public class CollisionDetection {
         int entityTopWorldY = entity.getWorldY() + entity.hitBox.y;
         int entityBottomWorldY = entity.getWorldY() + entity.hitBox.y + entity.hitBox.height;
 
-        int entityLeftCol = entityLeftWorldX / Window.TILESIZE;
-        int entityRightCol = entityRightWorldX / Window.TILESIZE;
-        int entityTopRow = entityTopWorldY / Window.TILESIZE;
-        int entityBottomRow = entityBottomWorldY / Window.TILESIZE;
-
+        int lCol = entityLeftWorldX / Tile.TILESIZE; // get the left and right column number of the entity's hitbox, in tile coordinates
+        int rCOl = entityRightWorldX / Tile.TILESIZE;
+        int tRow = entityTopWorldY / Tile.TILESIZE; // get the top and bottom row number of the entity's hitbox, in tile coordinates
+        int bRow = entityBottomWorldY / Tile.TILESIZE;
+        TileManager tm = window.tileM;
         int tileNum1, tileNum2;
 
         switch (entity.direction) {
             case "up":
-                entityTopRow = (entityTopWorldY - entity.getSpeed()) / Window.TILESIZE;
-                tileNum1 = window.tileM.mapTileNum[entityLeftCol][entityTopRow];
-                tileNum2 = window.tileM.mapTileNum[entityRightCol][entityTopRow];
-                if (window.tileM.tiles[tileNum1].isCollision() == true
-                        || window.tileM.tiles[tileNum2].isCollision() == true)
+                tRow = (entityTopWorldY - entity.getSpeed()) / Tile.TILESIZE;
+                tileNum1 = tm.mapTileNum[lCol][tRow];
+                tileNum2 = tm.mapTileNum[rCOl][tRow];
+                if (tm.tiles[tileNum1].isCollision() == true
+                        || tm.tiles[tileNum2].isCollision() == true)
                     entity.collisionOn = true;
                 break;
             case "down":
-                entityBottomRow = (entityBottomWorldY + entity.getSpeed()) / Window.TILESIZE;
-                tileNum1 = window.tileM.mapTileNum[entityLeftCol][entityBottomRow];
-                tileNum2 = window.tileM.mapTileNum[entityRightCol][entityBottomRow];
-                if (window.tileM.tiles[tileNum1].isCollision() == true
-                        || window.tileM.tiles[tileNum2].isCollision() == true)
+                bRow = (entityBottomWorldY + entity.getSpeed()) / Tile.TILESIZE;
+                tileNum1 = tm.mapTileNum[lCol][bRow];
+                tileNum2 = tm.mapTileNum[rCOl][bRow];
+                if (tm.tiles[tileNum1].isCollision() == true
+                        || tm.tiles[tileNum2].isCollision() == true)
                     entity.collisionOn = true;
                 break;
             case "left":
-                entityLeftCol = (entityLeftWorldX - entity.getSpeed()) / Window.TILESIZE;
-                tileNum1 = window.tileM.mapTileNum[entityLeftCol][entityTopRow];
-                tileNum2 = window.tileM.mapTileNum[entityLeftCol][entityBottomRow];
-                if (window.tileM.tiles[tileNum1].isCollision() == true
-                        || window.tileM.tiles[tileNum2].isCollision() == true)
+                lCol = (entityLeftWorldX - entity.getSpeed()) / Tile.TILESIZE;
+                tileNum1 = tm.mapTileNum[lCol][tRow];
+                tileNum2 = tm.mapTileNum[lCol][bRow];
+                if (tm.tiles[tileNum1].isCollision() == true
+                        || tm.tiles[tileNum2].isCollision() == true)
                     entity.collisionOn = true;
                 break;
             case "right":
-                entityRightCol = (entityRightWorldX + entity.getSpeed()) / Window.TILESIZE;
-                tileNum1 = window.tileM.mapTileNum[entityRightCol][entityTopRow];
-                tileNum2 = window.tileM.mapTileNum[entityRightCol][entityBottomRow];
-                if (window.tileM.tiles[tileNum1].isCollision() == true
-                        || window.tileM.tiles[tileNum2].isCollision() == true)
+                rCOl = (entityRightWorldX + entity.getSpeed()) / Tile.TILESIZE;
+                tileNum1 = tm.mapTileNum[rCOl][tRow];
+                tileNum2 = tm.mapTileNum[rCOl][bRow];
+                if (tm.tiles[tileNum1].isCollision() == true
+                        || tm.tiles[tileNum2].isCollision() == true)
                     entity.collisionOn = true;
                 break;
 
@@ -64,7 +64,7 @@ public class CollisionDetection {
 
     public Item checkObject(Entity entity, boolean player) {
         Item contact = null;
-        for (Item item : window.items.values()) {
+        for (Item item : Game.items.values()) {
             entity.hitBox.x += entity.getWorldX();
             entity.hitBox.y += entity.getWorldY();
             item.HITBOX.x += item.worldX;
@@ -201,7 +201,7 @@ public class CollisionDetection {
                         break;
                     case "down":
                         player.attackArea.y += player.getSpeed();
-                        player.attackArea.y -= 2 * Window.TILESIZE;
+                        player.attackArea.y -= 2 * Tile.TILESIZE;
                         if (player.attackArea.intersects(target[i].hitBox)) {
 
                             index = i;
@@ -218,7 +218,7 @@ public class CollisionDetection {
                         break;
                     case "right":
                         player.attackArea.x += player.getSpeed();
-                        player.attackArea.x -= 2 * Window.TILESIZE;
+                        player.attackArea.x -= 2 * Tile.TILESIZE;
                         if (player.attackArea.intersects(target[i].hitBox)) {
                             player.collisionOn = true;
                             index = i;
@@ -240,39 +240,39 @@ public class CollisionDetection {
         entity.hitBox.x += entity.getWorldX();
         entity.hitBox.y += entity.getWorldY();
 
-        Window.player.hitBox.x = Window.player.getWorldX() + Window.player.hitBox.x;
-        Window.player.hitBox.y = Window.player.getWorldY() + Window.player.hitBox.y;
+        Game.player.hitBox.x = Game.player.getWorldX() + Game.player.hitBox.x;
+        Game.player.hitBox.y = Game.player.getWorldY() + Game.player.hitBox.y;
         switch (entity.direction) {
             case "up":
                 entity.hitBox.y -= entity.getSpeed();
-                if (entity.hitBox.intersects(Window.player.hitBox)) {
+                if (entity.hitBox.intersects(Game.player.hitBox)) {
                     entity.collisionOn = true;
 
                 }
                 break;
             case "down":
                 entity.hitBox.y += entity.getSpeed();
-                if (entity.hitBox.intersects(Window.player.hitBox)) {
+                if (entity.hitBox.intersects(Game.player.hitBox)) {
                     entity.collisionOn = true;
 
                 }
                 break;
             case "left":
                 entity.hitBox.x -= entity.getSpeed();
-                if (entity.hitBox.intersects(Window.player.hitBox)) {
+                if (entity.hitBox.intersects(Game.player.hitBox)) {
                     entity.collisionOn = true;
                 }
                 break;
             case "right":
                 entity.hitBox.x += entity.getSpeed();
-                if (entity.hitBox.intersects(Window.player.hitBox)) {
+                if (entity.hitBox.intersects(Game.player.hitBox)) {
                     entity.collisionOn = true;
 
                 }
                 break;
         }
         entity.hitBox.x = entity.hitBoxDefeaultX;
-        Window.player.hitBox.x = Window.player.hitBoxDefeaultX;
-        Window.player.hitBox.y = Window.player.hitBoxDefeaultY;
+        Game.player.hitBox.x = Game.player.hitBoxDefeaultX;
+        Game.player.hitBox.y = Game.player.hitBoxDefeaultY;
     }
 }

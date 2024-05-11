@@ -8,6 +8,8 @@ import javax.imageio.ImageIO;
 
 public class TileManager {
 
+    public final static int maxWorldCol = 50;
+    public final static int maxWorldRow = 50;
     public Window window;
     Tile[] tiles;
     String[] tileNames = { "grass", "grass1", "path", "wall", "tree", "tree", "water", "edgeofwater-left",
@@ -20,13 +22,13 @@ public class TileManager {
     boolean[] tileCollisions = { false, false, false, true, true, true, true, true, true, true, true, true, true, true,
             true };
     int mapTileNum[][];
-    public final int SCREEN_X = Window.SCREENWIDTH / 2 - Window.TILESIZE / 2;
-    public final int SCREEN_Y = Window.SCREENHEIGHT / 2 - Window.TILESIZE / 2;
+    public final int SCREEN_X = Window.SCREENWIDTH / 2 - Tile.TILESIZE / 2;
+    public final int SCREEN_Y = Window.SCREENHEIGHT / 2 - Tile.TILESIZE / 2;
 
     public TileManager(Window window) {
         this.window = window;
         tiles = new Tile[20];
-        mapTileNum = new int[window.maxWorldCol][window.maxWorldRow];
+        mapTileNum = new int[maxWorldCol][maxWorldRow];
         getTileImage();
         loadMapData("assets/world01.txt");
     }
@@ -61,7 +63,7 @@ public class TileManager {
     public void setup(int index, String imagePath, boolean collision) throws IOException {
         UtilityTools uTool = new UtilityTools();
         BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/assets/" + imagePath + ".png"));
-        BufferedImage scaledImg = uTool.scaleImage(img, Window.TILESIZE, Window.TILESIZE);
+        BufferedImage scaledImg = uTool.scaleImage(img, Tile.TILESIZE, Tile.TILESIZE);
         tiles[index] = new Tile(scaledImg, collision);
     }
 
@@ -83,15 +85,15 @@ public class TileManager {
             int col = 0;
 
             int row = 0;
-            while (col < window.maxWorldCol && row < window.maxWorldRow) {
+            while (col < maxWorldCol && row < maxWorldRow) {
                 String line = br.readLine();
-                while (col < window.maxWorldCol) {
+                while (col < maxWorldCol) {
                     String numbers[] = line.split(" ");
                     int num = Integer.parseInt(numbers[col]);
                     mapTileNum[col][row] = num;
                     col++;
                 }
-                if (col == window.maxWorldCol) {
+                if (col == maxWorldCol) {
                     col = 0;
                     row++;
                 }
@@ -107,26 +109,26 @@ public class TileManager {
         int worldCol = 0;
         int worldRow = 0;
 
-        while (worldCol < window.maxWorldCol && worldRow < window.maxWorldRow) {
+        while (worldCol < maxWorldCol && worldRow < maxWorldRow) {
 
-            int worldX = worldCol * Window.TILESIZE;
-            int worldY = worldRow * Window.TILESIZE;
-            int screenX = worldX - Window.player.getWorldX() + SCREEN_X;
-            int screenY = worldY - Window.player.getWorldY() + SCREEN_Y;
+            int worldX = worldCol * Tile.TILESIZE;
+            int worldY = worldRow * Tile.TILESIZE;
+            int screenX = worldX - Game.player.getWorldX() + SCREEN_X;
+            int screenY = worldY - Game.player.getWorldY() + SCREEN_Y;
 
             int tileNum = mapTileNum[worldCol][worldRow];
             if (window.isVisible() == true) {
-                if (worldX + Window.TILESIZE > Window.player.getWorldX() - SCREEN_X &&
-                        worldX - Window.TILESIZE < Window.player.getWorldX() + SCREEN_X &&
-                        worldY + Window.TILESIZE > Window.player.getWorldY() - SCREEN_Y &&
-                        worldY - Window.TILESIZE < Window.player.getWorldY() + SCREEN_Y) // only render
+                if (worldX + Tile.TILESIZE > Game.player.getWorldX() - SCREEN_X &&
+                        worldX - Tile.TILESIZE < Game.player.getWorldX() + SCREEN_X &&
+                        worldY + Tile.TILESIZE > Game.player.getWorldY() - SCREEN_Y &&
+                        worldY - Tile.TILESIZE < Game.player.getWorldY() + SCREEN_Y) // only render
                                                                                          // tiles
                     // in
                     // the camera view
-                    g2.drawImage(tiles[tileNum].getImage(), screenX, screenY, Window.TILESIZE, Window.TILESIZE, null);
+                    g2.drawImage(tiles[tileNum].getImage(), screenX, screenY, Tile.TILESIZE, Tile.TILESIZE, null);
             }
             worldCol++;
-            if (worldCol == window.maxWorldCol) {
+            if (worldCol == maxWorldCol) {
                 worldCol = 0;
                 worldRow++;
             }

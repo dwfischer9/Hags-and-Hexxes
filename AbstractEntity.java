@@ -31,8 +31,8 @@ abstract class AbstractEntity {
     public int invincibleCounter = 0;
     public Window window;
     public Rectangle hitBox = new Rectangle(8, 16, 32, 32);
-    public final int SCREEN_X = Window.SCREENWIDTH / 2 - Window.TILESIZE / 2;
-    public final int SCREEN_Y = Window.SCREENHEIGHT / 2 - Window.TILESIZE / 2;
+    public final int SCREEN_X = Window.SCREENWIDTH / 2 - Tile.TILESIZE / 2;
+    public final int SCREEN_Y = Window.SCREENHEIGHT / 2 - Tile.TILESIZE / 2;
     // Entity Properties
     public boolean collisionOn = false; // true if the entity is currently colliding with something.
     public boolean invincible;// true if the entity is currently invincible, typically enabled due to taking
@@ -60,16 +60,16 @@ abstract class AbstractEntity {
      * @param maxHealth The maximum health of the creature.
      * 
      */
-    public AbstractEntity(final Window window, final String name, final int level, final int health,
+    public AbstractEntity(final String name, final int level, final int health,
             final int maxHealth) {
         this.name = name;
         this.health = health;
         this.level = level;
-        this.window = window;
         this.direction = "down";
         this.maxHealth = maxHealth;
         this.image = up1;
-        this.cDetection = window.cDetection;
+        this.window = Game.window;
+        this.cDetection = new CollisionDetection(this.window);
     }
 
     public String toString() {
@@ -273,68 +273,66 @@ abstract class AbstractEntity {
         final UtilityTools uTool = new UtilityTools();
         try {
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/up1.png"));
-            up1 = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE);
+            up1 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
 
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/up2.png"));
-            up2 = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE);
+            up2 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
 
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/down1.png"));
-            down1 = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE);
+            down1 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/down2.png"));
-            down2 = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE);
+            down2 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
 
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/left1.png"));
-            left1 = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE);
+            left1 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
 
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/left2.png"));
-            left2 = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE);
+            left2 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
 
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/right1.png"));
-            right1 = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE);
+            right1 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
 
             image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/right2.png"));
-            right2 = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE);
+            right2 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
             if (name == "player") {
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackup1.png"));
-                attackup1 = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE * 2);
+                attackup1 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE * 2);
 
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackup2.png"));
-                attackup2 = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE * 2);
+                attackup2 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE * 2);
 
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackdown1.png"));
-                attackdown1 = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE * 2);
+                attackdown1 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE * 2);
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackdown2.png"));
-                attackdown2 = uTool.scaleImage(image, Window.TILESIZE, Window.TILESIZE * 2);
+                attackdown2 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE * 2);
 
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackleft1.png"));
-                attackleft1 = uTool.scaleImage(image, Window.TILESIZE * 2, Window.TILESIZE);
+                attackleft1 = uTool.scaleImage(image, Tile.TILESIZE * 2, Tile.TILESIZE);
 
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackleft2.png"));
-                attackleft2 = uTool.scaleImage(image, Window.TILESIZE * 2, Window.TILESIZE);
+                attackleft2 = uTool.scaleImage(image, Tile.TILESIZE * 2, Tile.TILESIZE);
 
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackright1.png"));
-                attackright1 = uTool.scaleImage(image, Window.TILESIZE * 2, Window.TILESIZE);
+                attackright1 = uTool.scaleImage(image, Tile.TILESIZE * 2, Tile.TILESIZE);
 
                 image = ImageIO.read(getClass().getResourceAsStream("/assets/" + getName() + "/attackright2.png"));
-                attackright2 = uTool.scaleImage(image, Window.TILESIZE * 2, Window.TILESIZE);
+                attackright2 = uTool.scaleImage(image, Tile.TILESIZE * 2, Tile.TILESIZE);
             }
 
             System.out.println("Finished loading assets for " + getName());
         } catch (final IOException e) {
-            // TODO Auto-generated catch block
+            System.out.println("Error loading assets for " + getName());
             e.printStackTrace();
         }
     }
 
     public void draw(final Graphics2D g2) {
-        final int screenX = worldX - Window.player.getWorldX() + this.SCREEN_X;
-        final int screenY = worldY - Window.player.getWorldY() + this.SCREEN_Y;
-        if (worldX + Window.TILESIZE > Window.player.getWorldX() - this.SCREEN_X &&
-                worldX - Window.TILESIZE < Window.player.getWorldX() + this.SCREEN_X &&
-                worldY + Window.TILESIZE > Window.player.getWorldY() - this.SCREEN_Y &&
-                worldY - Window.TILESIZE < Window.player.getWorldY() + this.SCREEN_Y) { // only render tiles in
-                                                                                        // the
-            // camera view
+        final int screenX = worldX - Game.player.getWorldX() + SCREEN_X;
+        final int screenY = worldY - Game.player.getWorldY() + SCREEN_Y;
+        if (worldX + Tile.TILESIZE > Game.player.getWorldX() - SCREEN_X &&
+                worldX - Tile.TILESIZE < Game.player.getWorldX() + SCREEN_X &&
+                worldY + Tile.TILESIZE > Game.player.getWorldY() - SCREEN_Y &&
+                worldY - Tile.TILESIZE < Game.player.getWorldY() + SCREEN_Y) { // only render tiles in the camera view
             g2.drawImage(getImage(), screenX, screenY, null);
 
         }
@@ -352,16 +350,15 @@ abstract class AbstractEntity {
             dropItem.worldY = worldY;
         }
     }
-
     public void drawHealthBar(final Graphics2D g2, final int screenX, final int screenY) {
         g2.setColor(Color.red);
-        g2.fillRoundRect(screenX, screenY - 5, Window.TILESIZE, 10, 2, 2);
+        g2.fillRoundRect(screenX, screenY - 5, Tile.TILESIZE, 10, 2, 2);
         g2.setColor(Color.green);
 
-        g2.fillRoundRect(screenX, screenY - 5, (int) (Window.TILESIZE * this.getHealth() / this.getMaxHealth()), 10, 2,
+        g2.fillRoundRect(screenX, screenY - 5, (int) (Tile.TILESIZE * this.getHealth() / this.getMaxHealth()), 10, 2,
                 2);
         g2.setColor(new Color(26, 26, 26));
-        g2.drawRoundRect(screenX, screenY - 5, Window.TILESIZE, 10, 2, 2);
+        g2.drawRoundRect(screenX, screenY - 5, Tile.TILESIZE, 10, 2, 2);
     }
 
     /**
@@ -371,7 +368,7 @@ abstract class AbstractEntity {
     public int getDistance(final AbstractEntity e1) {
         final int distanceY = Math.abs(e1.worldY - this.worldY);
         final int distanceX = Math.abs(e1.worldX - this.worldX);
-        return (distanceX + distanceY) / Window.TILESIZE;
+        return (distanceX + distanceY) / Tile.TILESIZE;
     }
 
     public int getWorldX() {
