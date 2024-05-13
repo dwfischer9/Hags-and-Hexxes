@@ -74,19 +74,19 @@ public class AssetSetter {
         tutorialNPC.setup();
         tutorialNPC.setWorldX(Tile.TILESIZE * 23);
         tutorialNPC.setWorldY(Tile.TILESIZE * 20);
-        Game.npc[0] = tutorialNPC;
+        Game.npc.add(tutorialNPC);
 
         Entity slime = new Entity("slime", 4, 90, 90);
         slime.isMonster = true;
         slime.hitBoxDefeaultX = 6;
         slime.hitBoxDefeaultY = 18;
-        slime.hitBox = new Rectangle(6, 18, Tile.TILESIZE, Tile.TILESIZE);
+        slime.setHitBox(new Rectangle(6, 18, Tile.TILESIZE, Tile.TILESIZE));
         slime.setup();
         slime.setWorldX(Tile.TILESIZE * 24);
         slime.setWorldY(Tile.TILESIZE * 28);
         slime.setSpeed(2);
         slime.dropTable.put(Game.items.get("Slime Heart Gem"), 1.0);
-        Game.monster[0] = slime;
+        Game.monster.add(slime);
 
     }
 

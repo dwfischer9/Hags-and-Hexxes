@@ -1,16 +1,18 @@
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Game implements Runnable {
 
-    static Entity monster[] = new Entity[10];
-    static Entity npc[] = new Entity[10];
+    static ArrayList<Entity> monster = new ArrayList<Entity>();
+
+    static ArrayList<Entity> npc = new ArrayList<Entity>();
+    public static HashMap<String, Item> items = new HashMap<String, Item>();
     public static Player player;
     public static Window window;
     public static KeyHandler keyH;
     private static Game game;
-    public static HashMap<String, Item> items = new HashMap<String, Item>();
     private static final int FPS = 60;
     public final static int STARTSTATE = 0;
     public final static int PLAYSTATE = 1;
@@ -18,17 +20,17 @@ public class Game implements Runnable {
     public final static int PAUSESTATE = 3;
     public final static int DIALOGUESTATE = 4;
     public final static int GAMEOVERSTATE = 5;
-    public static int gameState;
+    private static int gameState;
     public Thread gameThread;
 
     public Game() {
     }
 
     public static void main(String[] args) throws IOException {
-        keyH = new KeyHandler();
-        window = new Window();
         player = new Player("player", 1,
                 10, 10);
+        keyH = new KeyHandler();
+        window = new Window();
 
         game = new Game();
         game.setupGame();
@@ -61,25 +63,25 @@ public class Game implements Runnable {
      */
     public void update() {
         if (gameState == PLAYSTATE) {
-            for (int i = 0; i < npc.length; i++) {
-                if (npc[i] != null) {
-                    if (npc[i].getHealth() == 0) {
-                        npc[i].dropItems();
-                        System.out.println(npc[i].getName() + " has been defeated!");
-                        npc[i] = null; // nulling the entity effectively 'kills' it
+            for (int i = 0; i < npc.size(); i++) {
+                if (npc.get(i) != null) {
+                    if (npc.get(i).getHealth() == 0) {
+                        npc.get(i).dropItems();
+                        System.out.println(npc.get(i).getName() + " has been defeated!");
+                        npc.remove(i); // nulling the entity effectively 'kills' it
                     } else {
-                        npc[i].update();
+                        npc.get(i).update();
                     }
                 }
             }
-            for (int i = 0; i < monster.length; i++) {
-                if (monster[i] != null) {
-                    if (monster[i].getHealth() == 0) {
-                        monster[i].dropItems();
-                        System.out.println(monster[i].getName() + " has been defeated!");
-                        monster[i] = null;
+            for (int i = 0; i < monster.size(); i++) {
+                if (monster.get(i) != null) {
+                    if (monster.get(i).getHealth() == 0) {
+                        monster.get(i).dropItems();
+                        System.out.println(monster.get(i).getName() + " has been defeated!");
+                        monster.remove(i);
                     } else {
-                        monster[i].update();
+                        monster.get(i).update();
                     }
                 }
             }
@@ -130,6 +132,14 @@ public class Game implements Runnable {
             }
         }
 
+    }
+
+    public static int getGameState() {
+        return gameState;
+    }
+
+    public static void setGameState(int gameState) {
+        Game.gameState = gameState;
     }
 
 }

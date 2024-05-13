@@ -3,36 +3,41 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Window extends JPanel {
     // ||---Screen Settings---||\\
-    public static final int SCALING = 3; // 960 x 576
-    public final static int MAXSCREENCOL = 32;
-    public final static int MAXSCREENROW = 18;
-    public final static int SCREENWIDTH = Tile.TILESIZE * MAXSCREENCOL;
-    public final static int SCREENHEIGHT = Tile.TILESIZE * MAXSCREENROW;
+    protected static final int SCALING = 3; // 960 x 576
+    protected final static int MAXSCREENCOL = 16;
+    protected final static int MAXSCREENROW = 18;
+    protected final static int SCREENWIDTH = Tile.TILESIZE * MAXSCREENCOL;
+    protected final static int SCREENHEIGHT = Tile.TILESIZE * MAXSCREENROW;
+
     // ||---Defining Constants---||\\
     protected final static Color BG = new Color(26, 26, 26);
     public final int worldWidth = Tile.TILESIZE * TileManager.maxWorldCol;
     public final int worldHeight = Tile.TILESIZE * TileManager.maxWorldRow;
-    public final int SCREEN_X = SCREENWIDTH / 2 - Tile.TILESIZE / 2;
-    public final int SCREEN_Y = SCREENHEIGHT / 2 - Tile.TILESIZE / 2;
-    public CollisionDetection cDetection = new CollisionDetection(this);
+    public static final int SCREEN_X = SCREENWIDTH / 2 - Tile.TILESIZE / 2;
+    public static final int SCREEN_Y = SCREENHEIGHT / 2 - Tile.TILESIZE / 2;
+    public CollisionDetection cDetection;
     public UI ui;
-    public TileManager tileM = new TileManager(this);
+    public TileManager tileM;
     // WORLD SETTINGS
 
     private final static Dimension winSize = new Dimension(SCREENWIDTH, SCREENHEIGHT);
-    int playerSpeed = 6;
+
 
     /**
      * Constructs a new instance of Window and sets some defeault properties
      */
     public Window() {
-        this.ui = new UI(this);
+        this.ui = new UI();
+        this.tileM = new TileManager(this);
+        this.cDetection = new CollisionDetection(this);
         setFocusTraversalKeysEnabled(false);
         this.setPreferredSize(winSize);
         this.setBackground(BG);
@@ -64,22 +69,13 @@ public class Window extends JPanel {
         tileM.draw(g2);
         // Objects
         for (final Item item : Game.items.values()) {
-            item.draw(g2, this);
+            item.draw(g2);
         }
-        // NPC
-        for (int i = 0; i < Game.npc.length; i++) {
-            if (Game.npc[i] != null) {
-                Game.npc[i].draw(g2);
+        for (final ArrayList<Entity> entityList : Arrays.asList(Game.npc, Game.monster)) {
+            for (final Entity entity : entityList) {
+                entity.draw(g2);
             }
         }
-
-        // Monsters
-        for (int i = 0; i < Game.monster.length; i++) {
-            if (Game.monster[i] != null) {
-                Game.monster[i].draw(g2);
-            }
-        }
-        // Player
         Game.player.draw(g2);
         final long drawEnd = System.nanoTime();
         final long passed = drawEnd - drawStart;

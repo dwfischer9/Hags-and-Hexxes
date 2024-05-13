@@ -69,13 +69,13 @@ public class Item {
         return name;
     }
 
-    public void draw(Graphics2D g2, Window window) {
-        int screenX = worldX - Game.player.getWorldX() + window.SCREEN_X;
-        int screenY = worldY - Game.player.getWorldY() + window.SCREEN_Y;
-        if (worldX + Tile.TILESIZE > Game.player.getWorldX() - window.SCREEN_X &&
-                worldX - Tile.TILESIZE < Game.player.getWorldX() + window.SCREEN_X &&
-                worldY + Tile.TILESIZE > Game.player.getWorldY() - window.SCREEN_Y &&
-                worldY - Tile.TILESIZE < Game.player.getWorldY() + window.SCREEN_Y) // only render tiles in
+    public void draw(Graphics2D g2) {
+        int screenX = worldX - Game.player.getWorldX() + Window.SCREEN_X ;
+        int screenY = worldY - Game.player.getWorldY() + Window.SCREEN_Y;
+        if (worldX + Tile.TILESIZE > Game.player.getWorldX() - Window.SCREEN_X &&
+                worldX - Tile.TILESIZE < Game.player.getWorldX() + Window.SCREEN_X &&
+                worldY + Tile.TILESIZE > Game.player.getWorldY() - Window.SCREEN_Y &&
+                worldY - Tile.TILESIZE < Game.player.getWorldY() + Window.SCREEN_Y) // only render tiles in
                                                                                         // the
             // camera view
             g2.drawImage(image, screenX, screenY, Tile.TILESIZE, Tile.TILESIZE, null);

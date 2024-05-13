@@ -21,7 +21,6 @@ public class KeyHandler implements KeyListener {
     @Override
     public void keyPressed(final KeyEvent e) {
         final int code = e.getKeyCode();
-
         switch (code) { // Key inputs.
             case KeyEvent.VK_W:
             case KeyEvent.VK_UP:
@@ -43,7 +42,6 @@ public class KeyHandler implements KeyListener {
                 escapePressed = true;
                 break;
             case KeyEvent.VK_SPACE:
-                System.out.println("Space pressed");
                 this.spacePressed = true;
                 break;
             case KeyEvent.VK_E:

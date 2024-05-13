@@ -13,8 +13,8 @@ public class Weapon {
     public double knockBack;
     public int[] xPts = { 0, 32, 32, 0 };
     public int[] yPts = { 0, 0, 32, 32 };
-    public int damageLowerBound;
-    public int damageUpperBound;
+    public int damageLBound;
+    public int damageUBound;
 
     public Weapon(Rectangle hitBoxLeft, Rectangle hitBoxRight, Rectangle hitBoxUp, Rectangle hitBoxDown, String name,
             int damageLowerBound, int damageUpperBound) {
@@ -24,7 +24,7 @@ public class Weapon {
         this.hitBoxUp = hitBoxUp;
         this.hitBoxDown = hitBoxDown;
         this.name = name;
-        this.damageLowerBound = damageLowerBound;
-        this.damageUpperBound = damageUpperBound;
+        this.damageLBound = damageLowerBound;
+        this.damageUBound = damageUpperBound;
     }
 }

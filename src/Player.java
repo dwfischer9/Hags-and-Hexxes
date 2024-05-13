@@ -11,16 +11,15 @@ class Player extends Entity {
     private int strength = 10;
     private boolean attacking = false;
     public Rectangle attackArea;
-    private UI ui;
     public int hasKey = 0;
     public HashMap<Item, Integer> inventory = new HashMap<Item, Integer>(); // this hashMap will be used to store the
                                                                             // player's inventory. Item is the item,
                                                                             // Integer is the quantity of the item.
     public int inventorySize = 10; // default inventory size.
     public BufferedImage image = getImage();
-    int tempScreenX = SCREEN_X;
-    int tempScreenY = SCREEN_Y;
-
+    int tempScreenX = Window.SCREEN_X;
+    int tempScreenY = Window.SCREEN_Y;
+    private Window window;
     public Weapon longSword = new Weapon(new Rectangle(0, 0, Tile.TILESIZE * 3, Tile.TILESIZE * 1),
             new Rectangle(0, 0, Tile.TILESIZE * 3, Tile.TILESIZE * 1),
             new Rectangle(0, 0, Tile.TILESIZE * 1, Tile.TILESIZE * 3),
@@ -35,7 +34,6 @@ class Player extends Entity {
         this.weapon = longSword;
         this.image = getImage();
         this.isFriendly = true;
-        this.ui = window.ui;
         this.attackArea = this.weapon.hitBoxLeft;
         setDefaultValues();
     }
@@ -47,18 +45,19 @@ class Player extends Entity {
     public void setDefaultValues() {
         this.hitBoxDefeaultY = 16;
         this.hitBoxDefeaultX = 8;
-        this.hitBox = new Rectangle(8, 16, 32, 32);
+        this.window = Game.window;
+        this.setHitBox(new Rectangle(8, 16, 32, 32));
         this.setWorldX(Tile.TILESIZE * 23);
         this.setWorldY(Tile.TILESIZE * 21);
         this.setSpeed(6);
         attacking = false;
     }
 
-    private void damageMonster(int index) {
+    private void damageMonster(int i) {
 
-        if (index != 999 && Game.monster[index].invincible != true) {
+        if (i != 999 && Game.monster.get(i).invincible != true) {
 
-            Entity entity = Game.monster[index];
+            Entity entity = Game.monster.get(i);
             int damage = calculateDamage(entity);
             entity.setHealth(entity.getHealth() - damage);
             entity.invincible = true;
@@ -77,8 +76,8 @@ class Player extends Entity {
             // save hitbox before the attack
             int currentWorldX = getWorldX();
             int currentWorldY = getWorldY();
-            int hitBoxWidth = hitBox.width;
-            int hitBoxHeight = hitBox.height;
+            int hitBoxWidth = getHitBox().width;
+            int hitBoxHeight = getHitBox().height;
             // adjust hitbox for the attack area
             switch (direction) {
                 case "up":
@@ -98,8 +97,8 @@ class Player extends Entity {
             damageMonster(window.cDetection.checkAttackEntity(this, Game.monster));
             this.setWorldX(currentWorldX);
             this.setWorldY(currentWorldY);
-            hitBox.width = hitBoxWidth;
-            hitBox.height = hitBoxHeight;
+            getHitBox().width = hitBoxWidth;
+            getHitBox().height = hitBoxHeight;
         }
         if (spriteCounter > 80) {
             spriteNum = 1;
@@ -109,8 +108,8 @@ class Player extends Entity {
     }
 
     public BufferedImage getImage() {
-        tempScreenX = SCREEN_X;
-        tempScreenY = SCREEN_Y;
+        tempScreenX = Window.SCREEN_X;
+        tempScreenY = Window.SCREEN_Y;
         switch (direction) { // handles the direction that the sprite is facing.
             case "up":
                 if (!attacking) {
@@ -118,9 +117,8 @@ class Player extends Entity {
                         image = up1;
                     if (spriteNum == 2)
                         image = up2;
-                }
-                if (attacking) {
-                    tempScreenY = SCREEN_Y - Tile.TILESIZE;
+                } else {
+                    tempScreenY = Window.SCREEN_Y - Tile.TILESIZE;
                     if (spriteNum == 1)
                         image = attackup1;
                     if (spriteNum == 2)
@@ -133,8 +131,7 @@ class Player extends Entity {
                         image = down1;
                     if (spriteNum == 2)
                         image = down2;
-                }
-                if (attacking) {
+                } else {
                     if (spriteNum == 1)
                         image = attackdown1;
                     if (spriteNum == 2)
@@ -148,9 +145,8 @@ class Player extends Entity {
 
                         if (spriteNum == 2)
                             image = left2;
-                }
-                if (attacking) {
-                    tempScreenX = SCREEN_X - Tile.TILESIZE;
+                } else {
+                    tempScreenX = Window.SCREEN_X - Tile.TILESIZE;
                     if (spriteNum == 1)
                         image = attackleft1;
                     if (spriteNum == 2)
@@ -164,8 +160,7 @@ class Player extends Entity {
                         image = right1;
                     if (spriteNum == 2)
                         image = right2;
-                }
-                if (attacking) {
+                } else {
                     if (spriteNum == 1)
                         image = attackright1;
                     if (spriteNum == 2)
@@ -203,14 +198,15 @@ class Player extends Entity {
         } else if (keyH.rightPressed) {
             direction = "right";
         } else if (keyH.tabPressed) {
-            if (Game.gameState == Game.PLAYSTATE)
-                Game.gameState = Game.MENUSTATE;
+            if (Game.getGameState() == Game.PLAYSTATE)
+                Game.setGameState(Game.MENUSTATE);
+            ;
         }
 
     }
 
     public void update(KeyHandler keyH) {
-        if (Game.gameState == Game.PLAYSTATE) {
+        if (Game.getGameState() == Game.PLAYSTATE) {
             updateKeys(keyH);
             if (invincible == true) {
                 invincibleCounter++;
@@ -224,7 +220,7 @@ class Player extends Entity {
             }
         }
         if (getHealth() == 0) {
-            Game.gameState = Game.GAMEOVERSTATE; // head to the game over screen.
+            Game.setGameState(Game.GAMEOVERSTATE); // head to the game over screen.
         }
         if (attacking == true) {
             attacking();
@@ -282,20 +278,20 @@ class Player extends Entity {
     public void draw(Graphics2D g2) {
         // DEBUG
         // AttackArea
-        tempScreenX = getSCREEN_X() + attackArea.x;
-        tempScreenY = getSCREEN_Y() + attackArea.y;
+        tempScreenX = Window.SCREEN_X + attackArea.x;
+        tempScreenY = Window.SCREEN_Y + attackArea.y;
         switch (direction) {
             case "up":
-                tempScreenY = getSCREEN_Y() - attackArea.height;
+                tempScreenY = Window.SCREEN_Y - attackArea.height;
                 break;
             case "down":
-                tempScreenY = getSCREEN_Y() + Tile.TILESIZE;
+                tempScreenY = Window.SCREEN_Y + Tile.TILESIZE;
                 break;
             case "left":
-                tempScreenX = SCREEN_X - attackArea.width;
+                tempScreenX = Window.SCREEN_X - attackArea.width;
                 break;
             case "right":
-                tempScreenX = SCREEN_X + Tile.TILESIZE;
+                tempScreenX = Window.SCREEN_X + Tile.TILESIZE;
                 break;
 
         }
@@ -309,9 +305,9 @@ class Player extends Entity {
 
     private void interactNPC(int i, KeyHandler keyH) {
         if (i != 999) {
-            if (keyH.ePressed == true) {
-                Game.gameState = Game.DIALOGUESTATE;
-                currentInteraction = Game.npc[i];
+            if (keyH.ePressed ) {
+                Game.setGameState(Game.DIALOGUESTATE);
+                currentInteraction = Game.npc.get(i);
                 keyH.ePressed = false;
             }
         }
@@ -357,7 +353,7 @@ class Player extends Entity {
     private int calculateDamage(Entity monster) {
         int damage = 0;
         if (checkHit(monster)) {
-            int weaponRoll = ThreadLocalRandom.current().nextInt(weapon.damageLowerBound, weapon.damageUpperBound + 1);
+            int weaponRoll = ThreadLocalRandom.current().nextInt(weapon.damageLBound, weapon.damageUBound + 1);
             damage = (int) ((strength * (2 * weaponRoll)) / (monster.defense));
             System.out.println(damage);
         }

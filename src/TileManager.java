@@ -24,10 +24,11 @@ public class TileManager {
     int mapTileNum[][];
     public final int SCREEN_X = Window.SCREENWIDTH / 2 - Tile.TILESIZE / 2;
     public final int SCREEN_Y = Window.SCREENHEIGHT / 2 - Tile.TILESIZE / 2;
-
+    public Entity player;
     public TileManager(Window window) {
         this.window = window;
         tiles = new Tile[20];
+        this.player = Game.player;
         mapTileNum = new int[maxWorldCol][maxWorldRow];
         getTileImage();
         loadMapData("assets/world01.txt");
@@ -113,15 +114,15 @@ public class TileManager {
 
             int worldX = worldCol * Tile.TILESIZE;
             int worldY = worldRow * Tile.TILESIZE;
-            int screenX = worldX - Game.player.getWorldX() + SCREEN_X;
-            int screenY = worldY - Game.player.getWorldY() + SCREEN_Y;
+            int screenX = worldX - player.getWorldX() + SCREEN_X;
+            int screenY = worldY - player.getWorldY() + SCREEN_Y;
 
             int tileNum = mapTileNum[worldCol][worldRow];
-            if (window.isVisible() == true) {
-                if (worldX + Tile.TILESIZE > Game.player.getWorldX() - SCREEN_X &&
-                        worldX - Tile.TILESIZE < Game.player.getWorldX() + SCREEN_X &&
-                        worldY + Tile.TILESIZE > Game.player.getWorldY() - SCREEN_Y &&
-                        worldY - Tile.TILESIZE < Game.player.getWorldY() + SCREEN_Y) // only render
+            if (window.isVisible()) {
+                if (worldX + Tile.TILESIZE > player.getWorldX() - SCREEN_X &&
+                        worldX - Tile.TILESIZE < player.getWorldX() + SCREEN_X &&
+                        worldY + Tile.TILESIZE > player.getWorldY() - SCREEN_Y &&
+                        worldY - Tile.TILESIZE < player.getWorldY() + SCREEN_Y) // only render
                                                                                          // tiles
                     // in
                     // the camera view

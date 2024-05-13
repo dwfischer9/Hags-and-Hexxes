@@ -20,10 +20,10 @@ public class UI {
     int dialogueNumber = 0;
     int menuItem = 0;
     private Graphics2D g2;
-    private Window window;
+    // private Window window;
 
-    public UI(Window window) {
-        this.window = window;
+    public UI() {
+        // this.window = window;
     }
 
     /**
@@ -37,7 +37,7 @@ public class UI {
 
     public void draw(final Graphics2D g2) {
         this.g2 = g2;
-        switch (Game.gameState) {
+        switch (Game.getGameState()) {
             case Game.STARTSTATE:
                 drawStartScreen();
                 break;
@@ -59,7 +59,7 @@ public class UI {
     }
 
     private void naviagteMenus() {
-        switch (Game.gameState) {
+        switch (Game.getGameState()) {
             case Game.STARTSTATE:
                 if (Game.keyH.upPressed) {
                     Game.keyH.upPressed = false;
@@ -327,12 +327,15 @@ public class UI {
     }
 
     private void selectOption(int commandNum) {
-        if (Game.gameState == Game.STARTSTATE || Game.gameState == Game.PAUSESTATE) {
-            if (commandNum == 0)
-                Game.gameState = Game.PLAYSTATE;
-            else if (commandNum == 3) {
-                System.exit(0); // exit with status code 0
-            }
+       switch(Game.getGameState()){
+            case Game.PAUSESTATE:
+            case Game.STARTSTATE:
+                if (commandNum == 0)
+                    Game.setGameState(Game.PLAYSTATE);
+                else if (commandNum == 3) {
+                    System.exit(0); // exit with status code 0
+                }
+            break;
         }
     }
 
@@ -341,5 +344,4 @@ public class UI {
         int x = Window.SCREENWIDTH / 2 - length / 2;
         return x;
     }
-
 }
