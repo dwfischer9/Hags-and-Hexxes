@@ -1,3 +1,14 @@
 {
-    "java.format.settings.url": "eclipse-formatter.xml"
+    "java.format.settings.url": "eclipse-formatter.xml",
+    "explorer.excludeGitIgnore": true,
+    "files.exclude": {
+        "*.gitignore": true,
+        "**/.class": true
+    },
+    "explorer.fileNesting.enabled": true,
+    "search.useGlobalIgnoreFiles": true,
+    "search.useParentIgnoreFiles": true,
+    "scm.alwaysShowActions": true,
+    "search.useIgnoreFiles": false,
+    "java.dependency.syncWithFolderExplorer": false
 }
