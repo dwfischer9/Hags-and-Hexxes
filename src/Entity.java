@@ -13,13 +13,30 @@ public class Entity extends AbstractEntity {
     public String currentDialogue = "";
     public int dialogueCounter = 0;
     public boolean interactable;
-    public int hitBoxDefeaultX = 8, hitBoxDefeaultY = 16;
-    String dialogues[] = new String[20];
+    private final String dialogues[] = new String[20];
     public boolean highlight = false;
+    private Game game;
 
-    public Entity(String name, int level, int health, int maxHealth) {
-        super(name, 5, 90, 90);
+    public Entity(String name, int level, int maxHealth) {
+        super(name, level, maxHealth);
         this.interactable = true;
+    }
+    
+    public Entity(String name, int level, int maxHealth, Game game) {
+        super(name, level, maxHealth);
+        this.game = game;
+        this.interactable = true;
+    }
+
+    public String[] getDialogues() {
+        return dialogues;
+
+    }
+
+    public void setDialogues(String dialogues[]) {
+        if (dialogues != null) {
+            System.arraycopy(dialogues, 0, this.dialogues, 0, Math.min(dialogues.length, this.dialogues.length));
+        }
     }
 
     public void update() {
@@ -27,24 +44,20 @@ public class Entity extends AbstractEntity {
         collisionOn = false;
         cDetection.checkTile(this);
         cDetection.checkPlayer(this);
-        cDetection.checkEntity(this, Game.npc);
-        cDetection.checkEntity(this, Game.monster);
-        cDetection.checkObject(this, false);
         
-        if (collisionOn == false && Game.getGameState() == Game.PLAYSTATE) {
-            switch (direction) {
-                case "up":
-                    this.setWorldY(this.getWorldY() - this.getSpeed());
-                    break;
-                case "down":
-                    this.setWorldY(this.getWorldY() + this.getSpeed());
-                    break;
-                case "left":
-                    this.setWorldX(this.getWorldX() - this.getSpeed());
-                    break;
-                case "right":
-                    this.setWorldX(this.getWorldX() + this.getSpeed());
-                    break;
+        if (game != null) {
+            cDetection.checkEntity(this, game.getNpcs());
+            cDetection.checkEntity(this, game.getMonsters());
+        }
+        
+        cDetection.checkObject(this, false);
+
+        if (collisionOn == false && game != null && game.getGameState() == Game.PLAYSTATE) {
+            switch (getDirection()) {
+                case "up" -> this.setWorldY(this.getWorldY() - this.getSpeed());
+                case "down" -> this.setWorldY(this.getWorldY() + this.getSpeed());
+                case "left" -> this.setWorldX(this.getWorldX() - this.getSpeed());
+                case "right" -> this.setWorldX(this.getWorldX() + this.getSpeed());
             }
         }
         /// invincible timer
@@ -60,17 +73,17 @@ public class Entity extends AbstractEntity {
 
     public void setAction() {
         actionLock++;
-        if (actionLock == 50 && Game.getGameState() == Game.PLAYSTATE) {
+        if (actionLock == 50 && game != null && game.getGameState() == Game.PLAYSTATE) {
             Random rand = new Random();
             int i = rand.nextInt(100) + 1;// generate random number from 1 to 100
             if (i <= 25)
-                this.direction = "up";
+                setDirection("up");
             if (i > 25 && i <= 50)
-                this.direction = "down";
+                setDirection("down");
             if (i > 50 && i <= 75)
-                this.direction = "left";
+                setDirection("left");
             if (i > 75 && i < 100)
-                this.direction = "right";
+                setDirection("right");
             actionLock = 0;
 
         }

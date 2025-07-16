@@ -1,9 +1,9 @@
+import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.awt.Rectangle;
 
 /**
  * 
@@ -14,36 +14,47 @@ import java.awt.Rectangle;
  */
 
 public class AssetSetter {
-    private final String itemsFilePath = "assets/items.csv";
-    Player player = Game.player;
+    String basePath = System.getProperty("user.dir"); // Gets the current working directory
 
+// Build paths dynamically - check if we're in src directory
+    private final String itemsFilePath = basePath.contains("/src") || basePath.contains("\\src") 
+        ? basePath + "/assets/items.csv" 
+        : basePath + "/src/assets/items.csv";
+    private final String npcFilePath = basePath.contains("/src") || basePath.contains("\\src") 
+        ? basePath + "/assets/npc.csv" 
+        : basePath + "/src/assets/npc.csv";
+    private final UtilityTools tools;
+    private Game game;
+    
     public AssetSetter() {
-        readItems();
+        tools = new UtilityTools();
+    }
+    
+    public AssetSetter(Game game) {
+        this.game = game;
+        tools = new UtilityTools();
     }
 
-    private HashMap<String, Item> readItems() {
-        String line = "";
+    HashMap<String, Item> readItems() {
+        String line;
         Item item;
-        HashMap<String, Item> items = new HashMap<String, Item>();
+        HashMap<String, Item> items = new HashMap<>();
 
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(itemsFilePath));
-
-            while ((line = reader.readLine()) != null) {
-                String[] itemData = line.split(",");
-                item = new Item(itemData[0], itemData[1], (Integer.parseInt(itemData[2]) == 1),
-                        Integer.parseInt(itemData[3]), Integer.parseInt(itemData[4]), Integer.parseInt(itemData[5]),
-                        itemData[6]);
-                items.put(itemData[0], item);
+            try (BufferedReader reader = new BufferedReader(new FileReader(itemsFilePath))) {
+                while ((line = reader.readLine()) != null) {
+                    String[] itemData = line.split(",");
+                    item = new Item(itemData[0], itemData[1], (Integer.parseInt(itemData[2]) == 1),
+                            Integer.parseInt(itemData[3]), Integer.parseInt(itemData[4]), Integer.parseInt(itemData[5]),
+                            itemData[6]);
+                    items.put(itemData[0], item);
+                }
             }
-            reader.close();
 
         } catch (FileNotFoundException e) {
             System.err.println("Items file not found.");
-            e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // TODO: Auto-generated catch block
         }
         return items;
     }
@@ -54,43 +65,85 @@ public class AssetSetter {
      * @throws IOException
      */
     public void setObject() {
-
-        Game.items = readItems();
+        if (game != null) {
+            game.getItems().putAll(readItems());
+        }
     }
 
     /**
      * Instantiates and sets the world position of each NPC to appear on the map.
      */
     public void setNPC() {
-        Entity tutorialNPC = new Entity("tutorialNPC", 10, 40, 40);
-        tutorialNPC.dialogues[0] = "Hi there adventurer! Welcome to the tavern.\n We have cold drinks, warm beds, and food that you can eat.";
-        tutorialNPC.dialogues[1] = "But I can see that you're not here for just food.\n Your lot comes to me looking for rumors.";
-        tutorialNPC.dialogues[2] = "I've heard talk of a slime wandering around the inn.\n I can't have it hurting my customers. Go take care of it!";
-        // Quest slimeQuest = new Quest(window, 20, "My First Job",
-        // "The inkeeper of Hod's Respite asked me to take care of a wandering slime. I
-        // should deal with it soon.",
-        // window.items.get("Slime Heart Gem"), 1);
-        tutorialNPC.setSpeed(0);
-        tutorialNPC.setup();
-        tutorialNPC.setWorldX(Tile.TILESIZE * 23);
-        tutorialNPC.setWorldY(Tile.TILESIZE * 20);
-        Game.npc.add(tutorialNPC);
+        String line;
+        String[] entityData;
+        Entity npc;
+        BufferedReader reader;
+        int xCoord, yCoord;
+        
+        System.out.println("Loading NPCs from: " + npcFilePath);
+        
+        try {
+            reader = new BufferedReader(new FileReader(npcFilePath));
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue; // Skip empty lines
+                
+                entityData = line.split(",");
+                if (entityData.length < 7) {
+                    System.err.println("Invalid NPC data line: " + line);
+                    continue;
+                }
+                
+                npc = new Entity(entityData[0], Integer.parseInt(entityData[1]), Integer.parseInt(entityData[2]));
+                npc.setDialogues(entityData[3].split(";"));
+                xCoord = Integer.parseInt(entityData[4].split(";")[0]);
+                yCoord = Integer.parseInt(entityData[4].split(";")[1]);
+                npc.setWorldX(Tile.TILESIZE * xCoord);
+                npc.setWorldY(Tile.TILESIZE * yCoord);
+                npc.setSpeed(Integer.parseInt(entityData[5]));
+                npc.setup();
+                // entityData 6 is a 'flag' to denote if entity is an NPC or monster.
+                boolean npcFlag = (Integer.parseInt(entityData[6]) == 0);
+                if (npcFlag) {
+                    if (game != null) {
+                        game.addNpc(npc);
+                    }
+                } else {
+                    npc.isMonster = true;
+                    npc.setHitBoxDefaultX(6);
+                    npc.setHitBoxDefaultY(18);
+                    npc.setHitBox(new Rectangle(6, 18, Tile.TILESIZE, Tile.TILESIZE));
+                    if (game != null) {
+                        game.addMonster(npc);
+                    }
+                }
+            }
+            reader.close();
 
-        Entity slime = new Entity("slime", 4, 90, 90);
-        slime.isMonster = true;
-        slime.hitBoxDefeaultX = 6;
-        slime.hitBoxDefeaultY = 18;
-        slime.setHitBox(new Rectangle(6, 18, Tile.TILESIZE, Tile.TILESIZE));
-        slime.setup();
-        slime.setWorldX(Tile.TILESIZE * 24);
-        slime.setWorldY(Tile.TILESIZE * 28);
-        slime.setSpeed(2);
-        slime.dropTable.put(Game.items.get("Slime Heart Gem"), 1.0);
-        Game.monster.add(slime);
-
+        } catch (FileNotFoundException err) {
+            System.err.println("NPC file not found at: " + npcFilePath);
+            System.err.println("Current working directory: " + System.getProperty("user.dir"));
+        } catch (IOException err) {
+            System.err.println("Error reading NPC file: " + err.getMessage());
+        } catch (NumberFormatException err) {
+            System.err.println("Invalid number format in NPC data: " + err.getMessage());
+        } catch (ArrayIndexOutOfBoundsException err) {
+            System.err.println("Invalid NPC data format: " + err.getMessage());
+        }
+        // TODO: replcate droptable using another column in CSV referencing items name.
+        // Make sure items are loaded BEFORE entities in assetsetter call.
+        // slime.dropTable.put(Game.items.get("Slime Heart Gem"), 1.0);
     }
 
     public void setPlayer() {
-        Game.player.setup();
+        if (game != null && game.getPlayer() != null) {
+            game.getPlayer().setup();
+        }
     }
+
+    public void setLights() {
+        if (tools != null) {
+            tools.addLight(tools.new LightingNode(21, 23, 4));
+        }
+    }
+
 }

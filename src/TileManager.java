@@ -1,16 +1,15 @@
-import java.io.BufferedReader;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.awt.Graphics2D;
 import javax.imageio.ImageIO;
 
 public class TileManager {
 
-    public final static int maxWorldCol = 50;
-    public final static int maxWorldRow = 50;
-    public Window window;
+    public static int MAXWORLDCOL = 50;
+    public static  int MAXWORLDROW = 50;
     Tile[] tiles;
     String[] tileNames = { "grass", "grass1", "path", "wall", "tree", "tree", "water", "edgeofwater-left",
             "water-corner-bottom-left", "edgeofwater-right", "water-corner-top-right", "water-corner-top-left",
@@ -26,15 +25,14 @@ public class TileManager {
     public final int SCREEN_Y = Window.SCREENHEIGHT / 2 - Tile.TILESIZE / 2;
     public Entity player;
     public TileManager(Window window) {
-        this.window = window;
         tiles = new Tile[20];
-        this.player = Game.player;
-        mapTileNum = new int[maxWorldCol][maxWorldRow];
-        getTileImage();
-        loadMapData("assets/world01.txt");
+        this.player = Game.getInstance().getPlayer();
+        mapTileNum = new int[MAXWORLDCOL][MAXWORLDROW];
+        initializeTileImages();
+        initializeMapData();
     }
 
-    public void getTileImage() {
+    private void initializeTileImages() {
         if (tileNames.length != tileCollisions.length) {
             System.out.println("Error: tileNames and tileCollisions are not the same length");
             System.out.println(tileNames.length);
@@ -49,14 +47,17 @@ public class TileManager {
             e.printStackTrace();
         }
     }
+    
+    public void getTileImage() {
+        initializeTileImages();
+    }
 
     /**
      * A helper method to pre-scale the images before the game loop begins, intended
      * to improve performance by only loading images once.
      * 
      * @param index     the number the tile will be represented by in map files.
-     * @param imagePath the name of the tile, excluding the extension as all tiles
-     *                  in this program will be in PNG format.
+     * @param imagePath the name of the tile, excluding the extension as all tiles will be in PNG format.
      * @param collision True: The tile should be impassable by the player.
      *                  False(default): The player can pass through the tile.
      * @throws IOException
@@ -68,6 +69,10 @@ public class TileManager {
         tiles[index] = new Tile(scaledImg, collision);
     }
 
+    private void initializeMapData() {
+        loadMapData("assets/world01.txt");
+    }
+    
     /**
      * A method that is used to load map files. This currently only supports loading
      * maps
@@ -81,28 +86,27 @@ public class TileManager {
     public void loadMapData(String filePath) {
         try {
             InputStream is = getClass().getResourceAsStream(filePath);
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-            int col = 0;
-
-            int row = 0;
-            while (col < maxWorldCol && row < maxWorldRow) {
-                String line = br.readLine();
-                while (col < maxWorldCol) {
-                    String numbers[] = line.split(" ");
-                    int num = Integer.parseInt(numbers[col]);
-                    mapTileNum[col][row] = num;
-                    col++;
-                }
-                if (col == maxWorldCol) {
-                    col = 0;
-                    row++;
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+                int col = 0;
+                
+                int row = 0;
+                while (col < MAXWORLDCOL && row < MAXWORLDROW) {
+                    String line = br.readLine();
+                    while (col < MAXWORLDCOL) {
+                        String numbers[] = line.split(" ");
+                        int num = Integer.parseInt(numbers[col]);
+                        mapTileNum[col][row] = num;
+                        col++;
+                    }
+                    if (col == MAXWORLDCOL) {
+                        col = 0;
+                        row++;
+                    }
                 }
             }
-            br.close();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException | NumberFormatException e) {
+            
         }
     }
 
@@ -110,7 +114,7 @@ public class TileManager {
         int worldCol = 0;
         int worldRow = 0;
 
-        while (worldCol < maxWorldCol && worldRow < maxWorldRow) {
+        while (worldCol < MAXWORLDCOL && worldRow < MAXWORLDROW) {
 
             int worldX = worldCol * Tile.TILESIZE;
             int worldY = worldRow * Tile.TILESIZE;
@@ -118,7 +122,7 @@ public class TileManager {
             int screenY = worldY - player.getWorldY() + SCREEN_Y;
 
             int tileNum = mapTileNum[worldCol][worldRow];
-            if (window.isVisible()) {
+            if (Game.getInstance().getWindow().isVisible()) {
                 if (worldX + Tile.TILESIZE > player.getWorldX() - SCREEN_X &&
                         worldX - Tile.TILESIZE < player.getWorldX() + SCREEN_X &&
                         worldY + Tile.TILESIZE > player.getWorldY() - SCREEN_Y &&
@@ -129,7 +133,7 @@ public class TileManager {
                     g2.drawImage(tiles[tileNum].getImage(), screenX, screenY, Tile.TILESIZE, Tile.TILESIZE, null);
             }
             worldCol++;
-            if (worldCol == maxWorldCol) {
+            if (worldCol == MAXWORLDCOL) {
                 worldCol = 0;
                 worldRow++;
             }

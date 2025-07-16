@@ -1,5 +1,5 @@
-import java.awt.Rectangle;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -10,23 +10,23 @@ import javax.imageio.ImageIO;
  */
 public class Item {
 
-    protected final Rectangle HITBOX = new Rectangle(0, 0, 24, 24);
-    protected final Integer HITBOXDEFAULTX = 0;
-    protected final Integer HITBOXDEFAULTY = 0;
+    protected final Rectangle hitBox = new Rectangle(0, 0, 24, 24);
+    protected final Integer hitBoxDefaultX = 0;
+    protected final Integer hitBoxDefaultY = 0;
     protected BufferedImage image;
 
     protected String name;
     protected boolean collision;
     protected Integer worldX, worldY;
-    private String description;
-    private String filename;
+    private final String description;
+    private final String filename;
     protected final UtilityTools uTool = new UtilityTools();
 
-    public Item(String name, String description, Boolean collision, int gold, int worldX, int worldY,String filename) {
+    public Item(String name, String description, Boolean collision, int gold, int startingX, int startingY,String filename) {
         this.name = name;
         this.description = description;
-        this.worldX = worldX * Tile.TILESIZE;
-        this.worldY = worldY * Tile.TILESIZE;
+        this.worldX = startingX * Tile.TILESIZE;
+        this.worldY = startingY * Tile.TILESIZE;
         this.collision = collision;
         this.filename = filename;
         this.image = setup();
@@ -56,7 +56,6 @@ public class Item {
             System.out.println("Loaded assets for item " + name);
         } catch (IOException e) {
             System.err.println("Error getting image for item: " + name);
-            e.printStackTrace();
         }
         return image;
     }
@@ -70,12 +69,15 @@ public class Item {
     }
 
     public void draw(Graphics2D g2) {
-        int screenX = worldX - Game.player.getWorldX() + Window.SCREEN_X ;
-        int screenY = worldY - Game.player.getWorldY() + Window.SCREEN_Y;
-        if (worldX + Tile.TILESIZE > Game.player.getWorldX() - Window.SCREEN_X &&
-                worldX - Tile.TILESIZE < Game.player.getWorldX() + Window.SCREEN_X &&
-                worldY + Tile.TILESIZE > Game.player.getWorldY() - Window.SCREEN_Y &&
-                worldY - Tile.TILESIZE < Game.player.getWorldY() + Window.SCREEN_Y) // only render tiles in
+        Player player = Game.getInstance().getPlayer();
+        if (player == null) return;
+        
+        int screenX = worldX - player.getWorldX() + Window.SCREEN_X ;
+        int screenY = worldY - player.getWorldY() + Window.SCREEN_Y;
+        if (worldX + Tile.TILESIZE > player.getWorldX() - Window.SCREEN_X &&
+                worldX - Tile.TILESIZE < player.getWorldX() + Window.SCREEN_X &&
+                worldY + Tile.TILESIZE > player.getWorldY() - Window.SCREEN_Y &&
+                worldY - Tile.TILESIZE < player.getWorldY() + Window.SCREEN_Y) // only render tiles in
                                                                                         // the
             // camera view
             g2.drawImage(image, screenX, screenY, Tile.TILESIZE, Tile.TILESIZE, null);
@@ -85,5 +87,10 @@ public class Item {
      * This method is to be called when an item is picked up from the map.
      */
     public void remove(){
+    }
+
+    public void resetHitBox() {
+        this.hitBox.x = hitBoxDefaultX;
+        this.hitBox.y = hitBoxDefaultY;
     }
 }

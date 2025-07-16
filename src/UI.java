@@ -1,347 +1,595 @@
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * UI
+ * Enhanced UI System for Hags and Hexxes
+ * Features modern design, animations, and responsive layout
  */
 public class UI {
-
-    private final Font hel_12 = new Font("Helvetica", Font.PLAIN, 12);
-    private final Font hel_20 = new Font("Helvetica", Font.PLAIN, 20);
-    private final Font hel_40 = new Font("Helvetica", Font.PLAIN, 40);
-    private final Font hel_30 = new Font("Helvetica", Font.PLAIN, 30);
-    private final Color menuColor = new Color(157, 80, 255, 250);
-    int commandNum = 0;
-    public String currentDialogue = "";
-    int dialogueNumber = 0;
-    int menuItem = 0;
-    private Graphics2D g2;
-    // private Window window;
-
+    
+    // UI Constants
+    private static final int ANIMATION_SPEED = 8;
+    private static final int FADE_DURATION = 30;
+    private static final int PULSE_DURATION = 60;
+    
+    // Colors
+    private static final Color PRIMARY_COLOR = new Color(157, 80, 255, 250);
+    private static final Color SECONDARY_COLOR = new Color(121, 5, 232, 200);
+    private static final Color ACCENT_COLOR = new Color(255, 215, 0, 255);
+    private static final Color DANGER_COLOR = new Color(220, 53, 69, 255);
+    private static final Color SUCCESS_COLOR = new Color(40, 167, 69, 255);
+    private static final Color BACKGROUND_COLOR = new Color(0, 0, 0, 180);
+    private static final Color TEXT_COLOR = Color.WHITE;
+    private static final Color BORDER_COLOR = new Color(255, 255, 255, 100);
+    
+    // Fonts
+    private final Font titleFont = new Font("Arial", Font.BOLD, 48);
+    private final Font subtitleFont = new Font("Arial", Font.BOLD, 24);
+    private final Font bodyFont = new Font("Arial", Font.PLAIN, 16);
+    private final Font smallFont = new Font("Arial", Font.PLAIN, 12);
+    private final Font menuFont = new Font("Arial", Font.BOLD, 18);
+    
+    // UI State
+    private int windowWidth;
+    private int windowHeight;
+    private int animationFrame = 0;
+    private int fadeAlpha = 0;
+    private boolean fadeIn = true;
+    private List<UINotification> notifications = new ArrayList<>();
+    private String debugString = "";
+    private int commandNum = 0;
+    private int menuItem = 0;
+    private Game game;
+    
+    // Animation states
+    private float menuSlideOffset = 0;
+    private float healthBarPulse = 0;
+    private int cursorBlinkTimer = 0;
+    
     public UI() {
-        // this.window = window;
+        initializeUI();
     }
-
-    /**
-     * @param text
-     */
-    private void drawString(Graphics g, String text, int x, int y) {
-
-        for (String line : text.split("\n"))
-            g.drawString(line, x, y += g.getFontMetrics().getHeight());
+    
+    public UI(Game game) {
+        this.game = game;
+        initializeUI();
     }
-
+    
+    private void initializeUI() {
+        // Use the actual game window size instead of full screen
+        this.windowWidth = Window.SCREENWIDTH;
+        this.windowHeight = Window.SCREENHEIGHT;
+        this.animationFrame = 0;
+    }
+    
+    public void updateWindowSize(int width, int height) {
+        // Use the actual game window size instead of full screen
+        this.windowWidth = Window.SCREENWIDTH;
+        this.windowHeight = Window.SCREENHEIGHT;
+    }
+    
+    public void update() {
+        animationFrame++;
+        
+        // Update animations
+        if (fadeIn && fadeAlpha < 255) {
+            fadeAlpha += ANIMATION_SPEED;
+        } else if (!fadeIn && fadeAlpha > 0) {
+            fadeAlpha -= ANIMATION_SPEED;
+        }
+        
+        // Update menu slide animation
+        if (game != null && game.getGameState() == Game.MENUSTATE) {
+            menuSlideOffset = Math.min(1.0f, menuSlideOffset + 0.1f);
+        } else {
+            menuSlideOffset = Math.max(0.0f, menuSlideOffset - 0.1f);
+        }
+        
+        // Update health bar pulse
+        healthBarPulse = (float) Math.sin(animationFrame * 0.1) * 0.3f + 0.7f;
+        
+        // Update cursor blink
+        cursorBlinkTimer = (cursorBlinkTimer + 1) % 30;
+        
+        // Update notifications
+        notifications.removeIf(UINotification::isExpired);
+        notifications.forEach(UINotification::update);
+    }
+    
     public void draw(final Graphics2D g2) {
-        this.g2 = g2;
-        switch (Game.getGameState()) {
-            case Game.STARTSTATE:
-                drawStartScreen();
-                break;
-            case Game.PLAYSTATE:
-                drawStatus();
-                break;
-            case Game.DIALOGUESTATE:
-                drawDialogue();
-                break;
-            case Game.PAUSESTATE:
-                drawPause();
-                break;
-            case Game.MENUSTATE:
-                drawMenu();
-                break;
-            case Game.GAMEOVERSTATE:
-                drawGameOver();
-        }
-    }
-
-    private void naviagteMenus() {
-        switch (Game.getGameState()) {
-            case Game.STARTSTATE:
-                if (Game.keyH.upPressed) {
-                    Game.keyH.upPressed = false;
-                    if (commandNum >= 0) {
-                        commandNum--;
-                    }
-                } else if (Game.keyH.downPressed) {
-                    Game.keyH.downPressed = false;
-                    if (commandNum <= 3) {
-                        commandNum++;
-                    }
+        if (game == null) return;
+        
+        // Enable anti-aliasing
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        
+        switch (game.getGameState()) {
+            case Game.STARTSTATE -> drawStartScreen(g2);
+            case Game.PLAYSTATE -> drawGameUI(g2);
+            case Game.DIALOGUESTATE -> {
+                if (game.getDialogueSystem() != null) {
+                    game.getDialogueSystem().draw(g2);
                 }
-                if (Game.keyH.spacePressed) {
-                    selectOption(commandNum);
-                }
-                if (commandNum < 0) {
-                    commandNum = 3;
-                } else if (commandNum > 3) {
-                    commandNum = 0;
-                }
-                break;
-        }
-    }
-
-    private int navigateItems(int currentItem, int maxItems) {
-        int itemNum = currentItem;
-        if (Game.keyH.leftPressed) {
-            Game.keyH.leftPressed = false;
-            itemNum--;
-        } else if (Game.keyH.rightPressed) {
-            Game.keyH.rightPressed = false;
-            itemNum++;
-        } else if (Game.keyH.upPressed && itemNum > 6) {
-            Game.keyH.upPressed = false;
-            itemNum -= 6;
-        } else if (Game.keyH.downPressed && itemNum <= 6) {
-            Game.keyH.downPressed = false;
-            itemNum += 6;
-        }
-
-        if (itemNum < 1)
-            itemNum = 1;
-        else if (itemNum > maxItems)
-            itemNum = maxItems;
-        return itemNum;
-    }
-
-    /**
-     * Handles the drawing of the menu screen.
-     */
-    private void drawMenu() {
-
-        // Draw the menu window.
-        int x = 50;
-        int y = 50;
-        // Draw the background of the menu
-        g2.setColor(menuColor);
-        g2.fillRoundRect(x, y, 800, 450, 20, 20);
-        // Draw the outline of the menu
-        g2.setColor(Color.WHITE);
-        g2.setStroke(new BasicStroke(5));
-        g2.drawRoundRect(x, y, 800, 450, 20, 20);
-        g2.setFont(hel_40);
-
-        // Draw the character's stats and any current effects they are under.
-        y = 100;
-        x = 65;
-        g2.drawString("Stats & Attributes", x, y);// draw title
-        g2.setFont(hel_20);
-        y += 50;
-        g2.drawString(String.format("Health: %.0f/%.0f", Game.player.getHealth(), Game.player.getMaxHealth()), x,
-                y); // draw health
-        y += 25;
-        g2.drawString(String.format("Defense: %d", Game.player.getDefense()), x, y);// draw defense
-        y += 25;
-        g2.drawString(String.format("Strength: %d", Game.player.getStrength()), x, y); // draw strength
-        y += 25;
-        g2.drawString(String.format("Speed: %d", Game.player.getSpeed()), x, y); // draw speed
-        // Draw the dividing line between stats and inventory.
-        g2.setStroke(new BasicStroke(5));
-        g2.drawLine(400, 70, 400, 480);
-        // Draw the inventory window.
-        x = 420;
-        y = 70;
-        int width = Tile.TILESIZE + 5;
-        int height = Tile.TILESIZE + 5;
-        Object[] arr = Game.player.inventory.keySet().toArray();
-        menuItem = navigateItems(menuItem, arr.length); // navigate through the inventory menu. Only slots that have
-                                                        // items in them should be selectable.
-        for (int i = 1; i <= Game.player.inventorySize; i++) {
-            if (menuItem == i && arr.length != 0) {
-                g2.setColor(Color.BLACK);
             }
-            g2.drawRoundRect(x, y, width, height, 3, 3);
-            if (i <= arr.length && arr[i - 1] != null) {
-                g2.drawImage(((Item) arr[i - 1]).getImage(), x, y, null); // draw the items present in the inventory.
-                g2.drawString(capitalize(((Item) arr[i - 1]).getName()), x + 5, y + Tile.TILESIZE + 30); // draw the
-                                                                                                         // // name
-                                                                                                         // of// the
-                                                                                                         // item.
+            case Game.PAUSESTATE -> drawPauseScreen(g2);
+            case Game.MENUSTATE -> drawInventoryMenu(g2);
+            case Game.GAMEOVERSTATE -> drawGameOverScreen(g2);
+        }
+        
+        // Draw notifications on top
+        drawNotifications(g2);
+    }
+    
+    private void drawStartScreen(Graphics2D g2) {
+        // Background with gradient
+        drawGradientBackground(g2);
+        
+        // Title with glow effect
+        drawGlowingText(g2, "Hags & Hexxes", windowWidth / 2, windowHeight / 3, titleFont, ACCENT_COLOR, 20);
+        
+        // Menu options
+        String[] options = {"New Game", "Load Game", "Options", "Exit"};
+        int startY = windowHeight / 2;
+        
+        for (int i = 0; i < options.length; i++) {
+            int y = startY + i * 60;
+            Color textColor = (commandNum == i) ? ACCENT_COLOR : TEXT_COLOR;
+            
+            if (commandNum == i) {
+                // Draw selection indicator
+                drawSelectionIndicator(g2, windowWidth / 2 - 150, y - 15);
             }
-            g2.setColor(Color.WHITE);
-
-            if (i % 6 == 0) { // every 6 items, break the line and start a new row.
-                x = 350;
-                y += Tile.TILESIZE + 40;
+            
+            drawCenteredText(g2, options[i], windowWidth / 2, y, menuFont, textColor);
+        }
+        
+        // Handle navigation
+        handleMenuNavigation();
+    }
+    
+    private void drawGameUI(Graphics2D g2) {
+        // Health bar
+        drawHealthBar(g2);
+        
+        // Mini-map or compass
+        drawCompass(g2);
+        
+        // Quick stats
+        drawQuickStats(g2);
+        
+        // Interaction prompt
+        drawInteractionPrompt(g2);
+    }
+    
+    private void drawHealthBar(Graphics2D g2) {
+        if (game == null || game.getPlayer() == null) return;
+        
+        Player player = game.getPlayer();
+        int barWidth = 200;
+        int barHeight = 20;
+        int x = 20;
+        int y = 20;
+        
+        // Background
+        drawRoundedRect(g2, x, y, barWidth, barHeight, 10, BACKGROUND_COLOR);
+        drawRoundedRect(g2, x, y, barWidth, barHeight, 10, BORDER_COLOR, false);
+        
+        // Health fill
+        float healthPercent = player.getHealth() / player.getMaxHealth();
+        int fillWidth = (int) (barWidth * healthPercent);
+        
+        Color healthColor = healthPercent > 0.5f ? SUCCESS_COLOR : 
+                           healthPercent > 0.25f ? ACCENT_COLOR : DANGER_COLOR;
+        
+        // Add pulse effect when health is low
+        if (healthPercent < 0.25f) {
+            healthColor = new Color(healthColor.getRed(), healthColor.getGreen(), 
+                                  healthColor.getBlue(), (int)(255 * healthBarPulse));
+        }
+        
+        drawRoundedRect(g2, x + 2, y + 2, fillWidth - 4, barHeight - 4, 8, healthColor);
+        
+        // Health text
+        String healthText = String.format("%.0f/%.0f", player.getHealth(), player.getMaxHealth());
+        drawCenteredText(g2, healthText, x + barWidth / 2, y + barHeight / 2 + 5, bodyFont, TEXT_COLOR);
+    }
+    
+    private void drawCompass(Graphics2D g2) {
+        int size = 80;
+        int x = windowWidth - size - 20;
+        int y = 20;
+        
+        // Compass background
+        drawRoundedRect(g2, x, y, size, size, size / 2, BACKGROUND_COLOR);
+        drawRoundedRect(g2, x, y, size, size, size / 2, BORDER_COLOR, false);
+        
+        // Compass needle
+        g2.setColor(ACCENT_COLOR);
+        g2.setStroke(new BasicStroke(3));
+        g2.drawLine(x + size / 2, y + 10, x + size / 2, y + size - 10);
+        g2.drawLine(x + 10, y + size / 2, x + size - 10, y + size / 2);
+        
+        // North indicator
+        drawCenteredText(g2, "N", x + size / 2, y + 15, smallFont, ACCENT_COLOR);
+    }
+    
+    private void drawQuickStats(Graphics2D g2) {
+        if (game == null || game.getPlayer() == null) return;
+        
+        Player player = game.getPlayer();
+        int x = 20;
+        int y = 60;
+        
+        String[] stats = {
+            "Level: " + player.getLevel(),
+            "Strength: " + player.getStrength(),
+            "Defense: " + player.getDefense(),
+            "Speed: " + player.getSpeed()
+        };
+        
+        for (int i = 0; i < stats.length; i++) {
+            drawText(g2, stats[i], x, y + i * 20, smallFont, TEXT_COLOR);
+        }
+    }
+    
+    private void drawInteractionPrompt(Graphics2D g2) {
+        // Show interaction prompt when near NPCs
+        if (game != null && game.getPlayer() != null) {
+            // This would check if player is near an interactable object
+            // For now, just show a general prompt
+            String prompt = "Press E to interact";
+            drawCenteredText(g2, prompt, windowWidth / 2, windowHeight - 100, bodyFont, ACCENT_COLOR);
+        }
+    }
+    
+    private void drawInventoryMenu(Graphics2D g2) {
+        if (game == null || game.getPlayer() == null) return;
+        
+        Player player = game.getPlayer();
+        
+        // Semi-transparent overlay
+        g2.setColor(new Color(0, 0, 0, 150));
+        g2.fillRect(0, 0, windowWidth, windowHeight);
+        
+        // Menu container with slide animation
+        int menuWidth = (int) (600 * menuSlideOffset);
+        int menuHeight = (int) (400 * menuSlideOffset);
+        int x = (windowWidth - menuWidth) / 2;
+        int y = (windowHeight - menuHeight) / 2;
+        
+        // Menu background
+        drawRoundedRect(g2, x, y, menuWidth, menuHeight, 20, PRIMARY_COLOR);
+        drawRoundedRect(g2, x, y, menuWidth, menuHeight, 20, BORDER_COLOR, false);
+        
+        // Title
+        drawCenteredText(g2, "Inventory", x + menuWidth / 2, y + 40, subtitleFont, TEXT_COLOR);
+        
+        // Inventory grid
+        drawInventoryGrid(g2, player, x + 20, y + 60, menuWidth - 40, menuHeight - 80);
+        
+        // Handle inventory navigation
+        handleInventoryNavigation(player);
+    }
+    
+    private void drawInventoryGrid(Graphics2D g2, Player player, int x, int y, int width, int height) {
+        int itemsPerRow = 6;
+        int itemSize = 50;
+        int spacing = 10;
+        
+        Object[] inventoryItems = player.inventory.keySet().toArray();
+        
+        for (int i = 0; i < player.inventorySize; i++) {
+            int itemX = x + (i % itemsPerRow) * (itemSize + spacing);
+            int itemY = y + (i / itemsPerRow) * (itemSize + spacing);
+            
+            // Item slot background
+            Color slotColor = (menuItem == i + 1) ? ACCENT_COLOR : BACKGROUND_COLOR;
+            drawRoundedRect(g2, itemX, itemY, itemSize, itemSize, 8, slotColor);
+            drawRoundedRect(g2, itemX, itemY, itemSize, itemSize, 8, BORDER_COLOR, false);
+            
+            // Item image and name
+            if (i < inventoryItems.length && inventoryItems[i] != null) {
+                Item item = (Item) inventoryItems[i];
+                g2.drawImage(item.getImage(), itemX + 5, itemY + 5, itemSize - 10, itemSize - 10, null);
+                drawCenteredText(g2, item.getName(), itemX + itemSize / 2, itemY + itemSize + 15, smallFont, TEXT_COLOR);
             }
-            x += 70;
-        }
-
-    }
-
-    private void drawPause() {
-        int x = Window.SCREENWIDTH / 2 - 300;
-        int y = Window.SCREENHEIGHT / 3 - 100;
-        g2.setFont(hel_40);
-        g2.setColor(menuColor);
-        g2.fillRoundRect(x, y, 600, 450, 20, 20); // Draw the background of the menu
-        g2.setColor(Color.WHITE);
-        g2.setStroke(new BasicStroke(5));
-        g2.drawRoundRect(x, y, 600, 450, 20, 20); // Draw the outline of the menu
-        g2.drawString("PAUSED", centerString("PAUSED"), 130);
-        g2.setFont(hel_20);
-        x += 20;
-        y += 100;
-        // draw the command options and display a cursor on the current selection.
-        g2.drawString("Resume", centerString("Resume"), y);
-        if (commandNum == 0) {
-            g2.drawString(">", centerString("Resume") - 20, y);
-        }
-        y += 50;
-        g2.drawString("Options", centerString("Options"), y);
-        if (commandNum == 1) {
-            g2.drawString(">", centerString("Options") - 20, y);
-        }
-        y += 50;
-        g2.drawString("Return to Main Menu", centerString("Return to Main Menu"), y);
-        if (commandNum == 2) {
-            g2.drawString(">", centerString("Return to Main Menu") - 20, y);
-        }
-        y += 50;
-        g2.drawString("Exit to Desktop", centerString("Exit to Desktop"), y);
-        if (commandNum == 3) {
-            g2.drawString(">", centerString("Exit to Desktop") - 20, y);
         }
     }
-
-    private void drawStartScreen() {
-
-        int x = 0;
-        int y = 0;
-        g2.setColor(new Color(157, 0, 200));
-        g2.fillRect(x, y, Window.SCREENWIDTH, Window.SCREENHEIGHT);
-        x = Window.SCREENWIDTH / 3;
-        y = Window.SCREENHEIGHT / 3;
-        g2.setFont(hel_40);
-        g2.setColor(Color.white);
-        g2.drawString("Hags & Hexxes", x, y);
-        y = Window.SCREENHEIGHT / 3 + 100;
-        g2.setFont(hel_30);
-        g2.drawString("New Game", x, y);
-        // update keys in the menu.
-        naviagteMenus();
-
-        if (commandNum == 0)
-            g2.drawString(">", x - 25, y);
-        y = Window.SCREENHEIGHT / 3 + 150;
-        g2.drawString("Load Game", x, y);
-        if (commandNum == 1)
-            g2.drawString(">", x - 25, y);
-        y = Window.SCREENHEIGHT / 3 + 200;
-        if (commandNum == 2)
-            g2.drawString(">", x - 25, y);
-        g2.drawString("Options", x, y);
-        y = Window.SCREENHEIGHT / 3 + 250;
-        if (commandNum == 3)
-            g2.drawString(">", x - 25, y);
-
-        g2.drawString("Exit to Desktop", x, y);
-        g2.dispose();
+    
+    private void drawPauseScreen(Graphics2D g2) {
+        // Semi-transparent overlay
+        g2.setColor(new Color(0, 0, 0, 150));
+        g2.fillRect(0, 0, windowWidth, windowHeight);
+        
+        // Pause menu
+        int menuWidth = 400;
+        int menuHeight = 300;
+        int x = (windowWidth - menuWidth) / 2;
+        int y = (windowHeight - menuHeight) / 2;
+        
+        drawRoundedRect(g2, x, y, menuWidth, menuHeight, 20, PRIMARY_COLOR);
+        drawRoundedRect(g2, x, y, menuWidth, menuHeight, 20, BORDER_COLOR, false);
+        
+        // Title
+        drawCenteredText(g2, "PAUSED", x + menuWidth / 2, y + 50, subtitleFont, TEXT_COLOR);
+        
+        // Menu options
+        String[] options = {"Resume", "Options", "Return to Main Menu", "Exit"};
+        for (int i = 0; i < options.length; i++) {
+            int optionY = y + 100 + i * 40;
+            Color textColor = (commandNum == i) ? ACCENT_COLOR : TEXT_COLOR;
+            
+            if (commandNum == i) {
+                drawSelectionIndicator(g2, x + 20, optionY - 10);
+            }
+            
+            drawText(g2, options[i], x + 50, optionY, menuFont, textColor);
+        }
+        
+        handleMenuNavigation();
     }
-
-    private String capitalize(String s) {
-        return s.substring(0, 1).toUpperCase() + s.substring(1);
+    
+    private void drawGameOverScreen(Graphics2D g2) {
+        // Dark overlay
+        g2.setColor(new Color(0, 0, 0, 200));
+        g2.fillRect(0, 0, windowWidth, windowHeight);
+        
+        // Game over text with effect
+        drawGlowingText(g2, "GAME OVER", windowWidth / 2, windowHeight / 3, titleFont, DANGER_COLOR, 30);
+        
+        // Menu options
+        String[] options = {"Load Game", "Options", "Exit to Desktop"};
+        int startY = windowHeight / 2;
+        
+        for (int i = 0; i < options.length; i++) {
+            int y = startY + i * 60;
+            Color textColor = (commandNum == i) ? ACCENT_COLOR : TEXT_COLOR;
+            
+            if (commandNum == i) {
+                drawSelectionIndicator(g2, windowWidth / 2 - 150, y - 15);
+            }
+            
+            drawCenteredText(g2, options[i], windowWidth / 2, y, menuFont, textColor);
+        }
+        
+        handleMenuNavigation();
     }
-
-    public void drawStatus() {
-        final int width = Tile.TILESIZE * 5;
-        final int height = Tile.TILESIZE * 1;
-        final int[] xPts = { 1, width, width - height, 1 };
-        final int[] yPts = { 1, 1, height, height };
-        g2.setColor(new Color(121, 5, 232, 200));
-        g2.fillPolygon(xPts, yPts, 4);
-        g2.setStroke(new BasicStroke(5));
-        g2.setColor(Color.black);
-        g2.drawPolygon(xPts, yPts, 4);
-        drawHealthBar();
-        g2.dispose();
+    
+    private void drawNotifications(Graphics2D g2) {
+        int y = 100;
+        for (UINotification notification : notifications) {
+            if (notification.isVisible()) {
+                drawNotification(g2, notification, windowWidth - 300, y);
+                y += 60;
+            }
+        }
     }
-
-    /**
-     * Handles the drawing of the health bar and the accompanying text. A helper
-     * method for {@link}
-     */
-    private void drawHealthBar() {
-        final int x = Tile.TILESIZE / 2;
-        final int y = Tile.TILESIZE / 2;
-        final int width = Tile.TILESIZE * 3;
-        final int height = Tile.TILESIZE / 4;
-        g2.setColor(new Color(30, 0, 0));
-        g2.fillRoundRect(x, y, width, height, 3, 3);
-        g2.setColor(Color.green);
-        g2.fillRect(x, y, (int) (width * ((Game.player.getHealth() / Game.player.getMaxHealth()))), height);
-        g2.setColor(Color.white);
-        g2.setFont(hel_12);
-        g2.drawString(String.format("%.0f/%.0f", Game.player.getHealth(), Game.player.getMaxHealth()), x, y - 5);
-        g2.dispose();
+    
+    private void drawNotification(Graphics2D g2, UINotification notification, int x, int y) {
+        int width = 280;
+        int height = 50;
+        
+        // Background
+        Color bgColor = notification.getType().getColor();
+        drawRoundedRect(g2, x, y, width, height, 10, bgColor);
+        drawRoundedRect(g2, x, y, width, height, 10, BORDER_COLOR, false);
+        
+        // Text
+        drawText(g2, notification.getMessage(), x + 10, y + 30, bodyFont, TEXT_COLOR);
     }
-
-    public void drawDialogue() {
-        int x = Tile.TILESIZE * 2;
-        int y = Tile.TILESIZE / 2;
-        final int width = Window.SCREENWIDTH - (Tile.TILESIZE * 4);
-        final int height = Window.SCREENHEIGHT - (Tile.TILESIZE * 9);
-        drawSubWindow(x, y, width, height);
-        x += Tile.TILESIZE;
-        y += Tile.TILESIZE;
-        g2.setFont(hel_20);
-        drawString(g2, currentDialogue, x, y);
-        g2.dispose();
+    
+    // Utility drawing methods
+    private void drawGradientBackground(Graphics2D g2) {
+        GradientPaint gradient = new GradientPaint(
+            0, 0, PRIMARY_COLOR,
+            windowWidth, windowHeight, SECONDARY_COLOR
+        );
+        g2.setPaint(gradient);
+        g2.fillRect(0, 0, windowWidth, windowHeight);
     }
-
-    private void drawGameOver() {
-
-        // Draw the menu window.
-        int x = 50;
-        int y = 50;
-        // Draw the background of the menu
-        g2.setColor(menuColor);
-        g2.fillRoundRect(x, y, 1430, 770, 20, 20);
-        // Draw the outline of the menu
-        g2.setColor(Color.WHITE);
-        g2.setStroke(new BasicStroke(5));
-        g2.drawRoundRect(x, y, 1430, 770, 20, 20);
-        g2.setFont(hel_40);
-        // Draw the dividing line between stats and inventory.
-        g2.setStroke(new BasicStroke(5));
-        g2.drawLine(400, 70, 400, 480);
-
-        g2.dispose();
+    
+    private void drawRoundedRect(Graphics2D g2, int x, int y, int width, int height, int radius, Color color) {
+        drawRoundedRect(g2, x, y, width, height, radius, color, true);
     }
-
-    public void drawSubWindow(final int x, final int y, final int width, final int height) {
-        g2.setColor(new Color(143, 12, 232, 200));
-        g2.fillRoundRect(x, y, width, height, 40, 40);
-        g2.setColor(new Color(26, 26, 26, 255));
-        g2.setStroke(new BasicStroke(5));
-        g2.drawRoundRect(x, y, width, height, 25, 25);
+    
+    private void drawRoundedRect(Graphics2D g2, int x, int y, int width, int height, int radius, Color color, boolean fill) {
+        g2.setColor(color);
+        RoundRectangle2D rect = new RoundRectangle2D.Float(x, y, width, height, radius, radius);
+        
+        if (fill) {
+            g2.fill(rect);
+        } else {
+            g2.setStroke(new BasicStroke(2));
+            g2.draw(rect);
+        }
     }
-
-    public void drawHitNumbers(Entity entity, int damage) {
-        int x = entity.getWorldX();
-        int y = entity.getWorldY();
-        drawString(g2, String.valueOf(damage), x - 2 * Tile.TILESIZE, y);
+    
+    private void drawGlowingText(Graphics2D g2, String text, int x, int y, Font font, Color color, int glowSize) {
+        g2.setFont(font);
+        
+        // Draw glow effect
+        for (int i = glowSize; i > 0; i--) {
+            Color glowColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 50 / i);
+            g2.setColor(glowColor);
+            g2.drawString(text, x - i, y - i);
+            g2.drawString(text, x + i, y + i);
+        }
+        
+        // Draw main text
+        g2.setColor(color);
+        g2.drawString(text, x, y);
     }
-
+    
+    private void drawCenteredText(Graphics2D g2, String text, int x, int y, Font font, Color color) {
+        g2.setFont(font);
+        g2.setColor(color);
+        FontMetrics fm = g2.getFontMetrics();
+        int textWidth = fm.stringWidth(text);
+        g2.drawString(text, x - textWidth / 2, y);
+    }
+    
+    private void drawText(Graphics2D g2, String text, int x, int y, Font font, Color color) {
+        g2.setFont(font);
+        g2.setColor(color);
+        g2.drawString(text, x, y);
+    }
+    
+    private void drawSelectionIndicator(Graphics2D g2, int x, int y) {
+        // Animated selection indicator
+        int alpha = cursorBlinkTimer < 15 ? 255 : 100;
+        g2.setColor(new Color(ACCENT_COLOR.getRed(), ACCENT_COLOR.getGreen(), ACCENT_COLOR.getBlue(), alpha));
+        g2.setStroke(new BasicStroke(3));
+        g2.drawLine(x, y, x + 20, y);
+    }
+    
+    // Input handling
+    private void handleMenuNavigation() {
+        if (game == null) return;
+        
+        KeyHandler keyH = game.getKeyHandler();
+        if (keyH == null) return;
+        
+        if (keyH.isActionPressed("UP")) {
+            keyH.resetKey("UP");
+            keyH.resetKey("UP_ALT");
+            commandNum = Math.max(0, commandNum - 1);
+        } else if (keyH.isActionPressed("DOWN")) {
+            keyH.resetKey("DOWN");
+            keyH.resetKey("DOWN_ALT");
+            commandNum = Math.min(3, commandNum + 1);
+        }
+        
+        if (keyH.isPressed("ATTACK") || keyH.isPressed("INTERACT")) {
+            keyH.resetKey("ATTACK");
+            keyH.resetKey("INTERACT");
+            selectOption(commandNum);
+        }
+    }
+    
+    private void handleInventoryNavigation(Player player) {
+        if (game == null) return;
+        
+        KeyHandler keyH = game.getKeyHandler();
+        if (keyH == null) return;
+        
+        int itemsPerRow = 6;
+        
+        if (keyH.isActionPressed("LEFT")) {
+            keyH.resetKey("LEFT");
+            keyH.resetKey("LEFT_ALT");
+            menuItem = Math.max(1, menuItem - 1);
+        } else if (keyH.isActionPressed("RIGHT")) {
+            keyH.resetKey("RIGHT");
+            keyH.resetKey("RIGHT_ALT");
+            menuItem = Math.min(player.inventorySize, menuItem + 1);
+        } else if (keyH.isActionPressed("UP")) {
+            keyH.resetKey("UP");
+            keyH.resetKey("UP_ALT");
+            menuItem = Math.max(1, menuItem - itemsPerRow);
+        } else if (keyH.isActionPressed("DOWN")) {
+            keyH.resetKey("DOWN");
+            keyH.resetKey("DOWN_ALT");
+            menuItem = Math.min(player.inventorySize, menuItem + itemsPerRow);
+        }
+    }
+    
     private void selectOption(int commandNum) {
-       switch(Game.getGameState()){
-            case Game.PAUSESTATE:
-            case Game.STARTSTATE:
-                if (commandNum == 0)
-                    Game.setGameState(Game.PLAYSTATE);
-                else if (commandNum == 3) {
-                    System.exit(0); // exit with status code 0
+        if (game == null) return;
+        
+        switch (game.getGameState()) {
+            case Game.STARTSTATE -> {
+                switch (commandNum) {
+                    case 0 -> game.setGameState(Game.PLAYSTATE);
+                    case 3 -> System.exit(0);
                 }
-            break;
+            }
+            case Game.PAUSESTATE -> {
+                switch (commandNum) {
+                    case 0 -> game.setGameState(Game.PLAYSTATE);
+                    case 3 -> System.exit(0);
+                }
+            }
+            case Game.GAMEOVERSTATE -> {
+                switch (commandNum) {
+                    case 0 -> game.setGameState(Game.PLAYSTATE);
+                    case 2 -> System.exit(0);
+                }
+            }
         }
     }
-
-    private int centerString(String s) {
-        int length = (int) g2.getFontMetrics().getStringBounds(s, g2).getWidth();
-        int x = Window.SCREENWIDTH / 2 - length / 2;
-        return x;
+    
+    // Public methods for notifications
+    public void addNotification(String message, UINotification.NotificationType type) {
+        notifications.add(new UINotification(message, type));
+    }
+    
+    public void printDebug(String s) {
+        debugString += "\n" + s;
+    }
+    
+    public void drawDebugString(Graphics2D g) {
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setColor(Color.RED);
+        g2d.setFont(smallFont);
+        drawText(g2d, debugString, 50, 50, smallFont, Color.RED);
+        g2d.dispose();
+    }
+    
+    // Inner classes
+    public static class UINotification {
+        public enum NotificationType {
+            INFO(new Color(0, 123, 255, 200)),
+            SUCCESS(new Color(40, 167, 69, 200)),
+            WARNING(new Color(255, 193, 7, 200)),
+            ERROR(new Color(220, 53, 69, 200));
+            
+            private final Color color;
+            
+            NotificationType(Color color) {
+                this.color = color;
+            }
+            
+            public Color getColor() {
+                return color;
+            }
+        }
+        
+        private String message;
+        private NotificationType type;
+        private int duration;
+        private int fadeTimer;
+        private boolean visible = true;
+        
+        public UINotification(String message, NotificationType type) {
+            this.message = message;
+            this.type = type;
+            this.duration = 180; // 3 seconds at 60fps
+            this.fadeTimer = 0;
+        }
+        
+        public void update() {
+            fadeTimer++;
+            if (fadeTimer >= duration) {
+                visible = false;
+            }
+        }
+        
+        public boolean isExpired() {
+            return fadeTimer >= duration + FADE_DURATION;
+        }
+        
+        public boolean isVisible() {
+            return visible;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+        
+        public NotificationType getType() {
+            return type;
+        }
     }
 }

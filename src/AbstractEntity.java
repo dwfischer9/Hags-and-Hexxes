@@ -2,9 +2,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.HashMap;
-
 import javax.imageio.ImageIO;
 
 /**
@@ -14,14 +12,14 @@ abstract class AbstractEntity {
     protected BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, attackup1, attackup2, attackdown1,
             attackdown2, attackleft1, attackleft2, attackright1, attackright2;
     private int worldX, worldY;
-    HashMap<Item, Double> dropTable = new HashMap<Item, Double>();
+    HashMap<Item, Double> dropTable = new HashMap<>();
     private String name;
     public CollisionDetection cDetection;
-    public Rectangle attackArea;
-    public int attackAreaDefaultx = 0;
-    public int attackAreaDefaulty = 0;
+    public int attackAreaDefaultX = 0;
+    public int attackAreaDefaultY = 0;
+    public Rectangle attackArea = new Rectangle(0, 0, 32, 32);
     public boolean isFriendly = false;
-    public String direction;
+    private String direction;
     private float health;
     public boolean attacking;
     public int dialogueCounter = 0;
@@ -30,24 +28,24 @@ abstract class AbstractEntity {
     int spriteNum = 1;
     public int invincibleCounter = 0;
     public Window window;
-    private Rectangle hitBox = new Rectangle(8, 16, 32, 32);
+
+    private int hitBoxDefaultX = 8, hitBoxDefaultY = 16;
+    private final Rectangle hitBox = new Rectangle(hitBoxDefaultX, hitBoxDefaultY, 32, 32);
     // Entity Properties
     public boolean collisionOn = false; // true if the entity is currently colliding with something.
     public boolean invincible;// true if the entity is currently invincible, typically enabled due to taking
                               // damage.1
     // Stats
-    private int level; // Level is a rough representation of an entity's power and capabilities. The
-                       // player's goal is to levl up and accrue more stat and skill points.
-    private int maxHealth; // The maxiumum amount of hit points that an entity can have, even it was healed
-                           // for a value that overflows.
+    private int level;
+    private int maxHealth;
     private int speed = 2; // Sets speed in the overworld as well as impoving the chance of moving first.
                            // Default value is 2.
     public int strength = 2; // Strength modifies the damage that the entity deals with physical based
-                             // attacks.
+                             // attacks. 
     public int defense = 2; // Defense reduces the damge that the entity takes from attacks.
     public int magic = 0; // Magic modifies the damage that the entity deals with magic based attacks. It
                           // also increases the entity's maximum mana.
-    public int mana = 20; // Mana is used to case spells and is harder to restore than health.
+    public int mana = 20; // Mana is used to cast spells and is harder to restore than health.
 
     /**
      * @param name      The name of the creature.
@@ -58,15 +56,15 @@ abstract class AbstractEntity {
      * @param maxHealth The maximum health of the creature.
      * 
      */
-    public AbstractEntity(final String name, final int level, final int health,
+    public AbstractEntity(final String name, final int level,
             final int maxHealth) {
         this.name = name;
-        this.health = health;
+        this.health = maxHealth;
         this.level = level;
         this.direction = "down";
         this.maxHealth = maxHealth;
         this.image = up1;
-        this.window = Game.window;
+        this.window = Game.getInstance().getWindow();
         this.cDetection = new CollisionDetection(this.window);
     }
 
@@ -76,54 +74,32 @@ abstract class AbstractEntity {
     }
 
     public void setHitBox(Rectangle hitBox) {
-        this.hitBox = hitBox;
-
+        if (hitBox != null) {
+            this.hitBox.setBounds(hitBox);
+        }
     }
 
+    @Override
     public String toString() {
         return String.format("%s, HP: %.0f / %.0f\n", this.name, this.getHealth(), this.getMaxHealth());
     }
 
-    /**
-     * Retreive the name of the creature.
-     * 
-     * @return the name of the creature.
-     */
     public String getName() {
         return this.name;
     }
 
-    /**
-     * Retrieve the level of the creature.
-     * 
-     * @return the level of the creature.
-     */
     public int getLevel() {
         return this.level;
     }
 
-    /**
-     * Retrieve the health of the creature.
-     * 
-     * @return the health of the creature.
-     */
     public float getHealth() {
         return this.health;
     }
 
-    /**
-     * @return Float the max health of the creature
-     */
     public float getMaxHealth() {
         return this.maxHealth;
     }
 
-    /**
-     * Set the creature's level to the given level.
-     * 
-     * @param newLevel must be in the range (0,100].
-     * @return the new level of the creature.
-     */
     public int setLevel(final int newLevel) {
         if (newLevel > 0 && newLevel <= 100)
             this.level = newLevel;
@@ -132,12 +108,6 @@ abstract class AbstractEntity {
         return this.level;
     }
 
-    /**
-     * Sets the name of this creature
-     * 
-     * @param name must have length of [2,20]
-     *             Set the name of the creature.
-     */
     public void setName(final String name) {
         if (name.length() >= 2 && name.length() <= 20)
             this.name = name;
@@ -145,12 +115,6 @@ abstract class AbstractEntity {
             System.err.println("The entered level name is not of valid length.");
     }
 
-    /**
-     * Sets the health of this creature
-     * 
-     * @param health must be a nonzero integer less than or equal to
-     *               the maximum health of the creature.
-     */
     public void setHealth(final float newHealth) {
         if (newHealth <= this.maxHealth)
             this.health = newHealth;
@@ -162,98 +126,64 @@ abstract class AbstractEntity {
     }
 
     // abstract float attack(Move moveChoice) throws IOException;
+    @SuppressWarnings("unused")
     abstract void levelUp();
 
     public BufferedImage getImage() {
         switch (getDirection()) { // handles the direction that the sprite is facing.
-            case "up":
+            case "up" -> {
                 if (attacking == false) {
                     switch (spriteNum) {
-                        case 1:
-                            image = up1;
-                            break;
-                        case 2:
-                            image = up2;
-                            break;
+                        case 1 -> image = up1;
+                        case 2 -> image = up2;
                     }
                 } else {
                     switch (spriteNum) {
-                        case 1:
-                            image = attackup1;
-                            break;
-                        case 2:
-                            image = attackup2;
-                            break;
+                        case 1 -> image = attackup1;
+                        case 2 -> image = attackup2;
                     }
                 }
-
-                break;
-            case "down":
+            }
+            case "down" -> {
                 if (!attacking) {
                     switch (spriteNum) {
-                        case 1:
-                            image = down1;
-                            break;
-                        case 2:
-                            image = down2;
-                            break;
+                        case 1 -> image = down1;
+                        case 2 -> image = down2;
                     }
                 } else {
                     switch (spriteNum) {
-                        case 1:
-                            image = attackdown1;
-                            break;
-                        case 2:
-                            image = attackdown2;
-                            break;
+                        case 1 -> image = attackdown1;
+                        case 2 -> image = attackdown2;
                     }
                 }
-                break;
+            }
 
-            case "left":
+            case "left" -> {
                 if (!attacking) {
                     switch (spriteNum) {
-                        case 1:
-                            image = left1;
-                            break;
-                        case 2:
-                            image = left2;
-                            break;
+                        case 1 -> image = left1;
+                        case 2 -> image = left2;
                     }
                 } else {
                     switch (spriteNum) {
-                        case 1:
-                            image = attackleft1;
-                            break;
-                        case 2:
-                            image = attackleft2;
-                            break;
+                        case 1 -> image = attackleft1;
+                        case 2 -> image = attackleft2;
                     }
                 }
-
-                break;
-            case "right":
+            }
+            case "right" -> {
                 if (!attacking) {
                     switch (spriteNum) {
-                        case 1:
-                            image = right1;
-                            break;
-                        case 2:
-                            image = right2;
-                            break;
+                        case 1 -> image = right1;
+                        case 2 -> image = right2;
                     }
                 } else {
                     switch (spriteNum) {
-                        case 1:
-                            image = attackright1;
-                            break;
-                        case 2:
-                            image = attackright2;
-                            break;
+                        case 1 -> image = attackright1;
+                        case 2 -> image = attackright2;
                     }
                 }
-
-                break;
+            }
         }
         spriteCounter++; // switches between sprite 1 and 2 for the direction.
         if (spriteCounter > 90) { // serves as an idle animation. The player image
@@ -280,62 +210,91 @@ abstract class AbstractEntity {
     public void setup() {
         final UtilityTools uTool = new UtilityTools();
         try {
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/up1.png"));
-            up1 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
-
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/up2.png"));
-            up2 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
-
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/down1.png"));
-            down1 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/down2.png"));
-            down2 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
-
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/left1.png"));
-            left1 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
-
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/left2.png"));
-            left2 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
-
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/right1.png"));
-            right1 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
-
-            image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/right2.png"));
-            right2 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE);
-            if (name == "player") {
-                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/attackup1.png"));
-                attackup1 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE * 2);
-
-                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/attackup2.png"));
-                attackup2 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE * 2);
-
-                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/attackdown1.png"));
-                attackdown1 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE * 2);
-                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/attackdown2.png"));
-                attackdown2 = uTool.scaleImage(image, Tile.TILESIZE, Tile.TILESIZE * 2);
-
-                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/attackleft1.png"));
-                attackleft1 = uTool.scaleImage(image, Tile.TILESIZE * 2, Tile.TILESIZE);
-
-                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/attackleft2.png"));
-                attackleft2 = uTool.scaleImage(image, Tile.TILESIZE * 2, Tile.TILESIZE);
-
-                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/attackright1.png"));
-                attackright1 = uTool.scaleImage(image, Tile.TILESIZE * 2, Tile.TILESIZE);
-
-                image = ImageIO.read(getClass().getResourceAsStream("/assets/" + name + "/attackright2.png"));
-                attackright2 = uTool.scaleImage(image, Tile.TILESIZE * 2, Tile.TILESIZE);
+            // Load basic movement sprites
+            String[] directions = {"up", "down", "left", "right"};
+            for (String dir : directions) {
+                BufferedImage img1 = loadImage("/assets/" + name + "/" + dir + "1.png");
+                BufferedImage img2 = loadImage("/assets/" + name + "/" + dir + "2.png");
+                
+                if (img1 != null && img2 != null) {
+                    switch (dir) {
+                        case "up" -> {
+                            up1 = uTool.scaleImage(img1, Tile.TILESIZE, Tile.TILESIZE);
+                            up2 = uTool.scaleImage(img2, Tile.TILESIZE, Tile.TILESIZE);
+                        }
+                        case "down" -> {
+                            down1 = uTool.scaleImage(img1, Tile.TILESIZE, Tile.TILESIZE);
+                            down2 = uTool.scaleImage(img2, Tile.TILESIZE, Tile.TILESIZE);
+                        }
+                        case "left" -> {
+                            left1 = uTool.scaleImage(img1, Tile.TILESIZE, Tile.TILESIZE);
+                            left2 = uTool.scaleImage(img2, Tile.TILESIZE, Tile.TILESIZE);
+                        }
+                        case "right" -> {
+                            right1 = uTool.scaleImage(img1, Tile.TILESIZE, Tile.TILESIZE);
+                            right2 = uTool.scaleImage(img2, Tile.TILESIZE, Tile.TILESIZE);
+                        }
+                    }
+                }
+            }
+            
+            // Load attack sprites for player only
+            if ("player".equals(name)) {
+                String[] attackDirections = {"attackup", "attackdown", "attackleft", "attackright"};
+                for (String dir : attackDirections) {
+                    BufferedImage img1 = loadImage("/assets/" + name + "/" + dir + "1.png");
+                    BufferedImage img2 = loadImage("/assets/" + name + "/" + dir + "2.png");
+                    
+                    if (img1 != null && img2 != null) {
+                        switch (dir) {
+                            case "attackup" -> {
+                                attackup1 = uTool.scaleImage(img1, Tile.TILESIZE, Tile.TILESIZE * 2);
+                                attackup2 = uTool.scaleImage(img2, Tile.TILESIZE, Tile.TILESIZE * 2);
+                            }
+                            case "attackdown" -> {
+                                attackdown1 = uTool.scaleImage(img1, Tile.TILESIZE, Tile.TILESIZE * 2);
+                                attackdown2 = uTool.scaleImage(img2, Tile.TILESIZE, Tile.TILESIZE * 2);
+                            }
+                            case "attackleft" -> {
+                                attackleft1 = uTool.scaleImage(img1, Tile.TILESIZE * 2, Tile.TILESIZE);
+                                attackleft2 = uTool.scaleImage(img2, Tile.TILESIZE * 2, Tile.TILESIZE);
+                            }
+                            case "attackright" -> {
+                                attackright1 = uTool.scaleImage(img1, Tile.TILESIZE * 2, Tile.TILESIZE);
+                                attackright2 = uTool.scaleImage(img2, Tile.TILESIZE * 2, Tile.TILESIZE);
+                            }
+                        }
+                    }
+                }
             }
 
             System.out.println("Finished loading assets for " + name);
-        } catch (final IOException e) {
-            System.out.println("Error loading assets for " + name);
-            e.printStackTrace();
+        } catch (final Exception e) {
+            System.out.println("Error loading assets for " + name + ": " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Helper method to load images with fallback paths
+     */
+    private BufferedImage loadImage(String path) {
+        try {
+            // Try loading from classpath first
+            BufferedImage img = ImageIO.read(getClass().getResourceAsStream(path));
+            if (img != null) return img;
+            
+            // Try loading from file system as fallback
+            String basePath = System.getProperty("user.dir");
+            String filePath = basePath + "/src" + path;
+            return ImageIO.read(new java.io.File(filePath));
+        } catch (Exception e) {
+            System.out.println("Could not load image: " + path);
+            return null;
         }
     }
 
     public void draw(final Graphics2D g2) {
-        Player p = Game.player;
+        Player p = Game.getInstance().getPlayer();
 
         final int screenX = worldX - p.getWorldX() + Window.SCREEN_X;
         final int screenY = worldY - p.getWorldY() + Window.SCREEN_Y;
@@ -365,13 +324,38 @@ abstract class AbstractEntity {
         g2.setColor(Color.RED);
         g2.fillRoundRect(screenX, screenY - 5, Tile.TILESIZE, 10, 2, 2);
         g2.setColor(Color.GREEN);
-
+ 
         g2.fillRoundRect(screenX, screenY - 5, (int) (Tile.TILESIZE * this.getHealth() / this.getMaxHealth()), 10, 2,
                 2);
         g2.setColor(new Color(26, 26, 26));
         g2.drawRoundRect(screenX, screenY - 5, Tile.TILESIZE, 10, 2, 2);
     }
-
+    public void moveEntity(){
+        if (collisionOn == false && !"none".equals(this.direction)) {
+            switch (this.direction) {
+                case "up" -> setWorldY(getWorldY() - getSpeed());
+                case "down" -> setWorldY(getWorldY() + getSpeed());
+                case "left" -> setWorldX(getWorldX() - getSpeed());
+                case "right" -> setWorldX(getWorldX() + getSpeed());
+                case "up-right" -> {
+                    setWorldY(getWorldY() - getSpeed());
+                    setWorldX(getWorldX() + getSpeed());
+                }
+                case "up-left" -> {
+                    setWorldY(getWorldY() - getSpeed());
+                    setWorldX(getWorldX() - getSpeed());
+                }
+                case "down-right" -> {
+                    setWorldY(getWorldY() + getSpeed());
+                    setWorldX(getWorldX() + getSpeed());
+                }
+                case "down-left" -> {
+                    setWorldY(getWorldY() + getSpeed());
+                    setWorldX(getWorldX() - getSpeed());
+                }
+            }
+        }
+    }
     /**
      * @param e1 - the entity to compare against this entity
      * @return the absolute distance between the two entities, in tiles.
@@ -380,6 +364,16 @@ abstract class AbstractEntity {
         final int distanceY = Math.abs(e1.worldY - this.worldY);
         final int distanceX = Math.abs(e1.worldX - this.worldX);
         return (distanceX + distanceY) / Tile.TILESIZE;
+    }
+
+    public void resetHitBox() {
+        this.hitBox.x = hitBoxDefaultX;
+        this.hitBox.y = hitBoxDefaultY;
+    }
+
+    public void resetAttackArea() {
+        this.attackArea.x = attackAreaDefaultX;
+        this.attackArea.y = attackAreaDefaultY;
     }
 
     public int getWorldX() {
@@ -420,6 +414,12 @@ abstract class AbstractEntity {
 
     public void setSpeed(final int speed) {
         this.speed = speed;
+    }
+    public void setHitBoxDefaultX(final int X) {
+        this.hitBoxDefaultX = X;
+    }
+    public void setHitBoxDefaultY(final int Y) {
+        this.hitBoxDefaultY = Y;
     }
 
 }

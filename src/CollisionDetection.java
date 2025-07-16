@@ -1,3 +1,4 @@
+import java.awt.Rectangle;
 import java.util.ArrayList;
 
 /**
@@ -24,103 +25,111 @@ public class CollisionDetection {
         int tRow = entityTopWorldY / Tile.TILESIZE; // get the top and bottom row number of the entity's hitbox, in tile
                                                     // coordinates
         int bRow = entityBottomWorldY / Tile.TILESIZE;
-        TileManager tm = window.tileM;
+        TileManager tm = window.getTileManager();
         int tileNum1, tileNum2;
 
-        switch (entity.direction) {
-            case "up":
+        switch (entity.getDirection()) {
+            case "up" -> {
                 tRow = (entityTopWorldY - entity.getSpeed()) / Tile.TILESIZE;
                 tileNum1 = tm.mapTileNum[lCol][tRow];
                 tileNum2 = tm.mapTileNum[rCOl][tRow];
-                if (tm.tiles[tileNum1].isCollision() == true
-                        || tm.tiles[tileNum2].isCollision() == true)
-                    entity.collisionOn = true;
-                break;
-            case "down":
+            }
+            case "down" -> {
                 bRow = (entityBottomWorldY + entity.getSpeed()) / Tile.TILESIZE;
                 tileNum1 = tm.mapTileNum[lCol][bRow];
                 tileNum2 = tm.mapTileNum[rCOl][bRow];
-                if (tm.tiles[tileNum1].isCollision() == true
-                        || tm.tiles[tileNum2].isCollision() == true)
-                    entity.collisionOn = true;
-                break;
-            case "left":
+            }
+            case "left" -> {
                 lCol = (entityLeftWorldX - entity.getSpeed()) / Tile.TILESIZE;
                 tileNum1 = tm.mapTileNum[lCol][tRow];
                 tileNum2 = tm.mapTileNum[lCol][bRow];
-                if (tm.tiles[tileNum1].isCollision() == true
-                        || tm.tiles[tileNum2].isCollision() == true)
-                    entity.collisionOn = true;
-                break;
-            case "right":
+            }
+            case "right" -> {
                 rCOl = (entityRightWorldX + entity.getSpeed()) / Tile.TILESIZE;
                 tileNum1 = tm.mapTileNum[rCOl][tRow];
                 tileNum2 = tm.mapTileNum[rCOl][bRow];
-                if (tm.tiles[tileNum1].isCollision() == true
-                        || tm.tiles[tileNum2].isCollision() == true)
-                    entity.collisionOn = true;
-                break;
-
+            }
+            case "up-right" -> {
+                // Check both up and right directions
+                int upRow = (entityTopWorldY - entity.getSpeed()) / Tile.TILESIZE;
+                int rightCol = (entityRightWorldX + entity.getSpeed()) / Tile.TILESIZE;
+                tileNum1 = tm.mapTileNum[lCol][upRow]; // Check up
+                tileNum2 = tm.mapTileNum[rightCol][tRow]; // Check right
+            }
+            case "up-left" -> {
+                // Check both up and left directions
+                int upRow = (entityTopWorldY - entity.getSpeed()) / Tile.TILESIZE;
+                int leftCol = (entityLeftWorldX - entity.getSpeed()) / Tile.TILESIZE;
+                tileNum1 = tm.mapTileNum[lCol][upRow]; // Check up
+                tileNum2 = tm.mapTileNum[leftCol][tRow]; // Check left
+            }
+            case "down-right" -> {
+                // Check both down and right directions
+                int downRow = (entityBottomWorldY + entity.getSpeed()) / Tile.TILESIZE;
+                int rightCol = (entityRightWorldX + entity.getSpeed()) / Tile.TILESIZE;
+                tileNum1 = tm.mapTileNum[lCol][downRow]; // Check down
+                tileNum2 = tm.mapTileNum[rightCol][tRow]; // Check right
+            }
+            case "down-left" -> {
+                // Check both down and left directions
+                int downRow = (entityBottomWorldY + entity.getSpeed()) / Tile.TILESIZE;
+                int leftCol = (entityLeftWorldX - entity.getSpeed()) / Tile.TILESIZE;
+                tileNum1 = tm.mapTileNum[lCol][downRow]; // Check down
+                tileNum2 = tm.mapTileNum[leftCol][tRow]; // Check left
+            }
+            default -> {
+                tileNum1 = 0;
+                tileNum2 = 0;
+            }
         }
+        if (tm.tiles[tileNum1].isCollision() == true
+                || tm.tiles[tileNum2].isCollision() == true)
+            entity.collisionOn = true;
 
     }
 
     public Item checkObject(Entity entity, boolean player) {
         Item contact = null;
-        for (Item item : Game.items.values()) {
+        Game game = Game.getInstance();
+        if (game == null || game.getItems() == null) return null;
+        
+        for (Item item : game.getItems().values()) {
             entity.getHitBox().x += entity.getWorldX();
             entity.getHitBox().y += entity.getWorldY();
-            item.HITBOX.x += item.worldX;
-            item.HITBOX.y += item.worldY;
+            item.hitBox.x += item.worldX;
+            item.hitBox.y += item.worldY;
 
-            switch (entity.direction) {
-                case "up":
+            switch (entity.getDirection()) {
+                case "up" -> entity.getHitBox().y -= entity.getSpeed();
+                case "down" -> entity.getHitBox().y += entity.getSpeed();
+                case "left" -> entity.getHitBox().x -= entity.getSpeed();
+                case "right" -> entity.getHitBox().x += entity.getSpeed();
+                case "up-right" -> {
                     entity.getHitBox().y -= entity.getSpeed();
-                    if (entity.getHitBox().intersects(item.HITBOX)) {
-                        if (item.collision)
-                            entity.collisionOn = true;
-                        if (player) {
-                            contact = item;
-                        }
-                    }
-                    break;
-                case "down":
-                    entity.getHitBox().y += entity.getSpeed();
-                    if (entity.getHitBox().intersects(item.HITBOX)) {
-                        if (item.collision)
-                            entity.collisionOn = true;
-                        if (player) {
-                            contact = item;
-                        }
-                    }
-                    break;
-                case "left":
-                    entity.getHitBox().x -= entity.getSpeed();
-                    if (entity.getHitBox().intersects(item.HITBOX)) {
-                        if (item.collision)
-                            entity.collisionOn = true;
-                        if (player) {
-                            contact = item;
-                        }
-                    }
-                    break;
-                case "right":
                     entity.getHitBox().x += entity.getSpeed();
-                    if (entity.getHitBox().intersects(item.HITBOX)) {
-                        if (item.collision)
-                            entity.collisionOn = true;
-                        if (player) {
-                            contact = item;
-                        }
-                    }
-                    break;
+                }
+                case "up-left" -> {
+                    entity.getHitBox().y -= entity.getSpeed();
+                    entity.getHitBox().x -= entity.getSpeed();
+                }
+                case "down-right" -> {
+                    entity.getHitBox().y += entity.getSpeed();
+                    entity.getHitBox().x += entity.getSpeed();
+                }
+                case "down-left" -> {
+                    entity.getHitBox().y += entity.getSpeed();
+                    entity.getHitBox().x -= entity.getSpeed();
+                }
             }
-
-            entity.getHitBox().x = entity.hitBoxDefeaultX;
-            entity.getHitBox().y = entity.hitBoxDefeaultY;
-            item.HITBOX.x = item.HITBOXDEFAULTX;
-            item.HITBOX.y = item.HITBOXDEFAULTY;
-
+            if (entity.getHitBox().intersects(item.hitBox)) {
+                if (item.collision)
+                    entity.collisionOn = true;
+                if (player) {
+                    contact = item;
+                }
+            }
+            entity.resetHitBox();
+            item.resetHitBox();
         }
         return contact;
     }
@@ -136,43 +145,35 @@ public class CollisionDetection {
 
                 target.get(i).getHitBox().x += target.get(i).getWorldX();
                 target.get(i).getHitBox().y += target.get(i).getWorldY();
-                switch (entity.direction) {
-                    case "up":
-
+                switch (entity.getDirection()) {
+                    case "up" -> entity.getHitBox().y -= entity.getSpeed();
+                    case "down" -> entity.getHitBox().y += entity.getSpeed();
+                    case "left" -> entity.getHitBox().x -= entity.getSpeed();
+                    case "right" -> entity.getHitBox().x += entity.getSpeed();
+                    case "up-right" -> {
                         entity.getHitBox().y -= entity.getSpeed();
-                        if (entity.getHitBox().intersects(target.get(i).getHitBox())) {
-                            entity.collisionOn = true;
-                            index = i;
-                        }
-                        break;
-                    case "down":
-
-                        entity.getHitBox().y += entity.getSpeed();
-                        if (entity.getHitBox().intersects(target.get(i).getHitBox())) {
-                            index = i;
-                            entity.collisionOn = true;
-
-                        }
-                        break;
-                    case "left":
-                        entity.getHitBox().x -= entity.getSpeed();
-                        if (entity.getHitBox().intersects(target.get(i).getHitBox())) {
-                            entity.collisionOn = true;
-                            index = i;
-                        }
-                        break;
-                    case "right":
                         entity.getHitBox().x += entity.getSpeed();
-                        if (entity.getHitBox().intersects(target.get(i).getHitBox())) {
-                            entity.collisionOn = true;
-                            index = i;
-                        }
-                        break;
+                    }
+                    case "up-left" -> {
+                        entity.getHitBox().y -= entity.getSpeed();
+                        entity.getHitBox().x -= entity.getSpeed();
+                    }
+                    case "down-right" -> {
+                        entity.getHitBox().y += entity.getSpeed();
+                        entity.getHitBox().x += entity.getSpeed();
+                    }
+                    case "down-left" -> {
+                        entity.getHitBox().y += entity.getSpeed();
+                        entity.getHitBox().x -= entity.getSpeed();
+                    }
                 }
-                entity.getHitBox().x = entity.hitBoxDefeaultX;
-                entity.getHitBox().y = entity.hitBoxDefeaultY;
-                target.get(i).getHitBox().x = target.get(i).hitBoxDefeaultX;
-                target.get(i).getHitBox().y = target.get(i).hitBoxDefeaultX;
+                if (entity.getHitBox().intersects(target.get(i).getHitBox())) {
+                    entity.collisionOn = true;
+                    index = i;
+                }
+                entity.resetHitBox();
+
+                target.get(i).resetHitBox();
             }
         }
 
@@ -184,98 +185,66 @@ public class CollisionDetection {
 
         for (int i = 0; i < target.size(); i++) {
             if (target.get(i) != null) {
-                // get solid area position for both entity and object
-                player.attackArea.x += player.getWorldX();
-                player.attackArea.y += player.getWorldY();
+                // Create a temporary attack area positioned relative to player's current position
+                Rectangle tempAttackArea = new Rectangle(
+                    player.getWorldX() + player.attackArea.x,
+                    player.getWorldY() + player.attackArea.y,
+                    player.attackArea.width,
+                    player.attackArea.height
+                );
 
                 target.get(i).getHitBox().x += target.get(i).getWorldX();
                 target.get(i).getHitBox().y += target.get(i).getWorldY();
-                switch (player.direction) {
-
-                    case "up":
-
-                        player.attackArea.y -= player.getSpeed();
-
-                        if (player.attackArea.intersects(target.get(i).getHitBox())) {
-
-                            player.collisionOn = true;
-                            index = i;
-                        }
-                        break;
-                    case "down":
-                        player.attackArea.y += player.getSpeed();
-                        player.attackArea.y -= 2 * Tile.TILESIZE;
-                        if (player.attackArea.intersects(target.get(i).getHitBox())) {
-
-                            index = i;
-                            player.collisionOn = true;
-
-                        }
-                        break;
-                    case "left":
-                        player.attackArea.x -= player.getSpeed();
-                        if (player.attackArea.intersects(target.get(i).getHitBox())) {
-                            player.collisionOn = true;
-                            index = i;
-                        }
-                        break;
-                    case "right":
-                        player.attackArea.x += player.getSpeed();
-                        player.attackArea.x -= 2 * Tile.TILESIZE;
-                        if (player.attackArea.intersects(target.get(i).getHitBox())) {
-                            player.collisionOn = true;
-                            index = i;
-                        }
-                        break;
+                
+                if (tempAttackArea.intersects(target.get(i).getHitBox())) {
+                    player.collisionOn = true;
+                    index = i;
                 }
-                player.attackArea.x = player.attackAreaDefaultx;
-                player.attackArea.y = player.attackAreaDefaulty;
-                target.get(i).getHitBox().x = target.get(i).hitBoxDefeaultX;
-                target.get(i).getHitBox().y = target.get(i).hitBoxDefeaultY;
+                target.get(i).resetHitBox();
             }
         }
-
         return index;
     }
 
     public void checkPlayer(Entity entity) {
+        Game game = Game.getInstance();
+        if (game == null) return;
+        
+        Player player = game.getPlayer();
+        if (player == null) return;
+        
         // get solid area position for both entity and object
         entity.getHitBox().x += entity.getWorldX();
         entity.getHitBox().y += entity.getWorldY();
 
-        Game.player.getHitBox().x = Game.player.getWorldX() + Game.player.getHitBox().x;
-        Game.player.getHitBox().y = Game.player.getWorldY() + Game.player.getHitBox().y;
-        switch (entity.direction) {
-            case "up":
+        player.getHitBox().x = player.getWorldX() + player.getHitBox().x;
+        player.getHitBox().y = player.getWorldY() + player.getHitBox().y;
+        switch (entity.getDirection()) {
+            case "up" -> entity.getHitBox().y -= entity.getSpeed();
+            case "down" -> entity.getHitBox().y += entity.getSpeed();
+            case "left" -> entity.getHitBox().x -= entity.getSpeed();
+            case "right" -> entity.getHitBox().x += entity.getSpeed();
+            case "up-right" -> {
                 entity.getHitBox().y -= entity.getSpeed();
-                if (entity.getHitBox().intersects(Game.player.getHitBox())) {
-                    entity.collisionOn = true;
-
-                }
-                break;
-            case "down":
-                entity.getHitBox().y += entity.getSpeed();
-                if (entity.getHitBox().intersects(Game.player.getHitBox())) {
-                    entity.collisionOn = true;
-
-                }
-                break;
-            case "left":
-                entity.getHitBox().x -= entity.getSpeed();
-                if (entity.getHitBox().intersects(Game.player.getHitBox())) {
-                    entity.collisionOn = true;
-                }
-                break;
-            case "right":
                 entity.getHitBox().x += entity.getSpeed();
-                if (entity.getHitBox().intersects(Game.player.getHitBox())) {
-                    entity.collisionOn = true;
-
-                }
-                break;
+            }
+            case "up-left" -> {
+                entity.getHitBox().y -= entity.getSpeed();
+                entity.getHitBox().x -= entity.getSpeed();
+            }
+            case "down-right" -> {
+                entity.getHitBox().y += entity.getSpeed();
+                entity.getHitBox().x += entity.getSpeed();
+            }
+            case "down-left" -> {
+                entity.getHitBox().y += entity.getSpeed();
+                entity.getHitBox().x -= entity.getSpeed();
+            }
         }
-        entity.getHitBox().x = entity.hitBoxDefeaultX;
-        Game.player.getHitBox().x = Game.player.hitBoxDefeaultX;
-        Game.player.getHitBox().y = Game.player.hitBoxDefeaultY;
+        if (entity.getHitBox().intersects(player.getHitBox()))
+            entity.collisionOn = true;
+        
+        entity.resetHitBox();
+        player.resetHitBox();
     }
 }

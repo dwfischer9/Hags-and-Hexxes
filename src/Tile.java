@@ -3,7 +3,7 @@ import java.awt.image.BufferedImage;
 
 public class Tile {
 
-    public static final int ORIGINALTILESIZE = 16;// 16x16 tiles
+    private static final int ORIGINALTILESIZE = 16;// 16x16 tiles
     protected final static int TILESIZE = Tile.ORIGINALTILESIZE * Window.SCALING;
     private BufferedImage image;
     private boolean collision = false;

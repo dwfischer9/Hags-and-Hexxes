@@ -1,145 +1,265 @@
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Game implements Runnable {
-
-    static ArrayList<Entity> monster = new ArrayList<Entity>();
-
-    static ArrayList<Entity> npc = new ArrayList<Entity>();
-    public static HashMap<String, Item> items = new HashMap<String, Item>();
-    public static Player player;
-    public static Window window;
-    public static KeyHandler keyH;
-    private static Game game;
-    private static final int FPS = 60;
+    // Game state constants
     public final static int STARTSTATE = 0;
     public final static int PLAYSTATE = 1;
     public final static int MENUSTATE = 2;
     public final static int PAUSESTATE = 3;
     public final static int DIALOGUESTATE = 4;
     public final static int GAMEOVERSTATE = 5;
-    private static int gameState;
-    public Thread gameThread;
+    
+    // Game loop constants
+    private static final int FPS = 60;
+    private static final int MILLISECONDS_PER_FRAME = 1000 / FPS;
+    private static final int SHUTDOWN_TIMEOUT_SECONDS = 60;
+    
+    // Game state management
+    private static Game instance;
+    private int gameState;
+    
+    // Game entities and components - now instance-based
+    private final ArrayList<Entity> monsters = new ArrayList<>();
+    private final ArrayList<Entity> npcs = new ArrayList<>();
+    private final HashMap<String, Item> items = new HashMap<>();
+    private Player player;
+    private Window window;
+    private KeyHandler keyH;
+    private ScheduledExecutorService scheduler;
+    private DialogueSystem dialogueSystem;
 
-    public Game() {
-    }
+    public Game() {}
 
     public static void main(String[] args) throws IOException {
-        player = new Player("player", 1,
-                10, 10);
-        keyH = new KeyHandler();
-        window = new Window();
+        try {
+            instance = new Game();
+            instance.initializeGame();
+            instance.setupGame();
+        } catch (Exception e) {
+            System.err.println("Failed to start game: " + e.getMessage());
+            System.err.println("Stack trace: " + e);
+            System.exit(1);
+        }
+    }
+    
 
-        game = new Game();
-        game.setupGame();
+    
+    /**
+     * Initializes the core game components
+     */
+    private void initializeGame() {
+        player = new Player("player", 1, 10);
+        keyH = new KeyHandler();
+        window = new Window(this);
+        dialogueSystem = new DialogueSystem(this);
     }
 
     private void setupGame() {
-        Window.setupFrame(window);
-        gameState = STARTSTATE;
-        startGameThread();
-        AssetSetter assetSetter = new AssetSetter();
-        player.setDefaultValues();
-        assetSetter.setObject();
-        assetSetter.setNPC();
-        assetSetter.setPlayer();
-
-    }
-
-    /**
-     * Initiates the game thread. Called in Game's main method
-     */
-    public void startGameThread() {
-
-        gameThread = new Thread(this);
-        gameThread.start();
-        System.out.println("Started game thread");
-    }
-
-    /**
-     * update Player, NPC & Monster entities. Only called during PLAYSTATE
-     */
-    public void update() {
-        if (gameState == PLAYSTATE) {
-            for (int i = 0; i < npc.size(); i++) {
-                if (npc.get(i) != null) {
-                    if (npc.get(i).getHealth() == 0) {
-                        npc.get(i).dropItems();
-                        System.out.println(npc.get(i).getName() + " has been defeated!");
-                        npc.remove(i); // nulling the entity effectively 'kills' it
-                    } else {
-                        npc.get(i).update();
-                    }
-                }
-            }
-            for (int i = 0; i < monster.size(); i++) {
-                if (monster.get(i) != null) {
-                    if (monster.get(i).getHealth() == 0) {
-                        monster.get(i).dropItems();
-                        System.out.println(monster.get(i).getName() + " has been defeated!");
-                        monster.remove(i);
-                    } else {
-                        monster.get(i).update();
-                    }
-                }
-            }
-            player.update(keyH);
+        try {
+            Window.setupFrame(window);
+            setGameState(STARTSTATE);
+            startGameScheduler();
+            
+            AssetSetter assetSetter = new AssetSetter(this);
+            player.setDefaultValues();
+            assetSetter.readItems();
+            assetSetter.setObject();
+            assetSetter.setNPC();
+            assetSetter.setPlayer();
+        } catch (Exception e) {
+            System.err.println("Failed to setup game: " + e.getMessage());
+            System.err.println("Stack trace: " + e);
+            stopScheduler();
+            System.exit(1);
         }
     }
 
     /**
-     * This is the method that controls the game loop.
+     * Starts the scheduled task to run the game loop at a fixed rate.
+     */
+    private void startGameScheduler() {
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(this, 0, MILLISECONDS_PER_FRAME, TimeUnit.MILLISECONDS);
+        if (window != null && window.getGui() != null) {
+            window.getGui().printDebug("Started game scheduler");
+        }
+    }
+
+    public void update() {
+        if (npcs != null) {
+            updateEntities(npcs);   // Update NPCs
+        }
+        if (monsters != null) {
+            updateEntities(monsters); // Update Monsters
+        }
+        if (player != null && keyH != null) {
+            player.update(keyH);    // Update Player
+        }
+        
+        // Update UI
+        if (window != null && window.getGui() != null) {
+            window.getGui().update();
+        }
+    }
+
+    private void updateEntities(List<Entity> entities) {
+        if (entities == null) {
+            return;
+        }
+        
+        Iterator<Entity> iterator = entities.iterator();
+        while (iterator.hasNext()) {
+            Entity entity = iterator.next();
+            if (entity != null) {
+                if (entity.getHealth() <= 0) {
+                    entity.dropItems();
+                    System.out.println(entity.getName() + " has been defeated!");
+                    if (window != null && window.getGui() != null) {
+                        window.getGui().printDebug(entity.getName() + " has been defeated!");
+                    }
+                    iterator.remove(); // Safe removal of the entity
+                } else {
+                    entity.update(); // Update the entity if still alive
+                }
+            }
+        }
+    }
+
+    /**
+     * This method controls the game loop and is executed periodically by the scheduler.
      */
     @Override
     public void run() {
-        final double drawInterval = 1000000000 / FPS; // 0.01666 seconds
-        double nextDrawTime = System.nanoTime() + drawInterval;
-        while (gameThread != null) {
-            window.repaint();
-            switch (gameState) {
-                case PLAYSTATE:
-                    update(); // While the game is not paused, update all entities, items, etc.
-                    break;
-                case DIALOGUESTATE:
-                    Entity curr = player.currentInteraction;
-                    if (keyH.ePressed) {
-                        keyH.ePressed = false;
-                        if (curr.dialogues[curr.dialogueCounter] != null) {
-                            window.ui.currentDialogue = curr.dialogues[curr.dialogueCounter++];
-                        } else {
-                            gameState = PLAYSTATE;
-                        }
+        try {
+            if (window != null) {
+                window.repaint();
+            }
+
+            switch (getGameState()) {
+                case PLAYSTATE -> update(); // Update entities, items, etc.
+
+                case DIALOGUESTATE -> handleDialogueState();
+
+                case MENUSTATE -> {
+                    if (keyH != null && keyH.isPressed("MENU")) {
+                        setGameState(PLAYSTATE); // Exit to PLAYSTATE from MENUSTATE
                     }
-                case MENUSTATE:
-                    if (keyH.escapePressed)
-                        gameState = PLAYSTATE;
+                }
             }
-
-            try {
-                double remainingTime = nextDrawTime - System.nanoTime();
-                remainingTime /= 1000000;
-                if (remainingTime < 0) // we don't need a sleep if the time is used up
-                    remainingTime = 0;
-
-                Thread.sleep((long) remainingTime);
-                nextDrawTime += drawInterval;
-                // pause the game loop so that we only draw 60 times per second
-            } catch (final InterruptedException e) {
-                e.printStackTrace();
-                System.err.println("Something went wrong when drawing the timer.");
-            }
+        } catch (Exception e) {
+            System.err.println("Error in game loop: " + e.getMessage());
+            System.err.println("Stack trace: " + e);
         }
-
+    }
+    
+    /**
+     * Handles the dialogue state logic
+     */
+    private void handleDialogueState() {
+        if (dialogueSystem != null) {
+            dialogueSystem.update();
+            dialogueSystem.handleKeyInput(keyH);
+            
+            if (!dialogueSystem.isActive()) {
+                setGameState(PLAYSTATE);
+            }
+        } else {
+            setGameState(PLAYSTATE);
+        }
     }
 
-    public static int getGameState() {
+ 
+    
+    public void addMonster(Entity monster) {
+        if (monsters != null) {
+            monsters.add(monster);
+        }
+    }
+    
+    public void addNpc(Entity npc) {
+        if (npcs != null) {
+            npcs.add(npc);
+        }
+    }
+    
+    public void addItem(String key, Item item) {
+        if (items != null) {
+            items.put(key, item);
+        }
+    }
+    
+    public DialogueSystem getDialogueSystem() {
+        return dialogueSystem;
+    }
+
+    /**
+     * Shuts down the scheduler gracefully when the game ends.
+     */
+    public void stopScheduler() {
+        if (scheduler != null && !scheduler.isShutdown()) {
+            scheduler.shutdown();
+            try {
+                if (!scheduler.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                    scheduler.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                scheduler.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+    
+    /**
+     * Cleanup method to be called when the game is shutting down
+     */
+    public static void cleanup() {
+        if (instance != null) {
+            instance.stopScheduler();
+        }
+    }
+        // Get the singleton instance of the game
+     
+    public static Game getInstance() {
+        return instance;
+    }
+       // Getters and setters for game state
+       public int getGameState() {
         return gameState;
     }
 
-    public static void setGameState(int gameState) {
-        Game.gameState = gameState;
+    public void setGameState(int gs) {
+        gameState = gs;
     }
-
+    
+    // Getters for game components
+    public Player getPlayer() {
+        return player;
+    }
+    
+    public Window getWindow() {
+        return window;
+    }
+    
+    public KeyHandler getKeyHandler() {
+        return keyH;
+    }
+    
+    public ArrayList<Entity> getMonsters() {
+        return monsters;
+    }
+    
+    public ArrayList<Entity> getNpcs() {
+        return npcs;
+    }
+    
+    public HashMap<String, Item> getItems() {
+        return items;
+    }
 }
